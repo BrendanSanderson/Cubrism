@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>image</key>
+		<string>dragonBoss</string>
+		<key>name</key>
+		<string>dragon</string>
+		<key>size</key>
+		<integer>100</integer>
+		<key>position</key>
+		<string>wall</string>
+	</dict>
+	<dict>
+		<key>image</key>
+		<string>generatorBoss</string>
+		<key>name</key>
+		<string>generator</string>
+		<key>size</key>
+		<integer>100</integer>
+		<key>position</key>
+		<string>center</string>
+	</dict>
+	<dict>
+		<key>image</key>
+		<string>golemBoss</string>
+		<key>name</key>
+		<string>golem</string>
+		<key>size</key>
+		<integer>100</integer>
+		<key>position</key>
+		<string>center</string>
+	</dict>
+</array>
+</plist>

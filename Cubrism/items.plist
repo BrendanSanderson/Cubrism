@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Coin</key>
+	<dict>
+		<key>ID</key>
+		<integer>0</integer>
+		<key>Type</key>
+		<string>Currency</string>
+		<key>Stackable</key>
+		<true/>
+	</dict>
+	<key>Common Equipment Shard</key>
+	<dict>
+		<key>ID</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Currency</string>
+		<key>Stackable</key>
+		<false/>
+	</dict>
+	<key>Uncommon Equipment Shard</key>
+	<dict>
+		<key>ID</key>
+		<integer>2</integer>
+		<key>Type</key>
+		<string>Currency</string>
+		<key>Stackable</key>
+		<false/>
+	</dict>
+	<key>Rare Equipment Shard</key>
+	<dict>
+		<key>ID</key>
+		<integer>3</integer>
+		<key>Type</key>
+		<string>Currency</string>
+		<key>Stackable</key>
+		<false/>
+	</dict>
+	<key>Legendary Equipment Shard</key>
+	<dict>
+		<key>ID</key>
+		<string>4</string>
+		<key>Type</key>
+		<string>Currency</string>
+		<key>Stackable</key>
+		<false/>
+	</dict>
+</dict>
+</plist>
