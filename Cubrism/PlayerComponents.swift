@@ -145,7 +145,8 @@ class ExpBarComponent: GKComponent {
     let expNode = SKNode()
     var expCropSprite: SKSpriteNode!
     var expBackgroundSprite: SKSpriteNode!
-    var levelLabel:UILabel!
+    //var levelLabel:UILabel!
+    var levelLabel: SKLabelNode!
     init(scene: GameScene) {
         let totalHeight = scene.size.height * 0.04
         expBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSizeMake(CGFloat(scene.size.width * 0.25), totalHeight))
@@ -158,13 +159,16 @@ class ExpBarComponent: GKComponent {
         expCropSprite.anchorPoint = CGPoint(x:0,y:0)
         scene.addChild(expNode)
         self.scene = scene
-        
-        levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: scene.size.height * 0.025), size: CGSize(width: scene.frame.width * 0.045, height: scene.frame.height * 0.05)))
-        levelLabel.font = UIFont(name: "Copperplate-Bold", size: 24)
-        levelLabel.textColor = UIColor.whiteColor()
-        levelLabel.text = String(format: "%i", Player.level)
-        levelLabel.textAlignment = .Right
-        scene.view!.addSubview(levelLabel)
+        levelLabel = SKLabelNode(text: String(format: "%i", Player.level))
+//        levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: scene.size.height * 0.025), size: CGSize(width: scene.frame.width * 0.045, height: scene.frame.height * 0.05)))
+        levelLabel.fontName = "Copperplate-Bold"
+        levelLabel.fontSize = 28
+        levelLabel.fontColor = UIColor.whiteColor()
+        levelLabel.horizontalAlignmentMode = .Right
+        levelLabel.verticalAlignmentMode = .Center
+        levelLabel.position = CGPoint(x: scene.frame.width * 0.045, y: scene.frame.height * 0.95)
+        scene.addChild(levelLabel)
+        //scene.view!.addSubview(levelLabel)
         super.init()
         self.updateBars(Player.exp)
     }

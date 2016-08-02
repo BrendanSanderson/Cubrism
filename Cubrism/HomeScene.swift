@@ -26,7 +26,8 @@ class HomeScene: GameScene {
     
     override func willMoveFromView(view: SKView) {
         self.removeAllChildren()
-        for (var i = (self.view!.subviews.count) - 1; i >= 0; i -= 1) {
+        for i in (0 ..< self.view!.subviews.count).reverse()
+        {
             if ((self.view!.subviews[i].isKindOfClass(UILabel)) == true)
             {
                 self.view!.subviews[i].removeFromSuperview()
@@ -77,6 +78,7 @@ class HomeScene: GameScene {
     func addVendors()
     {
         let _ = VendorEntity(s: self, t: "bank")
+        let _ = VendorEntity(s: self, t: "shop")
     }
     override func didBeginContact(contact: SKPhysicsContact) {
         super.didBeginContact(contact)

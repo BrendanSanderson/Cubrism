@@ -58,8 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if NSUserDefaults.standardUserDefaults().objectForKey("Gear") == nil
         {
             let gear : [String : [String : AnyObject]] = ["Power Core": Equipment(t: "Power Core").toDictionary(), "Armor Core": Equipment(t: "Armor Core").toDictionary(), "Pulsar": Equipment(t:"Pulsar").toDictionary(), "Special Pulsar": Equipment(t: "Special Pulsar").toDictionary(), "Shield": Equipment(t: "Shield").toDictionary(), "Attachment 1": Equipment(t: "Attachment").toDictionary(), "Attachment 2": Equipment(t: "Attachment").toDictionary()]
-            var data = NSKeyedArchiver.archivedDataWithRootObject(gear)
-            NSUserDefaults.standardUserDefaults().setObject(gear, forKey: "Gear")
+                NSUserDefaults.standardUserDefaults().setObject(gear, forKey: "Gear")
             NSUserDefaults.standardUserDefaults().synchronize()
         }
         if NSUserDefaults.standardUserDefaults().objectForKey("Inventory") == nil
@@ -73,6 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Player.updateInventory()
         self.window?.rootViewController = view;
         self.window?.makeKeyAndVisible()
+        Constants.updateMerchantInventory()
         return true
     }
 

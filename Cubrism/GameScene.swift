@@ -4,6 +4,8 @@ import SpriteKit
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var time = NSTimeInterval()
     var started = false
+    var vending = false
+    var vender: VendorPopUpNode!
     var doorAccessed = String()
     var world = 1
     override func didMoveToView(view: SKView) {
@@ -72,7 +74,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let touch = touches.first
             let button = nodeAtPoint(touch!.locationInNode(self))
             if  button.name == "pause"{
-                self.addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+                if vending == false
+                {
+                    self.addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+                }
+                else
+                {
+                    self.vender.removeFromParent()
+                    vending = false
+                    Player.saveItems()
+                    Player.updateEquipment()
+                }
             }
         }
     }
@@ -200,7 +212,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         {
             if ((secondBody.node?.isKindOfClass(VendorNode)) == true)
             {
-                (secondBody.node as! VendorNode).entity.act()
+                if vending == false
+                {
+                    (secondBody.node as! VendorNode).entity.act()
+                    vending = true
+                    self.vender = (secondBody.node as! VendorNode).entity.popUp
+                }
             }
         }
         else if (mask1 == Constants.enemyCategory && mask2 == Constants.playerShotCategory)

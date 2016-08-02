@@ -24,7 +24,7 @@ class Constants: NSObject {
     static var h: CGFloat!
     static var uH: CGFloat!
     static var uW: CGFloat!
-    
+    static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
     
     static func enemyMultiplier(level: Int) -> Double{
@@ -34,4 +34,39 @@ class Constants: NSObject {
         return pow((Double(level) + 5)/7 , 1.4)
     }
     
+    static func forTailingZero(temp: Double) -> String{
+        let tempVar = String(format: "%g", temp)
+        return tempVar
+    }
+    static func updateMerchantInventory()
+    {
+        let num = Int(arc4random_uniform(UInt32(5)))
+        merchantInventory.removeAll()
+        merchantInventory.append(Equipment(t: "Power Core", lev: Player.level, tie: 1, st: ""))
+        merchantInventory.append(Equipment(t: "Armor Core", lev: Player.level, tie: 1, st: ""))
+        merchantInventory.append(Equipment(t: "Pulsar", lev: Player.level, tie: 1, st: ""))
+        merchantInventory.append(Equipment(t: "Attachment", lev: Player.level, tie: 1, st: ""))
+        merchantInventory.append(Equipment(t: "Attachment", lev: Player.level, tie: 1, st: ""))
+        merchantInventory.append(Equipment(t: "Shield", lev: Player.level, tie: 1, st: ""))
+        if num == 0
+        {
+            merchantInventory.append(Equipment(t: "Power Core", lev: Player.level, tie: 2, st: ""))
+        }
+        else if num == 1
+        {
+            merchantInventory.append(Equipment(t: "Armor Core", lev: Player.level, tie: 2, st: ""))
+        }
+        else if num == 2
+        {
+            merchantInventory.append(Equipment(t: "Pulsar", lev: Player.level, tie: 2, st: ""))
+        }
+        else if num == 3
+        {
+            merchantInventory.append(Equipment(t: "Attachment", lev: Player.level, tie: 2, st: ""))
+        }
+        else
+        {
+            merchantInventory.append(Equipment(t: "Shield", lev: Player.level, tie: 2, st: ""))
+        }
+    }
 }

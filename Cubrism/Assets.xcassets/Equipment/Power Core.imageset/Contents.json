@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "ArmorCoret1x3.png",
+      "filename" : "Energy Core-2.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "ArmorCoret1x3-1.png",
+      "filename" : "Energy Core-1.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "ArmorCoret1x3-2.png",
+      "filename" : "Energy Core.png",
       "scale" : "3x"
     }
   ],

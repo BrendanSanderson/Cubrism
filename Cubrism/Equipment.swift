@@ -17,25 +17,40 @@ class Equipment: Item {
     var health = 0.0
     var level = 1
     var tier = 1
-    var subType = "String"
+    var price = 0
+    var subType = ""
     
-    init(t: String, lev: Int, tie: Int)
+    init(t: String, lev: Int, tie: Int, st: String)
     {
         super.init(t: t)
         level = lev
         tier = tie
+        subType = st
+        if tier == 0
+        {
+            tier = 1
+        }
+        if t == "Power   Core"
+        {
+            type = "Power Core"
+        }
+        price = level * tier * 3
         self.setStats()
     }
+//    convenience init(t: String, lev: Int, tie: Int)
+//    {
+//        self.init(t: t, lev: 1, tie: 1, st: "")
+//    }
     convenience override init(t: String)
     {
-        self.init(t: t, lev: 1, tie: 0)
+        self.init(t: t, lev: 1, tie: 1, st: "")
     }
     
     convenience init (tie: Int, lev: Int)
     {
         let num = Int(arc4random_uniform(UInt32(Constants.itemType.count)))
         let type = Constants.itemType[num]
-        self.init(t: type, lev: lev, tie: tie)
+        self.init(t: type, lev: lev, tie: tie, st: "")
     }
     func setStats()
     {
@@ -45,8 +60,6 @@ class Equipment: Item {
         {
             multip = 0.75 + (0.25 * Double(tier))
         }
-        
-        
         
         
 //        
@@ -65,34 +78,76 @@ class Equipment: Item {
 //            }
 //        }
         
-        if (type == "Power Core" || type == "Pulsar" || type == "Attachment 1" || type == "Attachment 2")
+        
+        if type == "Shield"
         {
-            self.attackPower = ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.shieldRegen = 10 * ((multip * Double(level))/75) * (Player.playerMultiplier(level, mult: 1.2) - Player.playerMultiplier(level, mult: 1.1))
         }
-        if (type == "Power Core" || type == "Pulsar" || type == "Attachment 1" || type == "Attachment 2")
+        else if type == "Power Core"
         {
+            self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            
+            self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+        }
+        else if type == "Pulsar"
+        {
+            self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
             self.attackSpeed = Double(tier * level/10)
         }
-        if (type == "Power Core" || type == "Shield" || type == "Attachment 1" || type == "Attachment 2")
+            
+        else if type == "Armor Core"
         {
-            self.defence = ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            
         }
-        if (type == "Power Core" || type == "Shield" || type == "Attachment 1" || type == "Attachment 2")
+        else if type == "Attachment"
         {
-            self.shield = ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
-        }
-        if (type == "Power Core" || type == "Shield" || type == "Attachment 1" || type == "Attachment 2")
-        {
-            self.shieldRegen = ((multip * Double(level))/75) * (Player.playerMultiplier(level, mult: 1.2) - Player.playerMultiplier(level, mult: 1.1))
-        }
-        if (type == "Power Core" || type == "Armor Core" || type == "Attachment 1" || type == "Attachment 2")
-        {
-            self.health = ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            if subType == ""
+            {
+                let num = Int(arc4random_uniform(UInt32(4)))
+                if num == 0
+                {
+                    self.subType = "AttackPower"
+                }
+                else if num == 1
+                {
+                    self.subType = "Defence"
+                }
+                else if num == 2
+                {
+                    self.subType = "Shield"
+                }
+                else
+                {
+                    self.subType = "Health"
+                }
+            }
+            if subType == "AttackPower"
+            {
+                self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+                self.attackSpeed = Double(tier * level/10)
+            }
+            else if subType == "Defence"
+            {
+                self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+                
+            }
+            else if subType == "Shield"
+            {
+                self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            }
+            else if subType == "Health"
+            {
+                self.health = 1 + 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            }
         }
         
+        
     }
-    
-    
     override init(coder aDecoder: NSCoder!) {
         super.init(coder: aDecoder)
         self.level = aDecoder.decodeObjectForKey("level") as! Int
@@ -112,11 +167,18 @@ class Equipment: Item {
         var dic = super.toDictionary()
         dic["level"] = level
         dic["tier"] = tier
+        dic["subType"] = subType
         return dic
     }
     convenience init(dic: [String: AnyObject])
     {
-        self.init(t: (dic["type"] as? String)!, lev: (dic["level"] as? Int)!, tie: (dic["tier"] as? Int)!)
+        var tSubType = ""
+        if dic["subType"] != nil
+        {
+            tSubType = (dic["subType"] as? String)!
+        }
+        NSLog(tSubType)
+        self.init(t: (dic["type"] as? String)!, lev: (dic["level"] as? Int)!, tie: (dic["tier"] as? Int)!, st: tSubType)
     }
 
 }

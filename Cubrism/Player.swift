@@ -84,7 +84,8 @@ class Player: NSObject {
         for i in 0 ..< inventoryDict.count
         {
             var dic = inventoryDict[i]
-            if dic["tier"] == nil
+            
+            if dic["tier"] != nil
             {
                 inventory.append(Equipment(dic: dic))
             }
@@ -179,7 +180,7 @@ class Player: NSObject {
             exp -= expToLevel(level)
             level += 1
         }
-        
+        Constants.updateMerchantInventory()
         NSUserDefaults.standardUserDefaults().setObject(level, forKey: "Level")
         NSUserDefaults.standardUserDefaults().setObject(exp, forKey: "Experience")
         NSUserDefaults.standardUserDefaults().setObject(totalExp, forKey: "TotalExperience")
@@ -210,19 +211,66 @@ class Player: NSObject {
     static func playerMultiplier(level: Int, mult: Double) -> Double{
         return pow((Double(level) + 4)/5, mult)
     }
+    static func addDrop (item: Item)
+    {
+        var arr = [Item]()
+        arr.append(item)
+        addDrops(arr)
+    }
     static func addDrops(items: [Item])
     {
         for i in 0 ..< items.count
         {
+            
             if (items[i].isKindOfClass(Equipment) == true)
             {
                 inventory.append((items[i] as? Equipment)!)
-                inventoryDict.append((items[i] as? Equipment)!.toDictionary())
+            }
+            else if items[i].stackable == false
+            {
+                inventory.append(items[i])
+            }
+            else
+            {
+                var num = -1
+                for j in 0 ..< inventory.count
+                {
+                    if inventory[j].type == items[i].type
+                    {
+                        num = j
+                    }
+                }
+                if num == -1
+                {
+                    inventory.append(items[i])
+                }
+                else
+                {
+                    inventory[num].quantity += items[i].quantity
+                }
+                
             }
         }
+        
+        Player.saveItems()
+        
+        
+        self.updateEquipment()
+    }
+    
+    static func saveItems()
+    {
+        Player.inventoryDict.removeAll()
+        for i in 0 ..< Player.inventory.count
+        {
+            Player.inventoryDict.append(Player.inventory[i].toDictionary())
+        }
+        
+        Player.gearDict = ["Power Core": gear["Power Core"]!.toDictionary(), "Armor Core": gear["Armor Core"]!.toDictionary(), "Pulsar" : gear["Pulsar"]!.toDictionary(), "Special Pulsar" : gear["Special Pulsar"]!.toDictionary(), "Shield" : gear["Shield"]!.toDictionary(), "Attachment 1" : gear["Attachment 1"]!.toDictionary(), "Attachment 2" : gear["Attachment 2"]!.toDictionary()]
+        NSUserDefaults.standardUserDefaults().setObject(gearDict, forKey:
+            "Gear")
         NSUserDefaults.standardUserDefaults().setObject(inventoryDict, forKey:
             "Inventory")
         NSUserDefaults.standardUserDefaults().synchronize()
-        self.updateEquipment()
     }
 }

@@ -69,6 +69,18 @@ class CompletedViewController: UIViewController {
         equipmentLabel.textAlignment = .Center
         view.addSubview(equipmentLabel)
         
+        let equipment1tier = UIImageView(frame: CGRect(x: view.frame.width * 0.5 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
+        equipment1tier.image = UIImage(named: "noEquipment")
+        view.addSubview(equipment1tier)
+        
+        let equipment2tier = UIImageView(frame: CGRect(x: view.frame.width * 0.4 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
+        equipment2tier.image = UIImage(named: "noEquipment")
+        view.addSubview(equipment2tier)
+        
+        let equipment3tier = UIImageView(frame: CGRect(x: view.frame.width * 0.6 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
+        equipment3tier.image = UIImage(named: "noEquipment")
+        view.addSubview(equipment3tier)
+        
         let equipment1 = UIImageView(frame: CGRect(x: view.frame.width * 0.5 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
         equipment1.image = UIImage(named: "noEquipment")
         view.addSubview(equipment1)
@@ -81,17 +93,35 @@ class CompletedViewController: UIViewController {
         equipment3.image = UIImage(named: "noEquipment")
         view.addSubview(equipment3)
         
+        
+        
         let numDrops = drops.count
         if (numDrops > 0)
         {
+            if drops[0].isKindOfClass(Equipment)
+            {
+                equipment1tier.image = UIImage (named: "tier\((drops[0] as! Equipment).tier)")
+                if (drops[0] as! Equipment).tier == 0
+                {
+                    equipment1tier.image = UIImage (named: "tier1")
+                }
+            }
             equipment1.image = UIImage(named: drops[0].type)
         }
         if (numDrops > 1)
         {
+            if drops[1].isKindOfClass(Equipment)
+            {
+                equipment2tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
+            }
             equipment2.image = UIImage(named: drops[1].type)
         }
         if (numDrops > 2)
         {
+            if drops[1].isKindOfClass(Equipment)
+            {
+                equipment3tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
+            }
             equipment2.image = UIImage(named: drops[2].type)
         }
         

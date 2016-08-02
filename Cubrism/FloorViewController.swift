@@ -289,11 +289,13 @@ class FloorViewController: UIViewController {
     func getDrops() -> [Item]
     {
         var d = [Item]()
-        let coins = Int(arc4random_uniform(UInt32((level * 10))))
-        d.append(Item(t: "Coin", q: coins))
+        let cubrixels = Int(arc4random_uniform(UInt32((level * 10))))
+        d.append(Item(t: "Cubrixel", q: cubrixels, s: true))
         
         let pt1 = 50 - level
         let pt2 = 50 + level
+        let pt3 = level
+        let pt4 = Int(Double(level) / 2.0)
         let num = Int(arc4random_uniform(UInt32(100)))
         if num <= (pt1)
         {
@@ -303,8 +305,15 @@ class FloorViewController: UIViewController {
         {
             d.append(Equipment(tie: 2, lev: level))
         }
-        
-        
+        let num2 = Int(arc4random_uniform(UInt32(100)))
+        if num2 <= (pt3)
+        {
+            d.append(Equipment(tie: 3, lev: level))
+        }
+        else if (num2 <= pt3 + pt4)
+        {
+            d.append(Equipment(tie: 4, lev: level))
+        }
         return d
     }
     

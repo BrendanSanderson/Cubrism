@@ -14,6 +14,7 @@ class VendorEntity: GKEntity {
     var type: String!
     var sprite: VendorNode!
     let node = SKNode()
+    var popUp: VendorPopUpNode!
     init(s: GameScene, t: String)
     {
         super.init()
@@ -32,6 +33,14 @@ class VendorEntity: GKEntity {
     }
     func act()
     {
-        scene.addChild(VendorPopUpNode(scene:scene, text: "", button1Text: "", button2Text: ""))
+        if type == "bank"
+        {
+            self.popUp = BankPopUpNode(scene:scene)
+        }
+        else if type == "shop"
+        {
+            self.popUp = ShopPopUpNode(scene: scene)
+        }
+        scene.addChild(self.popUp)
     }
 }

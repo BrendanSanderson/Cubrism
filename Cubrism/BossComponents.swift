@@ -357,7 +357,7 @@ class BossDragonBreatheComponent: ActionComponent {
     {
         let node = ShotNode()
         node.bossShooter = shooter
-        node.type = "GolemRock"
+        node.type = "DragonBreathe"
         let sprite = SKSpriteNode(imageNamed: String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         node.zPosition = shooter.node.zPosition - 1
@@ -412,8 +412,10 @@ class BossDragonBreatheComponent: ActionComponent {
             moveTo.y = (CGFloat(arc4random()) % scene.size.height * 0.9) + scene.size.height * 0.05
         }
         let action = SKAction.sequence([SKAction.moveTo(moveTo, duration: 0.5), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action1 = SKAction.sequence([SKAction.waitForDuration(0.75), SKAction.removeFromParent()])
         
         sprite.runAction(action)
+        sprite.parent?.runAction(action1)
         shots += 1
     }
     

@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "shieldt2x3.png",
+      "filename" : "shield-2.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "shieldt2x3-1.png",
+      "filename" : "shield-1.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "shieldt2x3-2.png",
+      "filename" : "shield.png",
       "scale" : "3x"
     }
   ],
