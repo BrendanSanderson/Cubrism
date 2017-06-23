@@ -13,7 +13,7 @@ class ProgressBar: SKCropNode {
     override init () {
         super.init()
         
-        self.maskNode = SKSpriteNode(color: UIColor.redColor(), size: CGSizeMake(300,10))
+        self.maskNode = SKSpriteNode(color: UIColor.red, size: CGSize(width: 300,height: 10))
         
        // sprite = SKSpriteNode(color: UIColor.whiteColor(), size: CGSizeMake(300,10))
         //setProgress(0.3)
@@ -21,8 +21,8 @@ class ProgressBar: SKCropNode {
     }
     init (color: UIColor) {
         super.init()
-        self.maskNode = SKSpriteNode(color:color, size: CGSizeMake(150,10))
-        sprite = SKSpriteNode(color: UIColor.whiteColor(), size: CGSizeMake(150,10))
+        self.maskNode = SKSpriteNode(color:color, size: CGSize(width: 150,height: 10))
+        sprite = SKSpriteNode(color: UIColor.white, size: CGSize(width: 150,height: 10))
         setProgress(0.3)
         self.addChild(sprite)
     }
@@ -31,7 +31,7 @@ class ProgressBar: SKCropNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setProgress (progress: CGFloat) {
+    func setProgress (_ progress: CGFloat) {
     self.maskNode!.xScale = progress
     }
 

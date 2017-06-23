@@ -25,11 +25,15 @@ class VendorEntity: GKEntity {
         node.addChild(sprite)
         self.addComponent(VisualComponent(scene: scene, sprite: sprite))
         self.sprite.physicsBody?.categoryBitMask = Constants.wallCategory
-        self.sprite.physicsBody?.dynamic = false
+        self.sprite.physicsBody?.isDynamic = false
         self.sprite.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.playerCategory
         self.sprite.physicsBody?.collisionBitMask = Constants.playerShotCategory | Constants.playerCategory
         scene.addChild(node)
         
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     func act()
     {

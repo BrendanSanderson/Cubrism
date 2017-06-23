@@ -2,24 +2,24 @@
 import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    var time = NSTimeInterval()
+    var time = TimeInterval()
     var started = false
     var vending = false
     var vender: VendorPopUpNode!
     var doorAccessed = String()
     var world = 1
-    override func didMoveToView(view: SKView) {
-        self.scaleMode = .ResizeFill
-        view.multipleTouchEnabled = true
-        self.view!.multipleTouchEnabled = true
+    override func didMove(to view: SKView) {
+        self.scaleMode = .resizeFill
+        view.isMultipleTouchEnabled = true
+        self.view!.isMultipleTouchEnabled = true
         self.scene!.backgroundColor = UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 1)
-        self.scene!.backgroundColor = UIColor.clearColor()
+        self.scene!.backgroundColor = UIColor.clear
         createGrid()
         self.physicsWorld.contactDelegate = self
-        super.didMoveToView(view)
+        super.didMove(to: view)
         
     }
-    override func update(currentTime: NSTimeInterval) {
+    override func update(_ currentTime: TimeInterval) {
         time = currentTime
     }
     func createGrid()
@@ -38,9 +38,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sn.zPosition = -25
         if world >= 1
         {
-            frame.fillColor = UIColor.whiteColor()
+            frame.fillColor = UIColor.white
             frame.fillTexture = SKTexture(imageNamed: String(format: "backgroundInner%i", world))
-            frame.strokeColor = UIColor.blackColor()
+            frame.strokeColor = UIColor.black
             frame.glowWidth = 0
             sn.texture = SKTexture(imageNamed: String(format: "background%i", world))
         }
@@ -51,13 +51,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             frame.glowWidth = 5
         }
         self.addChild(frame)
-        self.physicsBody = SKPhysicsBody(edgeLoopFromRect: gameFrame)
+        self.physicsBody = SKPhysicsBody(edgeLoopFrom: gameFrame)
         self.physicsBody?.categoryBitMask = Constants.wallCategory
         self.physicsBody?.collisionBitMask = Constants.playerShotCategory | Constants.playerCategory | Constants.enemyCategory | Constants.enemyShotCategory
         self.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.enemyShotCategory
         
         sn.size = CGSize(width: self.size.width, height: self.size.height)
-        sn.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
+        sn.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         self.addChild(sn)
         
         
@@ -68,11 +68,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
     }
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if (self.paused == false)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if (self.isPaused == false)
         {
             let touch = touches.first
-            let button = nodeAtPoint(touch!.locationInNode(self))
+            let button = atPoint(touch!.location(in: self))
             if  button.name == "pause"{
                 if vending == false
                 {
@@ -94,7 +94,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     
-    func didBeginContact(contact: SKPhysicsContact) {
+    func didBegin(_ contact: SKPhysicsContact) {
         var firstBody = contact.bodyB
         var secondBody = contact.bodyA
         
@@ -109,21 +109,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (mask1 == Constants.playerCategory && mask2 == Constants.teleporterCategory)
         {
             NSLog("teleporting")
-            if (self.isKindOfClass(HomeScene) == true)
+            if (self.isKind(of: HomeScene.self) == true)
             {
                 while (((self.view?.presentScene(nil)) == nil))
                 {
                 
                 }
                 //NSNotificationCenter.defaultCenter().postNotificationName("GoToFloorViewController", object: self)
-                NSNotificationCenter.defaultCenter().postNotificationName("GoToLevelSelectCollectionViewController", object: self)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelSelectCollectionViewController"), object: self)
                 
             }
-            else if (self.isKindOfClass(RoomScene) == true)
+            else if (self.isKind(of: RoomScene.self) == true)
             {
                 self.physicsWorld.contactDelegate = nil
                 //self.addChild(PopUpNode(scene: self, text: "You Won!", button1Text: "Retry", button2Text: "Leave"))
-                NSNotificationCenter.defaultCenter().postNotificationName("GoToCompletedViewController", object: self)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToCompletedViewController"), object: self)
                 
             }
         }
@@ -193,15 +193,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             {
             secondBody.node?.physicsBody?.contactTestBitMask = Constants.playerShotCategory
             let node = secondBody.node?.parent as! EnemyNode 
-            if (node.entity.type == "Suicide" || node.entity.type == "DragonFireball")
+            if (node.Entity.type == "Suicide" || node.Entity.type == "DragonFireball")
             {
-                Player.damagePlayer(Double(node.entity.meleeAttackPower))
+                Player.damagePlayer(Double(node.Entity.meleeAttackPower))
                 Player.entity.lastHit = time
-                node.entity.damageEnemy(node.entity.currentHealth)
+                node.Entity.damageEnemy(node.Entity.currentHealth)
             }
             else if(Player.entity.lastHit + 0.5 <= time)
             {
-                Player.damagePlayer(Double(node.entity.meleeAttackPower))
+                Player.damagePlayer(Double(node.Entity.meleeAttackPower))
                 Player.entity.lastHit = time
             }
             secondBody.node?.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.playerCategory
@@ -210,13 +210,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         else if (mask1 == Constants.playerCategory && mask2 == Constants.wallCategory)
         {
-            if ((secondBody.node?.isKindOfClass(VendorNode)) == true)
+            if ((secondBody.node?.isKind(of: VendorNode.self)) == true)
             {
                 if vending == false
                 {
-                    (secondBody.node as! VendorNode).entity.act()
+                    (secondBody.node as! VendorNode).Entity.act()
                     vending = true
-                    self.vender = (secondBody.node as! VendorNode).entity.popUp
+                    self.vender = (secondBody.node as! VendorNode).Entity.popUp
                 }
             }
         }
@@ -225,7 +225,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if firstBody.node != nil && firstBody.node?.parent != nil
             {
                 let node = firstBody.node?.parent as! EnemyNode
-                node.entity.damageEnemy(Int(Player.attackPower))
+                node.Entity.damageEnemy(Int(Player.attackPower))
                 
             }
             secondBody.node?.parent!.removeFromParent()
@@ -236,7 +236,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         else if (mask1 == Constants.bossCategory && mask2 == Constants.playerShotCategory)
         {
             let node = firstBody.node?.parent as! BossNode
-            node.entity.damageBoss(Player.attackPower)
+            node.Entity.damageBoss(Player.attackPower)
             secondBody.node?.parent!.removeFromParent()
             NSLog("Shot Deleted")
             
@@ -263,7 +263,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    func killEnemy(exp: Double)
+    func killEnemy(_ exp: Double)
     {
         
     }

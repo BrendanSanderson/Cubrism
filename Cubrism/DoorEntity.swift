@@ -52,19 +52,19 @@ class DoorEntity: GKEntity {
         }
         if (type == "challenge")
         {
-            imageName.appendContentsOf("Lock")
+            imageName.append("Lock")
         }
         else if (type == "completed")
         {
-            imageName.appendContentsOf("Unlock")
+            imageName.append("Unlock")
         }
         else if (type == "bossChallenge")
         {
-            imageName.appendContentsOf("BossLock")
+            imageName.append("BossLock")
         }
         else if (type == "bossCompleted")
         {
-            imageName.appendContentsOf("BossUnlock")
+            imageName.append("BossUnlock")
         }
         
         self.direction = direction
@@ -75,7 +75,7 @@ class DoorEntity: GKEntity {
         node.name = name
         self.sprite = sprite
         addComponent(VisualComponent(scene: scene, sprite: sprite))
-        sprite.physicsBody?.dynamic = false
+        sprite.physicsBody?.isDynamic = false
         if(type != "challenge" && type != "bossChallenge")
         {
             sprite.physicsBody?.categoryBitMask = Constants.doorCategory
@@ -83,6 +83,10 @@ class DoorEntity: GKEntity {
         
         node.addChild(sprite)
 
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
 }

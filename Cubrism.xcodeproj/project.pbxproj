@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */; };
 		BA017BBD1C9694A2003B64BC /* EnemyComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA017BBC1C9694A2003B64BC /* EnemyComponents.swift */; };
 		BA0B06081CA3759A003CE50D /* LevelSelectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */; };
 		BA20C8CE1C889E0800EE234D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA20C8CD1C889E0800EE234D /* AppDelegate.swift */; };
@@ -28,7 +29,6 @@
 		BA71AF9A1C9A7B02004E2847 /* PopUpNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA71AF991C9A7B02004E2847 /* PopUpNode.swift */; };
 		BAA3D3461C8CED0B0054BA31 /* VisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA3D3451C8CED0B0054BA31 /* VisualComponent.swift */; };
 		BAA3D3481C8CF01D0054BA31 /* PlayerEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA3D3471C8CF01D0054BA31 /* PlayerEntity.swift */; };
-		BAA3D3531C8CF40D0054BA31 /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA3D3521C8CF40D0054BA31 /* AnalogJoystick.swift */; };
 		BAA4351F1CA6011800AF3595 /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA4351E1CA6011800AF3595 /* Equipment.swift */; };
 		BAACCDF41CD55CCF001FEB25 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAACCDF31CD55CCF001FEB25 /* Item.swift */; };
 		BAACCDF61CD5776F001FEB25 /* items.plist in Resources */ = {isa = PBXBuildFile; fileRef = BAACCDF51CD5776F001FEB25 /* items.plist */; };
@@ -67,6 +67,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		BA017BBC1C9694A2003B64BC /* EnemyComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnemyComponents.swift; sourceTree = "<group>"; };
 		BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectNode.swift; sourceTree = "<group>"; };
 		BA20C8CA1C889E0800EE234D /* Cubrism.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cubrism.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,7 +95,6 @@
 		BA71AF991C9A7B02004E2847 /* PopUpNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopUpNode.swift; sourceTree = "<group>"; };
 		BAA3D3451C8CED0B0054BA31 /* VisualComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualComponent.swift; sourceTree = "<group>"; };
 		BAA3D3471C8CF01D0054BA31 /* PlayerEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerEntity.swift; sourceTree = "<group>"; };
-		BAA3D3521C8CF40D0054BA31 /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AnalogJoystick.swift; path = "../../../../Downloads/Swift-SpriteKit-Analog-Stick-master/AnalogStick Demo/AnalogStick Demo/AnalogStick/AnalogJoystick.swift"; sourceTree = "<group>"; };
 		BAA4351E1CA6011800AF3595 /* Equipment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
 		BAACCDF31CD55CCF001FEB25 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		BAACCDF51CD5776F001FEB25 /* items.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = items.plist; sourceTree = "<group>"; };
@@ -234,8 +234,8 @@
 			children = (
 				BAC28FE51CA65AD5003E07ED /* LevelCell.swift */,
 				BAD62F7F1C95F26800B9A5AD /* Constants.swift */,
-				BAA3D3521C8CF40D0054BA31 /* AnalogJoystick.swift */,
 				BA71AF991C9A7B02004E2847 /* PopUpNode.swift */,
+				2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */,
 				BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */,
 				BA5C6EB91CAEC31F00850B70 /* VendorPopUpNode.swift */,
 				BAD884531C94D7F30018BDDE /* ProgressBar.swift */,
@@ -310,19 +310,22 @@
 		BA20C8C21C889E0700EE234D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = Brendan;
 				TargetAttributes = {
 					BA20C8C91C889E0800EE234D = {
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = QV5DCZA4G6;
+						LastSwiftMigration = 0830;
 					};
 					BA20C8E11C889E0900EE234D = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0830;
 						TestTargetID = BA20C8C91C889E0800EE234D;
 					};
 					BA20C8EC1C889E0900EE234D = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0830;
 						TestTargetID = BA20C8C91C889E0800EE234D;
 					};
 				};
@@ -393,11 +396,11 @@
 				BAD62F861C964A6700B9A5AD /* DynamicEntity.swift in Sources */,
 				BA0B06081CA3759A003CE50D /* LevelSelectNode.swift in Sources */,
 				BAA4351F1CA6011800AF3595 /* Equipment.swift in Sources */,
-				BAA3D3531C8CF40D0054BA31 /* AnalogJoystick.swift in Sources */,
 				BAD62F841C96496D00B9A5AD /* ActionComponent.swift in Sources */,
 				BA22A8FE1C8E161500D52174 /* RoomScene.swift in Sources */,
 				BAA3D3461C8CED0B0054BA31 /* VisualComponent.swift in Sources */,
 				BAD62F801C95F26800B9A5AD /* Constants.swift in Sources */,
+				2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */,
 				BA017BBD1C9694A2003B64BC /* EnemyComponents.swift in Sources */,
 				BA20C8D21C889E0800EE234D /* HomeScene.swift in Sources */,
 				BA5AE4D51CA0F81F00BFF1E1 /* CompletedViewController.swift in Sources */,
@@ -462,8 +465,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -485,7 +490,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -506,8 +511,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -523,9 +530,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -537,11 +545,13 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Cubrism/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.Cubrism;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -552,11 +562,13 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Cubrism/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.Cubrism;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -569,6 +581,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.CubrismTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cubrism.app/Cubrism";
 			};
 			name = Debug;
@@ -581,6 +594,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.CubrismTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cubrism.app/Cubrism";
 			};
 			name = Release;
@@ -593,6 +607,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.CubrismUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = Cubrism;
 				USES_XCTRUNNER = YES;
 			};
@@ -605,6 +620,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Brendan.CubrismUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = Cubrism;
 				USES_XCTRUNNER = YES;
 			};

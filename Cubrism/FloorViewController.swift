@@ -33,7 +33,7 @@ class FloorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "loadingScreen")!)
-        self.view.multipleTouchEnabled = true
+        self.view.isMultipleTouchEnabled = true
         // Configure the view.
         
 //        NSNotificationCenter.defaultCenter().addObserver(
@@ -41,15 +41,15 @@ class FloorViewController: UIViewController {
 //            selector: #selector(FloorViewController.goToRoomScene(_:)),
 //            name: "GoToRoomScene",
 //            object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(FloorViewController.goToHomeViewController(_:)),
-            name: "GoToHomeViewController",
+            name: NSNotification.Name(rawValue: "GoToHomeViewController"),
             object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(FloorViewController.goToCompletedViewController(_:)),
-            name: "GoToCompletedViewController",
+            name: NSNotification.Name(rawValue: "GoToCompletedViewController"),
             object: nil)
         
         skView = SKView(frame: self.view.frame)
@@ -62,7 +62,7 @@ class FloorViewController: UIViewController {
     
         
     }
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         Player.currentViewController = self
@@ -70,21 +70,21 @@ class FloorViewController: UIViewController {
         
         buildMaze()
         scene = maze[Int(start.x)][Int(start.y)]
-        scene.scaleMode = .ResizeFill
+        scene.scaleMode = .resizeFill
         scene.startPosition = CGPoint (x: self.view.frame.width/2, y: self.view.frame.height/2)
         skView.presentScene(scene)
         
     }
     
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate : Bool {
         return true
     }
     
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return .AllButUpsideDown
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
         } else {
-            return .All
+            return .all
         }
     }
     
@@ -93,7 +93,7 @@ class FloorViewController: UIViewController {
         // Release any cached data, images, etc that aren't in use.
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden : Bool {
         return true
     }
     
@@ -106,7 +106,7 @@ class FloorViewController: UIViewController {
         var scene = RoomScene()
         scene.viewController = self
         scene.name = "startRoom"
-        maze = Array(count:length * 2 + 2, repeatedValue:Array(count:(length * 2) + 2, repeatedValue:RoomScene()))
+        maze = Array(repeating: Array(repeating: RoomScene(), count: (length * 2) + 2), count: length * 2 + 2)
         maze[Int(start.x)][Int(start.y)] = scene
         var oldPointer = pointer
         var direction = 1
@@ -161,7 +161,7 @@ class FloorViewController: UIViewController {
             
         }
     }
-    func oppositeDirection(direction: Int) -> Int
+    func oppositeDirection(_ direction: Int) -> Int
     {
         if direction == 0
         {
@@ -181,7 +181,7 @@ class FloorViewController: UIViewController {
         }
 
     }
-    func goToRoomScene(notification: NSNotification){
+    func goToRoomScene(_ notification: Notification){
         // Perform a segue or present ViewController directly
         //[self performSegueWithIdentifier:@"GameOverSegue" sender:self];
         var loc = 0
@@ -196,7 +196,7 @@ class FloorViewController: UIViewController {
             }
         }
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
-        newScene.scaleMode = .ResizeFill
+        newScene.scaleMode = .resizeFill
         newScene.maze = maze
         newScene.startPosition = start
         skView.presentScene(newScene)
@@ -217,7 +217,7 @@ class FloorViewController: UIViewController {
             }
         }
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
-        newScene.scaleMode = .ResizeFill
+        newScene.scaleMode = .resizeFill
         newScene.maze = maze
         newScene.startPosition = start
         skView.presentScene(newScene)
@@ -225,7 +225,7 @@ class FloorViewController: UIViewController {
     }
     
     
-    func doorStart (direction: Int, position: CGPoint) -> CGPoint
+    func doorStart (_ direction: Int, position: CGPoint) -> CGPoint
     {
         if direction == 0
         {
@@ -244,12 +244,12 @@ class FloorViewController: UIViewController {
             return CGPoint(x: self.view.frame.width * 0.9 - 32, y: position.y)
         }
     }
-    func goToHomeViewController(notification: NSNotification)
+    func goToHomeViewController(_ notification: Notification)
     {
         self.skView.presentScene(nil)
-        self.dismissViewControllerAnimated(false, completion: nil)
+        self.dismiss(animated: false, completion: nil)
     }
-    func goToCompletedViewController(notification: NSNotification)
+    func goToCompletedViewController(_ notification: Notification)
     {
         self.skView.presentScene(nil)
         var levelGap = Player.level - self.level
@@ -274,16 +274,16 @@ class FloorViewController: UIViewController {
         completeViewController.expGained = augExp
         completeViewController.drops = drops
         
-        if ((NSUserDefaults.standardUserDefaults().objectForKey("LevelCompleted") as! Int) < level)
+        if ((UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) < level)
         {
-            NSUserDefaults.standardUserDefaults().setObject(Int(level), forKey:
+            UserDefaults.standard.set(Int(level), forKey:
                 "LevelCompleted")
-            NSUserDefaults.standardUserDefaults().synchronize()
+            UserDefaults.standard.synchronize()
 
             
         }
         
-        self.presentViewController(completeViewController, animated: false, completion: nil)
+        self.present(completeViewController, animated: false, completion: nil)
     }
     
     func getDrops() -> [Item]

@@ -25,11 +25,11 @@ class BossEntity: DynamicEntity {
     var attack: ActionComponent!
     var firstAttack = true
     var exp = 50.0
-    var lastShot:NSTimeInterval = 0
+    var lastShot:TimeInterval = 0
     var type: String!
     override init()
     {
-        
+            super.init()
     }
     
     init(scene: GameScene, properties: NSDictionary)
@@ -38,16 +38,16 @@ class BossEntity: DynamicEntity {
         self.scene = scene
         node.entity = self
         level = (scene as! RoomScene).viewController.level
-        type = properties.valueForKey("name") as? String!
+        type = properties.value(forKey: "name") as? String!
         setUpBoss(properties)
         node.addChild(sprite)
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         sprite.zPosition = 10
         addComponent(BossBarComponent(scene: scene))
-        sprite.physicsBody?.dynamic = false
-        if (properties.valueForKey("name") as? String!) == "golem"
+        sprite.physicsBody?.isDynamic = false
+        if (properties.value(forKey: "name") as? String!) == "golem"
         {
-            sprite.physicsBody?.dynamic = true
+            sprite.physicsBody?.isDynamic = true
         }
         
         self.sprite.physicsBody?.categoryBitMask = Constants.bossCategory
@@ -55,17 +55,21 @@ class BossEntity: DynamicEntity {
         self.sprite.physicsBody?.collisionBitMask = Constants.playerShotCategory | Constants.playerCategory | Constants.wallCategory
         scene.addChild(node)
     }
-    func setUpBoss (properties: NSDictionary)
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    func setUpBoss (_ properties: NSDictionary)
     {
         var rangeMult = 50
         var effectMult = 10
         var meleeMult = 25
-        self.sprite = SKSpriteNode(texture: SKTexture(imageNamed: (properties.valueForKey("image") as? String)!), size: CGSize(width: (properties.valueForKey("size") as? Int)!, height: (properties.valueForKey("size") as? Int)!))
-        if (properties.valueForKey("position") as? String)! == "center"
+        self.sprite = SKSpriteNode(texture: SKTexture(imageNamed: (properties.value(forKey: "image") as? String)!), size: CGSize(width: (properties.value(forKey: "size") as? Int)!, height: (properties.value(forKey: "size") as? Int)!))
+        if (properties.value(forKey: "position") as? String)! == "center"
         {
             sprite.position = CGPoint(x: scene.frame.width/2.0, y: scene.frame.height/2.0)
         }
-        if (properties.valueForKey("name") as? String!) == "generator"
+        if (properties.value(forKey: "name") as? String!) == "generator"
         {
             let comp = BossSprayComponent(scene: scene, sprite: sprite, entity: self)
             addComponent(comp)
@@ -79,7 +83,7 @@ class BossEntity: DynamicEntity {
             sprite.size = CGSize(width: scene.frame.height * 0.2, height: scene.frame.height * 0.2)
 
         }
-        else if (properties.valueForKey("name") as? String!) == "dragon"
+        else if (properties.value(forKey: "name") as? String!) == "dragon"
         {
             sprite.size = CGSize(width: scene.frame.height * 0.3 * (10.0/7.0), height: scene.frame.height * 0.3)
             let comp = BossDragonBreatheComponent(scene: scene, sprite: sprite, entity: self)
@@ -106,7 +110,7 @@ class BossEntity: DynamicEntity {
                 sprite.position = CGPoint(x: scene.frame.width - sprite.size.height/2.5, y: scene.frame.height/2.0)
             }
         }
-        else if (properties.valueForKey("name") as? String!) == "golem"
+        else if (properties.value(forKey: "name") as? String!) == "golem"
         {
             let comp = GolemDropComponent(scene: scene, entity: self)
             addComponent(comp)
@@ -136,7 +140,7 @@ class BossEntity: DynamicEntity {
         exp = (exp * Constants.expMultiplier(level))
     }
     
-    override func act(currentTime: NSTimeInterval)
+    override func act(_ currentTime: TimeInterval)
     {
         if (actions.count > 0 && currentHealth/health <= 0.8)
         {
@@ -146,7 +150,7 @@ class BossEntity: DynamicEntity {
                 firstAttack = false
                 attack.action(currentTime)
             }
-            else if (attack.acting == false && lastShot +  NSTimeInterval(3) <= currentTime)
+            else if (attack.acting == false && lastShot +  TimeInterval(3) <= currentTime)
             {
                 attack = actions[Int(arc4random_uniform(UInt32(actions.count)))]
                 attack.action(currentTime)
@@ -167,36 +171,36 @@ class BossEntity: DynamicEntity {
     }
     
     
-    func damageBoss (damage: Double)
+    func damageBoss (_ damage: Double)
     {
-        node.entity.currentHealth -= damage
+        node.Entity.currentHealth -= damage
         
-        self.componentForClass(BossBarComponent)?.updateBars(currentHealth, totalHealth: health)
+        self.component(ofType: BossBarComponent.self)?.updateBars(currentHealth, totalHealth: health)
                     
-        if (node.entity.currentHealth <= 0)
+        if (node.Entity.currentHealth <= 0)
         {
             sprite.physicsBody = nil
-            self.removeComponentForClass(VisualComponent)
-            self.removeComponentForClass(BossBarComponent)
-            self.removeComponentForClass(BossShotTargetingComponent)
+            self.removeComponent(ofType: VisualComponent.self)
+            self.removeComponent(ofType: BossBarComponent.self)
+            self.removeComponent(ofType: BossShotTargetingComponent.self)
             if (type == "generator")
             {
-                self.removeComponentForClass(BossElectricFieldComponent)
-                self.removeComponentForClass(BossSprayComponent)
+                self.removeComponent(ofType: BossElectricFieldComponent.self)
+                self.removeComponent(ofType: BossSprayComponent.self)
             }
             else if (type == "dragon")
             {
-                self.removeComponentForClass(BossDragonBreatheComponent)
-                self.removeComponentForClass(BossDragonFireballComponent)
-                self.removeComponentForClass(BossDragonHeadTilt)
+                self.removeComponent(ofType: BossDragonBreatheComponent.self)
+                self.removeComponent(ofType: BossDragonFireballComponent.self)
+                self.removeComponent(ofType: BossDragonHeadTilt.self)
             }
             else if (type == "golem")
             {
-                self.componentForClass(GolemDropComponent)?.node.removeFromParent()
-                self.removeComponentForClass(BossGolemJumpComponent)
-                self.removeComponentForClass(BossTrackingComponent)
-                self.removeComponentForClass(GolemDropComponent)
-                self.removeComponentForClass(BossGolemRockShoot)
+                self.component(ofType: GolemDropComponent.self)?.node.removeFromParent()
+                self.removeComponent(ofType: BossGolemJumpComponent.self)
+                self.removeComponent(ofType: BossTrackingComponent.self)
+                self.removeComponent(ofType: GolemDropComponent.self)
+                self.removeComponent(ofType: BossGolemRockShoot.self)
 
             }
             actions.removeAll()

@@ -13,7 +13,7 @@ class PlayerEntity: DynamicEntity {
     let playerCategory: UInt32 = 0x1 << 0
     var node = SKNode()
     var sprite = SKSpriteNode()
-    var lastHit = NSTimeInterval(0)
+    var lastHit = TimeInterval(0)
     
     convenience init(scene: GameScene)
     {
@@ -37,7 +37,7 @@ class PlayerEntity: DynamicEntity {
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         addComponent(PlayerMovementComponent(scene: scene, node: node, sprite: sprite))
         addComponent(PlayerShootComponent(scene: scene, pNode: node))
-        if (scene.isKindOfClass(HomeScene))
+        if (scene.isKind(of: HomeScene.self))
         {
             addComponent(ExpBarComponent(scene: scene))
         }
@@ -45,7 +45,7 @@ class PlayerEntity: DynamicEntity {
         {
             addComponent(HealthBarComponent(scene: scene, playerNode: node, sprite: sprite))
         }
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         
         sprite.physicsBody?.categoryBitMask = Constants.playerCategory
         sprite.physicsBody?.collisionBitMask = Constants.doorCategory | Constants.wallCategory | Constants.enemyCategory | Constants.bossCategory | Constants.enemyShotCategory
@@ -57,6 +57,10 @@ class PlayerEntity: DynamicEntity {
     override init()
     {
         super.init()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 

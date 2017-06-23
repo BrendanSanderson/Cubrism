@@ -150,24 +150,24 @@ class Equipment: Item {
     }
     override init(coder aDecoder: NSCoder!) {
         super.init(coder: aDecoder)
-        self.level = aDecoder.decodeObjectForKey("level") as! Int
-        self.tier = aDecoder.decodeObjectForKey("tier") as! Int
+        self.level = aDecoder.decodeObject(forKey: "level") as! Int
+        self.tier = aDecoder.decodeObject(forKey: "tier") as! Int
         self.setStats()
         
     }
-    override func encodeWithCoder(aCoder: NSCoder) {
+    override func encodeWithCoder(_ aCoder: NSCoder) {
         super.encodeWithCoder(aCoder)
-        aCoder.encodeObject(level, forKey: "level")
-        aCoder.encodeObject(tier, forKey: "tier")
+        aCoder.encode(level, forKey: "level")
+        aCoder.encode(tier, forKey: "tier")
     
     }
     
     override func toDictionary() -> [String:AnyObject]
     {
         var dic = super.toDictionary()
-        dic["level"] = level
-        dic["tier"] = tier
-        dic["subType"] = subType
+        dic["level"] = level as AnyObject
+        dic["tier"] = tier as AnyObject
+        dic["subType"] = subType as AnyObject
         return dic
     }
     convenience init(dic: [String: AnyObject])

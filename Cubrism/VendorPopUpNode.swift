@@ -18,11 +18,11 @@ class VendorPopUpNode: SKNode
     {
         if (selectedNode != nil)
         {
-            labels[0].text = "\(selectedNode.item.type)"
-            if selectedNode.item.isKindOfClass(Equipment)
+            labels[0].text = "\(selectedNode.item.type!)"
+            if selectedNode.item.isKind(of: Equipment.self)
             {
                 let equip = (selectedNode.item as? Equipment)!
-                labels[0].text = "\(selectedNode.item.type) Lvl: \(equip.level)"
+                labels[0].text = "\(selectedNode.item.type!) Lvl: \(equip.level)"
                 var stats = [String]()
                 if round(10 * equip.attackPower) / 10 > 0
                 {
@@ -82,7 +82,7 @@ class VendorPopUpNode: SKNode
     func setupLabels()
     {
         labels[0] = SKLabelNode(fontNamed: "Arial")
-        labels[0].horizontalAlignmentMode = .Center
+        labels[0].horizontalAlignmentMode = .center
         labels[0].position = CGPoint(x: mainFrame.size.width * -0.2425, y: mainFrame.size.height * -(0.2 + 0.075))
         labels[0].zPosition = 1002
         labels[0].text = "No Selection"
@@ -98,7 +98,7 @@ class VendorPopUpNode: SKNode
             let x1 = (0.14 * CGFloat(i%3))
             let x = mainFrame.size.width * -(0.1025 + x1)
             labels[i] = SKLabelNode(fontNamed: "Arial")
-            labels[i].horizontalAlignmentMode = .Center
+            labels[i].horizontalAlignmentMode = .center
             labels[i].position = CGPoint(x: x, y: y)
             labels[i].zPosition = 1002
             labels[i].text = ""
@@ -115,7 +115,7 @@ class BankPopUpNode: VendorPopUpNode {
     let width = 5
     let height = 6
     let size = CGSize(width: 32, height: 32)
-    var inv = Array(count: 5, repeatedValue:Array(count: 6, repeatedValue:SKSpriteNode()))
+    var inv = Array(repeating: Array(repeating: SKSpriteNode(), count: 6), count: 5)
     var powerSquare = ItemNode(i: Player.gear["Power Core"]!)
     var armorSquare = ItemNode(i: Player.gear["Armor Core"]!)
     var shieldSquare = ItemNode(i: Player.gear["Shield"]!)
@@ -131,7 +131,7 @@ class BankPopUpNode: VendorPopUpNode {
     init (scene: GameScene)
     {
         super.init()
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
         mainFrame = SKSpriteNode(imageNamed: "popUp")
         mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
@@ -227,10 +227,10 @@ class BankPopUpNode: VendorPopUpNode {
     }
 
 
-    internal override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    internal override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        let selNode = nodeAtPoint(touches.first!.locationInNode(self))
-        if selNode.isKindOfClass(ItemNode)
+        let selNode = atPoint(touches.first!.location(in: self))
+        if selNode.isKind(of: ItemNode.self)
         {
             if selectedNode == nil || selNode.position == selectedNode.position
             {
@@ -269,7 +269,7 @@ class BankPopUpNode: VendorPopUpNode {
                         {
                             Player.gear[selectedNode.item.type] = selectedNode.item as? Equipment
                         }
-                        let i = Player.inventory.indexOf(selectedNode.item)!
+                        let i = Player.inventory.index(of: selectedNode.item)!
                         Player.inventory[i] = (selNode as? ItemNode)!.item
                         
                         
@@ -303,7 +303,7 @@ class BankPopUpNode: VendorPopUpNode {
             }
             
         }
-        else if selNode.isKindOfClass(SelectNode)
+        else if selNode.isKind(of: SelectNode.self)
         {
             selectedNode = nil
             self.updateLabels()
@@ -322,8 +322,8 @@ class ShopPopUpNode: VendorPopUpNode {
         let vWidth = 5
         let vHeight = 3
         let size = CGSize(width: 32, height: 32)
-        var inv = Array(count: 5, repeatedValue:Array(count: 6, repeatedValue:SKSpriteNode()))
-        var mInv = Array(count: 5, repeatedValue:Array(count: 3, repeatedValue:SKSpriteNode()))
+        var inv = Array(repeating: Array(repeating: SKSpriteNode(), count: 6), count: 5)
+        var mInv = Array(repeating: Array(repeating: SKSpriteNode(), count: 3), count: 5)
         let vendorButton = SellNode(s: CGSize(width: 72, height: 36))
         override init()
         {
@@ -333,7 +333,7 @@ class ShopPopUpNode: VendorPopUpNode {
         init (scene: GameScene)
         {
             super.init()
-            self.userInteractionEnabled = true
+            self.isUserInteractionEnabled = true
             self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
             mainFrame = SKSpriteNode(imageNamed: "popUp")
             mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
@@ -423,10 +423,10 @@ class ShopPopUpNode: VendorPopUpNode {
         }
         
         
-        internal override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        internal override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             
-            let selNode = nodeAtPoint(touches.first!.locationInNode(self))
-            if selNode.isKindOfClass(ItemNode)
+            let selNode = atPoint(touches.first!.location(in: self))
+            if selNode.isKind(of: ItemNode.self)
             {
                 selectedNode = selNode as? ItemNode
                 selectedSquare.position = selNode.position
@@ -435,13 +435,13 @@ class ShopPopUpNode: VendorPopUpNode {
                 addChild(selectedSquare)
                 }
                 self.updateLabels()
-                if selNode.position.x > 0 && (selNode as! ItemNode).item.isKindOfClass(Equipment)
+                if selNode.position.x > 0 && (selNode as! ItemNode).item.isKind(of: Equipment.self)
                 {
                     vendorButton.text.text = "Sell"
                     vendorButton.cost.text = "\(((selNode as! ItemNode).item as! Equipment).price)"
                     vendorButton.front()
                 }
-                else if selNode.position.x < 0 && (selNode as! ItemNode).item.isKindOfClass(Equipment)
+                else if selNode.position.x < 0 && (selNode as! ItemNode).item.isKind(of: Equipment.self)
                 {
                     vendorButton.text.text = "Buy"
                     vendorButton.cost.text = "\(2 * ((selNode as! ItemNode).item as! Equipment).price)"
@@ -453,21 +453,21 @@ class ShopPopUpNode: VendorPopUpNode {
                     vendorButton.text.text = "N/A"
                 }
             }
-            else if selNode.isKindOfClass(SellNode) || (selNode.parent?.isKindOfClass(SellNode))!
+            else if selNode.isKind(of: SellNode.self) || (selNode.parent?.isKind(of: SellNode.self))!
             {
                 if selectedNode.position.x > 0
                 {
                     let cubrixels = Item(t: "Cubrixel", q: (selectedNode.item as! Equipment).price, s: true)
                     Player.addDrop(cubrixels)
-                    let i = Player.inventory.indexOf(selectedNode.item as! Equipment)
-                    Player.inventory.removeAtIndex(i!)
+                    let i = Player.inventory.index(of: selectedNode.item as! Equipment)
+                    Player.inventory.remove(at: i!)
                     selectedSquare.removeFromParent()
                     vendorButton.back()
                     self.updateLabels()
                 }
                 else
                 {
-                    var index = 0
+                    var index = -1
                     for i in 0 ..< Player.inventory.count
                     {
                         if Player.inventory[i].type == "Cubrixel"
@@ -477,14 +477,24 @@ class ShopPopUpNode: VendorPopUpNode {
                     }
                     
                     let num = (selectedNode.item as! Equipment).price * 2
-                    
-                    if Player.inventory[index].quantity >= num
+                    if(index < 0)
+                    {
+                        selectedSquare.removeFromParent()
+                        labels[0].text = "You have no Cubrixels"
+                        labels[1].text = ""
+                        labels[2].text = ""
+                        labels[3].text = ""
+                        labels[4].text = ""
+                        labels[5].text = ""
+                        labels[6].text = ""
+                    }
+                    else if Player.inventory[index].quantity >= num
                     {
                         Player.addDrop(selectedNode.item as! Equipment)
                         Player.inventory[index].quantity -= num
                         
-                        let mIndex = Constants.merchantInventory.indexOf(selectedNode.item as! Equipment)
-                        Constants.merchantInventory.removeAtIndex(mIndex!)
+                        let mIndex = Constants.merchantInventory.index(of: selectedNode.item as! Equipment)
+                        Constants.merchantInventory.remove(at: mIndex!)
                         selectedSquare.removeFromParent()
                         vendorButton.back()
                         self.updateLabels()

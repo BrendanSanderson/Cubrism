@@ -25,7 +25,7 @@ class EnemyEntity: DynamicEntity {
     var level = 1
     override init()
     {
-        
+        super.init()
     }
     
     init(scene: GameScene, eType: String, lev: Int, elite: Bool)
@@ -51,7 +51,7 @@ class EnemyEntity: DynamicEntity {
         node.addChild(sprite)
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         self.sprite.physicsBody?.categoryBitMask = Constants.enemyCategory
-        self.sprite.physicsBody?.dynamic = true
+        self.sprite.physicsBody?.isDynamic = true
         self.sprite.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.playerCategory
         if (type != "Melee")
         {
@@ -69,8 +69,12 @@ class EnemyEntity: DynamicEntity {
     {
         self.init(scene: scene, eType: "Melee", lev:1, elite: false)
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    func setUpType (eType: String, elite: Bool)
+    func setUpType (_ eType: String, elite: Bool)
     {
         var healthMultiplier = 1.0
         var rangeAttackMultiplier = 1.0
@@ -221,7 +225,7 @@ class EnemyEntity: DynamicEntity {
     
     
     
-    func getNewPosition (position: CGPoint) -> CGPoint
+    func getNewPosition (_ position: CGPoint) -> CGPoint
     {
         var x = Int()
         var y = Int()
@@ -240,7 +244,7 @@ class EnemyEntity: DynamicEntity {
         }
     }
     
-    func getNewCenterPosition (position: CGPoint) -> CGPoint
+    func getNewCenterPosition (_ position: CGPoint) -> CGPoint
     {
         var x = Int()
         var y = Int()
@@ -259,7 +263,7 @@ class EnemyEntity: DynamicEntity {
         }
     }
     
-    override func act(currentTime: NSTimeInterval)
+    override func act(_ currentTime: TimeInterval)
     {
         if (alive == true)
         {
@@ -286,10 +290,10 @@ class EnemyEntity: DynamicEntity {
         }
     }
     
-    func damageEnemy (damage: Int)
+    func damageEnemy (_ damage: Int)
     {
-        node.entity.currentHealth -= damage
-        if (node.entity.currentHealth > 0)
+        node.Entity.currentHealth -= damage
+        if (node.Entity.currentHealth > 0)
         {
             statusNode.size = sprite.size
             if (Double(currentHealth)/Double(health) <= 0.25)
@@ -305,58 +309,58 @@ class EnemyEntity: DynamicEntity {
                 statusNode.texture = SKTexture(imageNamed: "damaged75")
             }
         }
-        else if (node.entity.currentHealth <= 0)
+        else if (node.Entity.currentHealth <= 0)
         {
             sprite.physicsBody = nil
-            self.removeComponentForClass(VisualComponent)
+            self.removeComponent(ofType: VisualComponent.self)
             if (type == "Melee" || type == "Suicide" || type == "DragonFireball")
             {
-                self.removeComponentForClass(EnemyTrackingComponent)
+                self.removeComponent(ofType: EnemyTrackingComponent.self)
             }
             else if (type == "Dash")
             {
-                self.removeComponentForClass(EnemyDashMovementComponent)
+                self.removeComponent(ofType: EnemyDashMovementComponent.self)
             }
             else if (type == "Range")
             {
-                self.removeComponentForClass(EnemyRandomMovementComponent)
-                self.removeComponentForClass(EnemyShotTargetingComponent)
+                self.removeComponent(ofType: EnemyRandomMovementComponent.self)
+                self.removeComponent(ofType: EnemyShotTargetingComponent.self)
             }
             else if (type == "RangeTripple")
             {
-                self.removeComponentForClass(EnemyRandomMovementComponent)
-                self.removeComponentForClass(EnemyShotTrippleComponent)
+                self.removeComponent(ofType: EnemyRandomMovementComponent.self)
+                self.removeComponent(ofType: EnemyShotTrippleComponent.self)
             }
             else if (type == "RangeTracking")
             {
-                self.componentForClass(EnemyShotTrackingComponent)?.bullet.removeFromParent()
-                self.removeComponentForClass(EnemyRandomMovementComponent)
-                self.removeComponentForClass(EnemyShotTrackingComponent)
+                self.component(ofType: EnemyShotTrackingComponent.self)?.bullet.removeFromParent()
+                self.removeComponent(ofType: EnemyRandomMovementComponent.self)
+                self.removeComponent(ofType: EnemyShotTrackingComponent.self)
             }
             else if (type == "Sludge")
             {
-                let nodes = self.componentForClass(EnemySludgeDroppingComponent)?.nodes
+                let nodes = self.component(ofType: EnemySludgeDroppingComponent.self)?.nodes
                 for i in 0 ..< nodes!.count
                 {
                     nodes![i].parent?.removeFromParent()
                 }
-                self.removeComponentForClass(EnemyRandomMovementComponent)
-                self.removeComponentForClass(EnemySludgeDroppingComponent)
+                self.removeComponent(ofType: EnemyRandomMovementComponent.self)
+                self.removeComponent(ofType: EnemySludgeDroppingComponent.self)
             }
             else if (type == "Bomber")
             {
-                let nodes = self.componentForClass(EnemyBombDroppingComponent)?.nodes
+                let nodes = self.component(ofType: EnemyBombDroppingComponent.self)?.nodes
                 for i in 0 ..< nodes!.count
                 {
                     nodes![i].parent?.removeFromParent()
                 }
-                self.removeComponentForClass(EnemyRandomMovementComponent)
-                self.removeComponentForClass(EnemyBombDroppingComponent)
+                self.removeComponent(ofType: EnemyRandomMovementComponent.self)
+                self.removeComponent(ofType: EnemyBombDroppingComponent.self)
             }
             else if (type == "RangeRing")
             {
                 
-                self.removeComponentForClass(EnemyRingShotComponent)
+                self.removeComponent(ofType: EnemyRingShotComponent.self)
             }
             actions.removeAll()
             actions.append(EnemyDyingComponent(scene: scene, sprite: sprite))

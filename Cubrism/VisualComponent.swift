@@ -15,14 +15,19 @@ class VisualComponent: ActionComponent {
     var coordinate: CGPoint!
     
     init(scene: GameScene, sprite: SKSpriteNode) {
+        super.init()
         self.scene = scene
         self.sprite = sprite
         self.coordinate = self.sprite.position
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false;
         sprite.physicsBody?.friction = 0;
         sprite.physicsBody?.usesPreciseCollisionDetection = true
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 }

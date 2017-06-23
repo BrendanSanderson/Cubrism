@@ -12,23 +12,25 @@ import GameplayKit
 class HomeScene: GameScene {
     var viewController = HomeViewController()
     var first = true
-    override func didMoveToView(view: SKView) {
+    var bank: VendorEntity!
+    var shop: VendorEntity!
+    override func didMove(to view: SKView) {
         
         /* Setup your scene here */
         addTeleporter()
         addVendors()
         addPlayer()
         Player.updatePlayer()
-        super.didMoveToView(view)
+        super.didMove(to: view)
         
         
     }
     
-    override func willMoveFromView(view: SKView) {
+    override func willMove(from view: SKView) {
         self.removeAllChildren()
-        for i in (0 ..< self.view!.subviews.count).reverse()
+        for i in (0 ..< self.view!.subviews.count).reversed()
         {
-            if ((self.view!.subviews[i].isKindOfClass(UILabel)) == true)
+            if ((self.view!.subviews[i].isKind(of: UILabel.self)) == true)
             {
                 self.view!.subviews[i].removeFromSuperview()
                 
@@ -36,7 +38,7 @@ class HomeScene: GameScene {
         }
         
 
-        super.willMoveFromView(view)
+        super.willMove(from: view)
     }
     
 //    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -44,7 +46,7 @@ class HomeScene: GameScene {
 //        
 //    }
    
-    override func update(currentTime: CFTimeInterval) {
+    override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
         super.update(currentTime)
     }
@@ -67,7 +69,7 @@ class HomeScene: GameScene {
         teleporterSprite.physicsBody = SKPhysicsBody(circleOfRadius: 10)
         teleporterSprite.physicsBody?.allowsRotation = false
         teleporterSprite.physicsBody?.affectedByGravity = false;
-        teleporterSprite.physicsBody?.dynamic = false
+        teleporterSprite.physicsBody?.isDynamic = false
         teleporterSprite.physicsBody?.friction = 0;
         teleporterSprite.physicsBody?.usesPreciseCollisionDetection = true
         teleporterSprite.physicsBody?.contactTestBitMask = Constants.playerCategory
@@ -77,10 +79,10 @@ class HomeScene: GameScene {
     }
     func addVendors()
     {
-        let _ = VendorEntity(s: self, t: "bank")
-        let _ = VendorEntity(s: self, t: "shop")
+        bank = VendorEntity(s: self, t: "bank")
+        shop = VendorEntity(s: self, t: "shop")
     }
-    override func didBeginContact(contact: SKPhysicsContact) {
-        super.didBeginContact(contact)
+    override func didBegin(_ contact: SKPhysicsContact) {
+        super.didBegin(contact)
     }
 }

@@ -11,7 +11,9 @@ import GameplayKit
 import GameKit
 
 class EnemyNode: SKNode {
-    var entity: EnemyEntity!
+    var Entity: EnemyEntity {
+    get { return self.entity as! EnemyEntity }
+    }
     override init() {
         super.init()
     }
@@ -21,7 +23,9 @@ class EnemyNode: SKNode {
 
 }
 class BossNode: SKNode {
-    var entity: BossEntity!
+    var Entity: BossEntity {
+        get { return self.entity as! BossEntity }
+    }
     override init() {
         super.init()
     }
@@ -45,28 +49,30 @@ class ShotNode: SKNode {
 
 class VendorNode: SKSpriteNode {
     var type = String()
-    var entity: VendorEntity!
+    var Entity: VendorEntity {
+     get { return self.entity as! VendorEntity }
+    }
     
     init(t: String)
     {
         if t == "bank"
         {
             let texture = SKTexture(imageNamed: "bank")
-            super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
+            super.init(texture: texture, color: UIColor.clear, size: texture.size())
             self.position = CGPoint(x: Constants.w * 0.33, y: Constants.h * 0.8)
             self.type = t
         }
         else if t == "shop"
         {
             let texture = SKTexture(imageNamed: "merchant")
-            super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
+            super.init(texture: texture, color: UIColor.clear, size: texture.size())
             self.position = CGPoint(x: Constants.w * 0.67, y: Constants.h * 0.8)
             self.type = t
         }
         else
         {
             let texture = SKTexture(imageNamed: "playerIcon")
-            super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
+            super.init(texture: texture, color: UIColor.clear, size: texture.size())
         }
     }
     required init?(coder aDecoder: NSCoder) {
@@ -79,7 +85,7 @@ class SelectNode: SKSpriteNode
 {
     init(texture: SKTexture, size: CGSize)
     {
-        super.init(texture: texture, color: UIColor.clearColor(), size: size)
+        super.init(texture: texture, color: UIColor.clear, size: size)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -100,18 +106,18 @@ class ItemNode: SelectNode {
             quantity = SKLabelNode(text: String(i.quantity))
             quantity.fontSize = 8
             quantity.fontName = "Arial"
-            quantity.horizontalAlignmentMode = .Right
+            quantity.horizontalAlignmentMode = .right
             
             quantity.position = CGPoint(x: 14, y: -14)
             quantity.zPosition = 1005
             addChild(quantity)
         }
-        if item.isKindOfClass(Equipment)
+        if item.isKind(of: Equipment.self)
         {
-            tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier\((i as! Equipment).tier)"), color: UIColor.clearColor(), size: self.size)
+            tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier\((i as! Equipment).tier)"), color: UIColor.clear, size: self.size)
             if ((i as! Equipment).tier == 0)
             {
-                tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier1"), color: UIColor.clearColor(), size: self.size)
+                tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier1"), color: UIColor.clear, size: self.size)
             }
             tier.zPosition = self.zPosition - 1
             self.addChild(tier)
@@ -132,23 +138,23 @@ class SellNode: SKSpriteNode
         super.init(texture: nil, color: UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1), size: s)
         text = SKLabelNode(text: String("N/A"))
         text.fontSize = 24
-        text.fontColor = UIColor.whiteColor()
+        text.fontColor = UIColor.white
         text.fontName = "Arial"
-        text.horizontalAlignmentMode = .Center
-        text.verticalAlignmentMode = .Center
+        text.horizontalAlignmentMode = .center
+        text.verticalAlignmentMode = .center
         text.zPosition = 1005
         text.position = CGPoint(x: 0 - (self.size.width * 0.1), y: 0)
         
         cost = SKLabelNode(text: String(""))
         cost.fontSize = 12
-        cost.fontColor = UIColor.whiteColor()
+        cost.fontColor = UIColor.white
         cost.fontName = "Arial"
-        cost.horizontalAlignmentMode = .Right
-        cost.verticalAlignmentMode = .Bottom
+        cost.horizontalAlignmentMode = .right
+        cost.verticalAlignmentMode = .bottom
         cost.zPosition = 1005
         cost.position = CGPoint(x: self.size.width * 0.5, y: 0)
         
-        cubrixel = SKSpriteNode(texture: SKTexture(imageNamed: "Cubrixel"), color: UIColor.clearColor(), size: CGSize(width: self.size.width * 0.2, height: self.size.width * 0.2))
+        cubrixel = SKSpriteNode(texture: SKTexture(imageNamed: "Cubrixel"), color: UIColor.clear, size: CGSize(width: self.size.width * 0.2, height: self.size.width * 0.2))
         cubrixel.zPosition = 1005
         cubrixel.position = CGPoint(x: self.size.width * 0.4, y: 0 - (self.size.width * 0.1))
         addChild(cubrixel)

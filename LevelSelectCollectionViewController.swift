@@ -14,14 +14,14 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     var pageControl = UIPageControl()
     var homeView = HomeViewController()
     override func loadView() {
-        self.view = UIView(frame: UIScreen.mainScreen().bounds)
+        self.view = UIView(frame: UIScreen.main.bounds)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = UICollectionViewScrollDirection.Horizontal
+        flowLayout.scrollDirection = UICollectionViewScrollDirection.horizontal
         flowLayout.minimumLineSpacing = self.view.frame.width * 0.05
         flowLayout.minimumInteritemSpacing = self.view.frame.width * 0.05
         flowLayout.sectionInset = UIEdgeInsets(top: self.view.frame.height * 0.3, left: self.view.frame.width * 0.2, bottom: self.view.frame.height * 0.3, right: self.view.frame.width * 0.2)
@@ -29,7 +29,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         addBackgrounds()
         
         self.collectionView!.showsHorizontalScrollIndicator = false;
-        self.collectionView!.pagingEnabled = true;
+        self.collectionView!.isPagingEnabled = true;
         self.collectionView!.delegate = self;
         self.collectionView!.dataSource = self;
         
@@ -37,31 +37,31 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         self.view.addSubview(self.collectionView!)
         
         //self.collectionView!.backgroundColor = UIColor(patternImage: UIImage(named:  String(format: "background%i", 1))!)
-        self.collectionView!.backgroundColor = UIColor.clearColor()
+        self.collectionView!.backgroundColor = UIColor.clear
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Register cell classes
-        self.collectionView!.registerClass(LevelCell.self, forCellWithReuseIdentifier: "Cell")
+        self.collectionView!.register(LevelCell.self, forCellWithReuseIdentifier: "Cell")
          //self.collectionView!.registerNib(UINib(nibName:"LevelCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
         // Do any additional setup after loading the view.
         
         let w = self.view.frame.size.width
         let h = self.view.frame.size.height
-        let frame = CGRectMake(0, h - 60, w, 60)
+        let frame = CGRect(x: 0, y: h - 60, width: w, height: 60)
         self.pageControl = UIPageControl(frame: frame)
         
-        self.pageControl.addTarget(self, action: #selector(pageControlChanged(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        self.pageControl.addTarget(self, action: #selector(pageControlChanged(_:)), for: UIControlEvents.valueChanged)
         
         self.pageControl.numberOfPages = 5;
-        self.pageControl.autoresizingMask = UIViewAutoresizing.FlexibleHeight
+        self.pageControl.autoresizingMask = UIViewAutoresizing.flexibleHeight
         self.view.addSubview(self.pageControl)
         
         
         let backImage = UIImageView(frame: CGRect(x: w * 0.9 , y: w * 0.05, width: w * 0.05, height: w * 0.05))
         backImage.image = UIImage(named: "backButton")
         let tapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(LevelSelectCollectionViewController.back(_:)))
-        backImage.userInteractionEnabled = true
+        backImage.isUserInteractionEnabled = true
         backImage.addGestureRecognizer(tapGestureRecognizer)
         self.view.addSubview(backImage)
         
@@ -71,9 +71,9 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    func back(img: AnyObject)
+    func back(_ img: AnyObject)
     {
-        self.dismissViewControllerAnimated(false, completion: nil)
+        self.dismiss(animated: false, completion: nil)
     }
     /*
     // MARK: - Navigation
@@ -87,40 +87,40 @@ class LevelSelectCollectionViewController: UICollectionViewController {
 
     // MARK: UICollectionViewDataSource
 
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 5
     }
 
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of items
         return 10
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! LevelCell
-        cell.backgroundColor = UIColor.blueColor()
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! LevelCell
+        cell.backgroundColor = UIColor.blue
         cell.imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.frame.width, height: cell.frame.height))
         
         cell.imageView.image = UIImage(named: "background\((indexPath.section + 1))Cell")
         cell.cellLabel = UILabel(frame: CGRect(x: 0, y: 0, width: cell.frame.width, height: cell.frame.height))
-        cell.cellLabel.textAlignment = .Center
+        cell.cellLabel.textAlignment = .center
         cell.cellLabel.text = "\((indexPath.row + 1))"
         
-        if (indexPath.section * 10) + indexPath.item > (NSUserDefaults.standardUserDefaults().objectForKey("LevelCompleted") as! Int){
+        if (indexPath.section * 10) + indexPath.item > (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
             let bottomImage = UIImage(named: "background\((indexPath.section + 1))Cell")
             let topImage = UIImage(named: "lockedCell")
             
-            let size = CGSizeMake(topImage!.size.width, topImage!.size.height)
+            let size = CGSize(width: topImage!.size.width, height: topImage!.size.height)
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
             
             
-            [bottomImage!.drawInRect(CGRectMake(0, 0, size.width, size.height))];
-            [topImage!.drawInRect(CGRectMake(0,0,size.width, size.height))];
+            [bottomImage!.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))];
+            [topImage!.draw(in: CGRect(x: 0,y: 0,width: size.width, height: size.height))];
             
             
-            let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+            let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
             UIGraphicsEndImageContext()
             
             cell.imageView.image = newImage
@@ -133,27 +133,27 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     
     }
     
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         if indexPath.section == 4
         {
             homeView.floorView.min = UInt32(1)
             homeView.floorView.max = UInt32(1)
             homeView.floorView.level = Player.level
-            self.dismissViewControllerAnimated(false, completion: nil)
-            NSNotificationCenter.defaultCenter().postNotificationName("GoToLevelFloorViewController",  object: nil)
+            self.dismiss(animated: false, completion: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
         }
-        else if indexPath.item <= (NSUserDefaults.standardUserDefaults().objectForKey("LevelCompleted") as! Int){
+        else if indexPath.item <= (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
             
-        if let path = NSBundle.mainBundle().pathForResource("levels", ofType: "plist"), dict = NSArray(contentsOfFile: path){
+        if let path = Bundle.main.path(forResource: "levels", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
             let level = dict[indexPath.item] as? NSDictionary
             
-            homeView.floorView.min = UInt32(((level?.valueForKey("min")) as? Int)!)
-            homeView.floorView.max = UInt32(((level?.valueForKey("max")) as? Int)!)
-            homeView.floorView.level = ((level?.valueForKey("level")) as? Int)!
+            homeView.floorView.min = UInt32(((level?.value(forKey: "min")) as? Int)!)
+            homeView.floorView.max = UInt32(((level?.value(forKey: "max")) as? Int)!)
+            homeView.floorView.level = ((level?.value(forKey: "level")) as? Int)!
             
-            self.dismissViewControllerAnimated(false, completion: nil)
-            NSNotificationCenter.defaultCenter().postNotificationName("GoToLevelFloorViewController",  object: nil)
+            self.dismiss(animated: false, completion: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
         }
         }
         
@@ -161,23 +161,23 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     
     
     
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
                                    layout collectionViewLayout: UICollectionViewLayout,
-                                          sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize
+                                          sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize
     {
         return CGSize(width: collectionView.bounds.size.width * 0.08, height: collectionView.bounds.size.height * 0.15)
         //return collectionView.bounds.size
     }
-    func pageControlChanged(sender: UIPageControl)
+    func pageControlChanged(_ sender: UIPageControl)
     {
     
         let pageControl = sender
         let pageWidth = self.collectionView!.frame.size.width
-        let scrollTo = CGPointMake(pageWidth * CGFloat(pageControl.currentPage), 0);
+        let scrollTo = CGPoint(x: pageWidth * CGFloat(pageControl.currentPage), y: 0);
         self.collectionView?.setContentOffset(scrollTo, animated: true)
     }
     
-    override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageWidth = self.collectionView!.frame.size.width
         self.pageControl.currentPage = Int(self.collectionView!.contentOffset.x / pageWidth)
 //        }
@@ -213,9 +213,9 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     {
         for i in 0 ..< self.collectionView!.subviews.count
         {
-            if ((self.collectionView?.subviews[i].isKindOfClass(UIImageView)) != nil)
+            if ((self.collectionView?.subviews[i].isKind(of: UIImageView.self)) != nil)
             {
-                self.collectionView?.sendSubviewToBack((self.collectionView?.subviews[i])!)
+                self.collectionView?.sendSubview(toBack: (self.collectionView?.subviews[i])!)
             }
         }
     }

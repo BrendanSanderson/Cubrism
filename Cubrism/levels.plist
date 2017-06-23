@@ -8,9 +8,9 @@
 		<key>level</key>
 		<integer>1</integer>
 		<key>max</key>
-		<integer>5</integer>
+		<integer>1</integer>
 		<key>min</key>
-		<integer>4</integer>
+		<integer>1</integer>
 	</dict>
 	<dict>
 		<key>items</key>

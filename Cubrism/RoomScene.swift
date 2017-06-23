@@ -1,6 +1,30 @@
 
 import SpriteKit
 import GameplayKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func <= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l <= r
+  default:
+    return !(rhs < lhs)
+  }
+}
+
 
 class RoomScene: GameScene {
     var doors = [DoorEntity]()      
@@ -11,26 +35,26 @@ class RoomScene: GameScene {
     var enemies = 2
     var playerEntity = PlayerEntity()
     var completed = false
-    var startTime: NSTimeInterval!
+    var startTime: TimeInterval!
     var viewController: FloorViewController!
     var enemyPoints = 4
-    override func didMoveToView(view: SKView) {
+    override func didMove(to view: SKView) {
         /* Setup your scene here */
         killedEnemies = 0
         addEntities()
         addDoors()
-        super.didMoveToView(view)
+        super.didMove(to: view)
         Player.damagePlayer(0)
     }
     
     
-        override func willMoveFromView(view: SKView) {
+        override func willMove(from view: SKView) {
         self.removeAllChildren()
         for i in 0 ..< entites.count
         {
             entites[i].alive = false
         }
-        super.willMoveFromView(view)
+        super.willMove(from: view)
     }
     
     
@@ -38,7 +62,7 @@ class RoomScene: GameScene {
 //    }
 
     
-    override func update(currentTime: CFTimeInterval) {
+    override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
 //        if (startTime == nil)
 //        {
@@ -108,26 +132,26 @@ class RoomScene: GameScene {
 //            
 //        }
 
-        if let path = NSBundle.mainBundle().pathForResource("Enemies", ofType: "plist"), enemiesArray = NSArray(contentsOfFile: path){
+        if let path = Bundle.main.path(forResource: "Enemies", ofType: "plist"), let enemiesArray = NSArray(contentsOfFile: path){
                 var remainPoints = enemyPoints
                 var totalEnemies = 0
                 while remainPoints >= 1
                 {
                     let en = enemiesArray[Int(arc4random_uniform(UInt32(enemiesArray.count)))] as? NSDictionary
-                    if (en!.valueForKey("points") as? Int) <= remainPoints && (en!.valueForKey("minLevel") as? Int) <= viewController.level
+                    if (en!.value(forKey: "points") as? Int) <= remainPoints && (en!.value(forKey: "minLevel") as? Int) <= viewController.level
                     {
                         var num = 0
                         for i in 0 ..< entites.count
                         {
-                            if (entites[i] as? EnemyEntity)!.type == (en!.valueForKey("name") as? String)
+                            if (entites[i] as? EnemyEntity)!.type == (en!.value(forKey: "name") as? String)
                             {
                                 num += 1
                             }
                         }
-                        if num < (en!.valueForKey("max") as? Int)
+                        if num < (en!.value(forKey: "max") as? Int)
                         {
-                            entites.append(EnemyEntity(scene: self, eType: (en!.valueForKey("name") as? String)!, lev: (en!.valueForKey("level") as? Int)!, elite: (en!.valueForKey("elite") as? Bool)!))
-                            remainPoints -= (en!.valueForKey("points") as? Int)!
+                            entites.append(EnemyEntity(scene: self, eType: (en!.value(forKey: "name") as? String)!, lev: (en!.value(forKey: "level") as? Int)!, elite: (en!.value(forKey: "elite") as? Bool)!))
+                            remainPoints -= (en!.value(forKey: "points") as? Int)!
                             totalEnemies += 1
                         }
                     }
@@ -139,7 +163,7 @@ class RoomScene: GameScene {
     }
     func addBoss()
     {
-        if let path = NSBundle.mainBundle().pathForResource("bosses", ofType: "plist"), dict = NSArray(contentsOfFile: path){
+        if let path = Bundle.main.path(forResource: "bosses", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
             let boss = dict[Int(arc4random_uniform(UInt32(dict.count)))] as? NSDictionary
             //let boss = dict[2] as? NSDictionary
             entites.append(BossEntity(scene: self, properties: boss!))
@@ -150,13 +174,13 @@ class RoomScene: GameScene {
     
     
     
-    func addDoor(direction: Int)
+    func addDoor(_ direction: Int)
     {
         let door = DoorEntity(scene: self, direction: direction, type: "regular")
         door.node.zPosition = 10
         self.addChild(door.node)
     }
-    override func killEnemy(exp: Double) {
+    override func killEnemy(_ exp: Double) {
         killedEnemies += 1
         Player.currentViewController.levelExp += Int(exp)
         if (killedEnemies == enemies)
@@ -166,7 +190,7 @@ class RoomScene: GameScene {
             unlockDoors()
         }
     }
-    func addTeleporter(point: CGPoint)
+    func addTeleporter(_ point: CGPoint)
     {
         //  let teleporterSprite = SKSpriteNode(color: UIColor.whiteColor(), size: CGSize(width: 64, height: 32))
         let teleporterSprite = SKSpriteNode(imageNamed: "horizontalDoor")
@@ -177,7 +201,7 @@ class RoomScene: GameScene {
         teleporterSprite.physicsBody = SKPhysicsBody(circleOfRadius: 10)
         teleporterSprite.physicsBody?.allowsRotation = false
         teleporterSprite.physicsBody?.affectedByGravity = false;
-        teleporterSprite.physicsBody?.dynamic = false
+        teleporterSprite.physicsBody?.isDynamic = false
         teleporterSprite.physicsBody?.friction = 0;
         teleporterSprite.physicsBody?.usesPreciseCollisionDetection = true
         teleporterSprite.physicsBody?.contactTestBitMask = Constants.playerCategory

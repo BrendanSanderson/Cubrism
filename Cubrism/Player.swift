@@ -17,17 +17,17 @@ class Player: NSObject {
     static var attackPower = 25.0
     static var attackSpeed = 25.0
     static var shieldRegen = 0.3
-    static var level = NSUserDefaults.standardUserDefaults().objectForKey("Level") as! Int
+    static var level = UserDefaults.standard.object(forKey: "Level") as! Int
     static var entity = PlayerEntity()
     static var defence = 0.0
-    static var exp = NSUserDefaults.standardUserDefaults().objectForKey("Experience") as! Int
-    static var totalExp = NSUserDefaults.standardUserDefaults().objectForKey("TotalExperience") as! Int
+    static var exp = UserDefaults.standard.object(forKey: "Experience") as! Int
+    static var totalExp = UserDefaults.standard.object(forKey: "TotalExperience") as! Int
     static var currentScene: GameScene!
     static var currentViewController: FloorViewController!
     static var gearDict : [String:[String : AnyObject]]!
     static var gear : [String : Equipment]!
-    static var inventoryDict = NSUserDefaults.standardUserDefaults().objectForKey("Inventory") as! [[String : AnyObject]]
-    static var inventory = NSUserDefaults.standardUserDefaults().objectForKey("Inventory") as! [Item]
+    static var inventoryDict = UserDefaults.standard.object(forKey: "Inventory") as! [[String : AnyObject]]
+    static var inventory = UserDefaults.standard.object(forKey: "Inventory") as! [Item]
     static var attackPowerBoost = 0.0
     static var attackSpeedBoost = 0.0
     static var defenceBoost = 0.0
@@ -46,7 +46,7 @@ class Player: NSObject {
         health = 100.0 * Player.playerMultiplier(level, mult: 1.2) + healthBoost
         shield = 100.0 * Player.playerMultiplier(level, mult: 1.1) + shieldBoost
         defence = defenceBoost
-        attackPower = 25.0 * Player.playerMultiplier(level, mult: 1.1) + attackPowerBoost
+        attackPower = 2500.0 * Player.playerMultiplier(level, mult: 1.1) + attackPowerBoost
         shieldRegen = 0.3 * (Player.playerMultiplier(level, mult: 1.0) + shieldRegenBoost/10.0)
         shotCoolDownSeconds = 0.5 - (attackSpeedBoost/40)
         currentHealth = health
@@ -94,11 +94,11 @@ class Player: NSObject {
                 inventory.append(Item(dic: dic))
             }
         }
-        Player.gearDict = NSUserDefaults.standardUserDefaults().objectForKey("Gear") as! [String:[String : AnyObject]]
+        Player.gearDict = UserDefaults.standard.object(forKey: "Gear") as! [String:[String : AnyObject]]
         Player.gear = ["Power Core": Equipment(dic: gearDict["Power Core"]!), "Armor Core": Equipment(dic: gearDict["Armor Core"]!), "Pulsar" : Equipment(dic: gearDict["Pulsar"]!), "Special Pulsar" : Equipment(dic: gearDict["Special Pulsar"]!), "Shield" : Equipment(dic: gearDict["Shield"]!), "Attachment 1" : Equipment(dic: gearDict["Attachment 1"]!), "Attachment 2" : Equipment(dic: gearDict["Attachment 2"]!)]
         
     }
-    static func damagePlayer(damage: Double)
+    static func damagePlayer(_ damage: Double)
     {
         let dam = damage - defence/10.0
         
@@ -119,7 +119,7 @@ class Player: NSObject {
         
         if (currentHealth <= 0 && alive == true)
         {
-            entity.componentForClass(HealthBarComponent)!.updateBars(0, health: 0)
+            entity.component(ofType: HealthBarComponent.self)!.updateBars(0, health: 0)
             currentViewController.levelExp = currentViewController.levelExp/2
             
             var levelGap = Player.level - currentViewController.level
@@ -143,7 +143,7 @@ class Player: NSObject {
         }
         else
         {
-            entity.componentForClass(HealthBarComponent)!.updateBars(currentShield, health: currentHealth)
+            entity.component(ofType: HealthBarComponent.self)!.updateBars(currentShield, health: currentHealth)
         }
         
     }
@@ -152,7 +152,7 @@ class Player: NSObject {
         if (entity.lastHit + 2 <= currentScene.time && currentShield < shield)
         {
             currentShield += shieldRegen
-            entity.componentForClass(HealthBarComponent)!.updateBars(currentShield, health: currentHealth)
+            entity.component(ofType: HealthBarComponent.self)!.updateBars(currentShield, health: currentHealth)
         }
         if (entity.sprite.position.x > currentScene.size.width * 0.95 - entity.sprite.size.width/2)
         {
@@ -171,7 +171,7 @@ class Player: NSObject {
             entity.sprite.position.y = currentScene.size.height * 0.1 + entity.sprite.size.height/2
         }
     }
-    static func augmentExperience(experience: Int)
+    static func augmentExperience(_ experience: Int)
     {
         exp += experience
         totalExp += experience
@@ -181,14 +181,14 @@ class Player: NSObject {
             level += 1
         }
         Constants.updateMerchantInventory()
-        NSUserDefaults.standardUserDefaults().setObject(level, forKey: "Level")
-        NSUserDefaults.standardUserDefaults().setObject(exp, forKey: "Experience")
-        NSUserDefaults.standardUserDefaults().setObject(totalExp, forKey: "TotalExperience")
-        NSUserDefaults.standardUserDefaults().synchronize()
+        UserDefaults.standard.set(level, forKey: "Level")
+        UserDefaults.standard.set(exp, forKey: "Experience")
+        UserDefaults.standard.set(totalExp, forKey: "TotalExperience")
+        UserDefaults.standard.synchronize()
         
     }
     
-    static func expToLevel(level: Int) -> Int
+    static func expToLevel(_ level: Int) -> Int
     {
         var total = 0.0
 //        for     i in 1 ... level
@@ -198,7 +198,7 @@ class Player: NSObject {
         return  Int((floor(total / 4)))
 
     }
-    static func totalExpToLevel(level: Int) -> Int
+    static func totalExpToLevel(_ level: Int) -> Int
     {
     var total = 0.0
     for i in 1 ... level
@@ -208,21 +208,21 @@ class Player: NSObject {
     return  Int((floor(total / 4)))
     
     }
-    static func playerMultiplier(level: Int, mult: Double) -> Double{
+    static func playerMultiplier(_ level: Int, mult: Double) -> Double{
         return pow((Double(level) + 4)/5, mult)
     }
-    static func addDrop (item: Item)
+    static func addDrop (_ item: Item)
     {
         var arr = [Item]()
         arr.append(item)
         addDrops(arr)
     }
-    static func addDrops(items: [Item])
+    static func addDrops(_ items: [Item])
     {
         for i in 0 ..< items.count
         {
             
-            if (items[i].isKindOfClass(Equipment) == true)
+            if (items[i].isKind(of: Equipment.self) == true)
             {
                 inventory.append((items[i] as? Equipment)!)
             }
@@ -267,10 +267,10 @@ class Player: NSObject {
         }
         
         Player.gearDict = ["Power Core": gear["Power Core"]!.toDictionary(), "Armor Core": gear["Armor Core"]!.toDictionary(), "Pulsar" : gear["Pulsar"]!.toDictionary(), "Special Pulsar" : gear["Special Pulsar"]!.toDictionary(), "Shield" : gear["Shield"]!.toDictionary(), "Attachment 1" : gear["Attachment 1"]!.toDictionary(), "Attachment 2" : gear["Attachment 2"]!.toDictionary()]
-        NSUserDefaults.standardUserDefaults().setObject(gearDict, forKey:
+        UserDefaults.standard.set(gearDict, forKey:
             "Gear")
-        NSUserDefaults.standardUserDefaults().setObject(inventoryDict, forKey:
+        UserDefaults.standard.set(inventoryDict, forKey:
             "Inventory")
-        NSUserDefaults.standardUserDefaults().synchronize()
+        UserDefaults.standard.synchronize()
     }
 }

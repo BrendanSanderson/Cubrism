@@ -18,16 +18,16 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
 
         super.viewDidLoad()
-        if NSUserDefaults.standardUserDefaults().objectForKey("Level") == nil
+        if UserDefaults.standard.object(forKey: "Level") == nil
         {
     
             let level = 0
             let experience = 0
             let totaExperience = 0
-            NSUserDefaults.standardUserDefaults().setObject(level, forKey: "Level")
-            NSUserDefaults.standardUserDefaults().setObject(experience, forKey: "Experience")
-            NSUserDefaults.standardUserDefaults().setObject(totaExperience, forKey: "TotaExperience")
-            NSUserDefaults.standardUserDefaults().synchronize()
+            UserDefaults.standard.set(level, forKey: "Level")
+            UserDefaults.standard.set(experience, forKey: "Experience")
+            UserDefaults.standard.set(totaExperience, forKey: "TotaExperience")
+            UserDefaults.standard.synchronize()
         }
         
         
@@ -38,33 +38,33 @@ class HomeViewController: UIViewController {
         levelSelectView = LevelSelectCollectionViewController()
         levelSelectView.homeView = self
         
-        self.view.multipleTouchEnabled = true
+        self.view.isMultipleTouchEnabled = true
             // Configure the view.
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(HomeViewController.goToFloorViewController(_:)),
-            name: "GoToFloorViewController",
+            name: NSNotification.Name(rawValue: "GoToFloorViewController"),
             object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(HomeViewController.resetHomeViewController(_:)),
-            name: "ResetHomeViewController",
+            name: NSNotification.Name(rawValue: "ResetHomeViewController"),
             object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(HomeViewController.restartFloorViewController(_:)),
-            name: "RestartFloorViewController",
+            name: NSNotification.Name(rawValue: "RestartFloorViewController"),
             object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(HomeViewController.goToLevelSelectCollectionViewController(_:)),
-            name: "GoToLevelSelectCollectionViewController",
+            name: NSNotification.Name(rawValue: "GoToLevelSelectCollectionViewController"),
             object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(HomeViewController.goToLevelFloorViewController(_:)),
-            name: "GoToLevelFloorViewController",
+            name: NSNotification.Name(rawValue: "GoToLevelFloorViewController"),
             object: nil)
         
         
@@ -78,25 +78,25 @@ class HomeViewController: UIViewController {
         skView.showsNodeCount = true
         scene.viewController = self
         skView.ignoresSiblingOrder = true
-        scene.scaleMode = .ResizeFill
+        scene.scaleMode = .resizeFill
             
         
     }
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         skView.presentScene(scene)
         Player.updateInventory()
         //self.pause
     }
 
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate : Bool {
         return true
     }
 
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return .AllButUpsideDown
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
         } else {
-            return .All
+            return .all
         }
     }
 
@@ -105,40 +105,40 @@ class HomeViewController: UIViewController {
         // Release any cached data, images, etc that aren't in use.
     }
 
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden : Bool {
         return true
     }
-    func resetHomeViewController(notification: NSNotification){
+    func resetHomeViewController(_ notification: Notification){
     
         self.skView.presentScene(nil)
         self.viewDidLoad()
     }
     
-    func goToFloorViewController(notification: NSNotification){
+    func goToFloorViewController(_ notification: Notification){
     // Perform a segue or present ViewController directly
     let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
     self.view.addSubview(loadingView)
-        self.view.bringSubviewToFront(loadingView)
+        self.view.bringSubview(toFront: loadingView)
     floorView.max = UInt32(6)
     floorView.max = UInt32(4)
     floorView.level = 1
-    self.presentViewController(floorView, animated: false, completion: nil)
+    self.present(floorView, animated: false, completion: nil)
     }
     
-    func goToLevelSelectCollectionViewController(notification: NSNotification){
-        self.presentViewController(levelSelectView, animated: false, completion: nil)
+    func goToLevelSelectCollectionViewController(_ notification: Notification){
+        self.present(levelSelectView, animated: false, completion: nil)
     }
     
-    func restartFloorViewController(notification: NSNotification){
-        self.presentViewController(floorView, animated: false, completion: nil)
+    func restartFloorViewController(_ notification: Notification){
+        self.present(floorView, animated: false, completion: nil)
     }
     
-    func goToLevelFloorViewController(notification: NSNotification){
+    func goToLevelFloorViewController(_ notification: Notification){
         
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)
         
-        self.presentViewController(floorView, animated: false, completion: nil)
+        self.present(floorView, animated: false, completion: nil)
     }
     
 }

@@ -27,38 +27,38 @@ class CompletedViewController: UIViewController {
         let completeLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.1), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.20)))
         completeLabel.text = "Floor Complete!"
         completeLabel.font = UIFont(name: "Copperplate-Bold", size: 48)
-        completeLabel.textAlignment = .Center
+        completeLabel.textAlignment = .center
         view.addSubview(completeLabel)
         
         let expGainedLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.3), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
         expGainedLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
         expGainedLabel.text = String(format: "Experience Gained: %i", expGained)
-        expGainedLabel.textAlignment = .Center
+        expGainedLabel.textAlignment = .center
         view.addSubview(expGainedLabel)
         
         let expGainedLabel2 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.4), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
         expGainedLabel2.font = UIFont(name: "Copperplate-Bold", size: 18)
         expGainedLabel2.text = String(format: "Experience: %i", Player.totalExp)
-        expGainedLabel2.textAlignment = .Center
+        expGainedLabel2.textAlignment = .center
         view.addSubview(expGainedLabel2)
 
         
         let expGainedLabel3 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.5), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
         expGainedLabel3.font = UIFont(name: "Copperplate-Bold", size: 18)
         expGainedLabel3.text = String(format: "Experience To Next: %i", (Player.expToLevel(Player.level)) - Player.exp)
-        expGainedLabel3.textAlignment = .Center
+        expGainedLabel3.textAlignment = .center
         view.addSubview(expGainedLabel3)
         
         let expBar = UIProgressView(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.625), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.05)))
         expBar.progress = Float(Player.exp)/Float(Player.expToLevel(Player.level))
-        expBar.progressTintColor = UIColor.orangeColor()
-        expBar.trackTintColor = UIColor.blackColor()
+        expBar.progressTintColor = UIColor.orange
+        expBar.trackTintColor = UIColor.black
         view.addSubview(expBar)
         
         let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.6), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
         levelLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
         levelLabel.text = String(format: "Level: %i", Player.level)
-        levelLabel.textAlignment = .Center
+        levelLabel.textAlignment = .center
         view.addSubview(levelLabel)
         
         
@@ -66,7 +66,7 @@ class CompletedViewController: UIViewController {
         let equipmentLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.725), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
         equipmentLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
         equipmentLabel.text = String(format: "Loot:")
-        equipmentLabel.textAlignment = .Center
+        equipmentLabel.textAlignment = .center
         view.addSubview(equipmentLabel)
         
         let equipment1tier = UIImageView(frame: CGRect(x: view.frame.width * 0.5 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
@@ -98,7 +98,7 @@ class CompletedViewController: UIViewController {
         let numDrops = drops.count
         if (numDrops > 0)
         {
-            if drops[0].isKindOfClass(Equipment)
+            if drops[0].isKind(of: Equipment.self)
             {
                 equipment1tier.image = UIImage (named: "tier\((drops[0] as! Equipment).tier)")
                 if (drops[0] as! Equipment).tier == 0
@@ -110,7 +110,7 @@ class CompletedViewController: UIViewController {
         }
         if (numDrops > 1)
         {
-            if drops[1].isKindOfClass(Equipment)
+            if drops[1].isKind(of: Equipment.self)
             {
                 equipment2tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
             }
@@ -118,7 +118,7 @@ class CompletedViewController: UIViewController {
         }
         if (numDrops > 2)
         {
-            if drops[1].isKindOfClass(Equipment)
+            if drops[1].isKind(of: Equipment.self)
             {
                 equipment3tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
             }
@@ -136,19 +136,19 @@ class CompletedViewController: UIViewController {
         
         
         let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.1)))
-        button.setTitle("Continue", forState: .Normal)
-        button.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        button.setTitle("Continue", for: UIControlState())
+        button.setTitleColor(UIColor.black, for: UIControlState())
         button.titleLabel!.font = UIFont(name: "Copperplate-Bold", size: 32)
         view.addSubview(button)
         
         let contineMethod: Selector = NSSelectorFromString("goToHome:")
-        button.addTarget(self, action: contineMethod, forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: contineMethod, for: .touchUpInside)
 
     }
     
-    func goToHome(sender: UIButton!) {
-        self.dismissViewControllerAnimated(false, completion: nil)
-        NSNotificationCenter.defaultCenter().postNotificationName("GoToHomeViewController", object: self)
+    func goToHome(_ sender: UIButton!) {
+        self.dismiss(animated: false, completion: nil)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToHomeViewController"), object: self)
     }
     
     
@@ -156,15 +156,15 @@ class CompletedViewController: UIViewController {
     
     
     
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate : Bool {
         return true
     }
     
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return .AllButUpsideDown
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
         } else {
-            return .All
+            return .all
         }
     }
     

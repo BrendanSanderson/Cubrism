@@ -17,18 +17,18 @@ class PlayerShootComponent: GKComponent {
     var node = SKNode()
     var playerSprite = SKNode()
     var velocity = CGPoint()
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var shotIsPending: Bool = false
     init(scene: GameScene, pNode: SKNode) {
         super.init()
         self.scene = scene
         self.playerNode = pNode
-        self.playerSprite = self.playerNode.childNodeWithName("playerSprite")!
+        self.playerSprite = self.playerNode.childNode(withName: "playerSprite")!
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8), UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.8)))
         let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
 
         
-        joystick.position = CGPointMake(scene.size.width - joystick.radius -  30, joystick.radius + 30)
+        joystick.position = CGPoint(x: scene.size.width - joystick.radius -  30, y: joystick.radius + 30)
         scene.addChild(joystick)
         joystick.startHandler = { [unowned self] in
             scene.started = true
@@ -36,7 +36,7 @@ class PlayerShootComponent: GKComponent {
         }
         joystick.trackingHandler = { [unowned scene] data in
             self.velocity = data.velocity
-            if (scene.paused == false)
+            if (scene.isPaused == false)
             {
                 if (data.velocity.x > 10.0 || data.velocity.x < -10.0 || data.velocity.y > 10.0 || data.velocity.y < -10.0)
                 {
@@ -56,9 +56,13 @@ class PlayerShootComponent: GKComponent {
         }
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    func ShotIfNeeded(currentTime: NSTimeInterval) {
-        if shotIsPending && (lastShotTime + NSTimeInterval(Player.shotCoolDownSeconds) <= currentTime) {
+    func ShotIfNeeded(_ currentTime: TimeInterval) {
+        if shotIsPending && (lastShotTime + TimeInterval(Player.shotCoolDownSeconds) <= currentTime) {
             shotIsPending = false
             lastShotTime = currentTime
             self.fire(self.velocity)
@@ -69,16 +73,16 @@ class PlayerShootComponent: GKComponent {
     
     
     
-    func fire(velocity: CGPoint)
+    func fire(_ velocity: CGPoint)
     {
         self.sprite = SKSpriteNode(imageNamed: "playerShot")
         self.node = SKNode()
         self.node.position = self.playerSprite.position
         self.node.addChild(self.sprite)
-        self.sprite.physicsBody = SKPhysicsBody(rectangleOfSize: self.sprite.size)
+        self.sprite.physicsBody = SKPhysicsBody(rectangleOf: self.sprite.size)
         self.sprite.physicsBody?.allowsRotation = false
         self.sprite.physicsBody?.affectedByGravity = false;
-        self.sprite.physicsBody?.dynamic = true
+        self.sprite.physicsBody?.isDynamic = true
         self.sprite.physicsBody?.friction = 0;
         self.sprite.physicsBody?.usesPreciseCollisionDetection = true
         self.sprite.physicsBody?.categoryBitMask = Constants.playerShotCategory
@@ -93,14 +97,14 @@ class PlayerShootComponent: GKComponent {
         self.followPath(velocity)
     }
 
-    func followPath(velocity: CGPoint) {
+    func followPath(_ velocity: CGPoint) {
         var sequence = [SKAction]()
         let destination = CGPoint(x:Int(20.0*velocity.x), y:Int(20.0*velocity.y))
-        let action = SKAction.sequence([SKAction.moveTo(destination, duration: 1.5), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: destination, duration: 1.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
-        self.sprite.runAction(SKAction.sequence(sequence))
+        self.sprite.run(SKAction.sequence(sequence))
     }
     
 }
@@ -119,7 +123,7 @@ class PlayerMovementComponent: GKComponent {
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.3), UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8)))
         let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
         
-        joystick.position = CGPointMake(joystick.radius + 30, joystick.radius + 30)
+        joystick.position = CGPoint(x: joystick.radius + 30, y: joystick.radius + 30)
         scene.addChild(joystick)
         joystick.startHandler = { [unowned self] in
             scene.started = true
@@ -127,13 +131,17 @@ class PlayerMovementComponent: GKComponent {
         }
         joystick.trackingHandler = { [unowned scene] data in
             
-            if (scene.paused == false)
+            if (scene.isPaused == false)
             {
-            self.playerSprite.position = CGPointMake(self.playerSprite.position.x + (data.velocity.x * 0.15), self.playerSprite.position.y + (data.velocity.y * 0.15))
+            self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (data.velocity.x * 0.15), y: self.playerSprite.position.y + (data.velocity.y * 0.15))
             }
         }
         
         
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
 }
@@ -149,12 +157,12 @@ class ExpBarComponent: GKComponent {
     var levelLabel: SKLabelNode!
     init(scene: GameScene) {
         let totalHeight = scene.size.height * 0.04
-        expBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSizeMake(CGFloat(scene.size.width * 0.25), totalHeight))
-        expCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSizeMake(CGFloat(scene.size.width * 0.25),totalHeight ))
+        expBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
+        expCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
         expCropSprite.zPosition = (expBackgroundSprite.zPosition + 1)
         expNode.addChild(expBackgroundSprite)
         expNode.addChild(expCropSprite)
-        expNode.position = CGPointMake(scene.size.width * 0.05, scene.size.height - scene.size.height * 0.07)
+        expNode.position = CGPoint(x: scene.size.width * 0.05, y: scene.size.height - scene.size.height * 0.07)
         expBackgroundSprite.anchorPoint = CGPoint(x:0,y:0)
         expCropSprite.anchorPoint = CGPoint(x:0,y:0)
         scene.addChild(expNode)
@@ -163,17 +171,21 @@ class ExpBarComponent: GKComponent {
 //        levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: scene.size.height * 0.025), size: CGSize(width: scene.frame.width * 0.045, height: scene.frame.height * 0.05)))
         levelLabel.fontName = "Copperplate-Bold"
         levelLabel.fontSize = 28
-        levelLabel.fontColor = UIColor.whiteColor()
-        levelLabel.horizontalAlignmentMode = .Right
-        levelLabel.verticalAlignmentMode = .Center
+        levelLabel.fontColor = UIColor.white
+        levelLabel.horizontalAlignmentMode = .right
+        levelLabel.verticalAlignmentMode = .center
         levelLabel.position = CGPoint(x: scene.frame.width * 0.045, y: scene.frame.height * 0.95)
         scene.addChild(levelLabel)
         //scene.view!.addSubview(levelLabel)
         super.init()
         self.updateBars(Player.exp)
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    func updateBars(exp: Int)
+    func updateBars(_ exp: Int)
     {
         expCropSprite.size.width = CGFloat(scene.size.width * 0.25 * CGFloat(Double(exp)/Double(Player.expToLevel(Player.level))))
         levelLabel.text = String(format: "%i", Player.level)

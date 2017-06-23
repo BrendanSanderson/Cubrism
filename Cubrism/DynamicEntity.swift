@@ -11,7 +11,7 @@ import GameplayKit
 
 class DynamicEntity: GKEntity {
     var alive = true
-    func act(currentTime: NSTimeInterval)
+    func act(_ currentTime: TimeInterval)
     {
         
     }

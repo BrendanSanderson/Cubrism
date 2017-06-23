@@ -11,7 +11,7 @@ import GameplayKit
 
 class ActionComponent: GKComponent {
     var acting = false
-    func action(currentTime: NSTimeInterval)
+    func action(_ currentTime: TimeInterval)
     {
         
     }

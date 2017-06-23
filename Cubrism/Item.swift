@@ -33,27 +33,28 @@ class Item: NSObject {
     
     
     init(coder aDecoder: NSCoder!) {
-        self.type = aDecoder.decodeObjectForKey("type") as! String
-        self.quantity = aDecoder.decodeObjectForKey("quantity") as! Int
+        self.type = aDecoder.decodeObject(forKey: "type") as! String
+        self.quantity = aDecoder.decodeObject(forKey: "quantity") as! Int
         
     }
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(type, forKey: "type")
-        aCoder.encodeObject(quantity, forKey: "quantity")
+    func encodeWithCoder(_ aCoder: NSCoder) {
+        aCoder.encode(type, forKey: "type")
+        aCoder.encode(quantity, forKey: "quantity")
         
     }
     func toDictionary() -> [String:AnyObject]
     {
         var dic = [String : AnyObject]()
-        dic["type"] = type
-        dic["quantity"] = quantity
-        dic["stackable"] = stackable
+        dic["type"] = type as AnyObject
+        dic["quantity"] = quantity as AnyObject
+        dic["stackable"] = stackable as AnyObject
         return dic
     }
     
     convenience init(dic: [String: AnyObject])
     {
-        self.init(t: (dic["type"] as? String)!, q: (dic["quantity"] as? Int)!, s: (dic["quantity"] as? Bool)!)
+        self.init(t: (dic["type"] as? String)!, q: (dic["quantity"] as? Int)!, s: (dic["stackable"] as? Bool)!
+        )
     }
 }

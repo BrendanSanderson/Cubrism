@@ -9,25 +9,54 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class BossSprayComponent: ActionComponent {
     var scene: GameScene!
     var bossSprite: SKSpriteNode!
     var shots = 0
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
     var angle = 0.0
     init(scene: GameScene, sprite: SKSpriteNode, entity:BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = sprite
         shooter = entity
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         if (acting == false)
         {
             acting = true
             shots = 0
-            angle =  2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)
+            angle =  2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)
         }
         else if (lastShot + 0.1 <= currentTime && shots < 32)
         {
@@ -47,10 +76,10 @@ class BossSprayComponent: ActionComponent {
         node.bossShooter = shooter
         let sprite = SKSpriteNode(imageNamed: "bossGeneratorShot")
         node.addChild(sprite)
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -65,21 +94,21 @@ class BossSprayComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode)
+    func followPath(_ sprite: SKSpriteNode)
     {
         var moveTo = CGPoint()
         moveTo.x = CGFloat(cos(angle) * 500.0)
         moveTo.y = CGFloat(sin(angle) * 500.0)
-        let action = SKAction.sequence([SKAction.moveTo(CGPoint(x: (sprite.position.x + moveTo.x), y: (sprite.position.y + moveTo.y)), duration: 2), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (sprite.position.x + moveTo.x), y: (sprite.position.y + moveTo.y)), duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
-        sprite.runAction(action)
+        sprite.run(action)
         if (shots < 16)
         {
-            angle += M_PI_4 * 0.5
+            angle += Double.pi/4.0 * 0.5
         }
         else if (shots < 32)
         {
-            angle -= M_PI_4 * 0.5
+            angle -= Double.pi/4.0 * 0.5
         }
         shots += 1
     }
@@ -90,16 +119,21 @@ class BossElectricFieldComponent: ActionComponent {
     var scene: GameScene!
     var bossSprite: SKSpriteNode!
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
     var points = [CGPoint]()
     var node = ShotNode()
     var exploded = false
     init(scene: GameScene, sprite: SKSpriteNode, entity:BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = sprite
         shooter = entity
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         if (acting == false)
         {
             acting = true
@@ -181,10 +215,10 @@ class BossElectricFieldComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode, point: CGPoint)
+    func followPath(_ sprite: SKSpriteNode, point: CGPoint)
     {
-        let action = SKAction.sequence([SKAction.moveTo(point, duration: 2), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
-        sprite.runAction(action)
+        let action = SKAction.sequence([SKAction.move(to: point, duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
+        sprite.run(action)
         
     }
     func explode()
@@ -197,10 +231,10 @@ class BossElectricFieldComponent: ActionComponent {
             sprite.position = points[i]
             node.addChild(sprite)
             
-            sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
             sprite.physicsBody?.allowsRotation = false
             sprite.physicsBody?.affectedByGravity = false
-            sprite.physicsBody?.dynamic = false
+            sprite.physicsBody?.isDynamic = false
             sprite.physicsBody?.friction = 0
             sprite.physicsBody?.usesPreciseCollisionDetection = true
             sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -220,10 +254,10 @@ class BossShotTargetingComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = BossEntity()
-    let shotCooldownSeconds: NSTimeInterval = 1
+    let shotCooldownSeconds: TimeInterval = 1
     var image: String!
     
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
     
     init(scene: GameScene, entity: BossEntity, image: String) {
@@ -239,8 +273,12 @@ class BossShotTargetingComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (lastShotTime + shotCooldownSeconds <= currentTime) {
             lastShotTime = currentTime
@@ -256,10 +294,10 @@ class BossShotTargetingComponent: ActionComponent {
         //let sprite = SKSpriteNode(color: UIColor(red: 77.0/255.0, green: 135.0/255.0, blue: 14.0/255.0, alpha: 1), size: CGSize(width: 5, height: 5))
         let sprite = SKSpriteNode(imageNamed: self.image)
         node.addChild(sprite)
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -275,7 +313,7 @@ class BossShotTargetingComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode)
+    func followPath(_ sprite: SKSpriteNode)
     {
         playerSprite = Player.entity.sprite
         var sequence = [SKAction]()
@@ -289,11 +327,11 @@ class BossShotTargetingComponent: ActionComponent {
             moveTo.y = 0 - CGFloat(sin(angle) * 1000.0)
         }
         //let distance = Double(hypotf(abs(Float(playerSprite.position.x) - Float(enemySprite.position.x)), abs(Float(playerSprite.position.y) - Float(enemySprite.position.y))))
-        let action = SKAction.sequence([SKAction.moveTo(CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
-        sprite.runAction(SKAction.sequence(sequence))
+        sprite.run(SKAction.sequence(sequence))
     }
     
 }
@@ -303,24 +341,29 @@ class BossDragonBreatheComponent: ActionComponent {
     var bossSprite: SKSpriteNode!
     var shots = 0
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
-    var shotStart: NSTimeInterval = 0
-    var currentTime: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
+    var shotStart: TimeInterval = 0
+    var currentTime: TimeInterval = 0
     var dragonMouthOpen = [SKTexture]()
     var dragonMouthClose = [SKTexture]()
     var nodes = [SKNode]()
     init(scene: GameScene, sprite: SKSpriteNode, entity:BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = sprite
         shooter = entity
         for i in 0 ..< 4
         {
             dragonMouthOpen.append(SKTexture(imageNamed: "dragonMouth\(i+1)"))
-            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), atIndex: 0)
+            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), at: 0)
         }
         
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         self.currentTime = currentTime
         if (acting == false)
         {
@@ -328,7 +371,7 @@ class BossDragonBreatheComponent: ActionComponent {
             shots = 0
             shotStart = currentTime
             bossSprite.zRotation = 0
-            bossSprite.runAction(SKAction.animateWithTextures(dragonMouthOpen, timePerFrame: 0.125))
+            bossSprite.run(SKAction.animate(with: dragonMouthOpen, timePerFrame: 0.125))
         }
         else if (lastShot + 0.01 <= currentTime && shots < 5000)
         {
@@ -348,7 +391,7 @@ class BossDragonBreatheComponent: ActionComponent {
         }
         else if (shots >= 5000)
         {
-            bossSprite.runAction(SKAction.animateWithTextures(dragonMouthClose, timePerFrame: 0.125))
+            bossSprite.run(SKAction.animate(with: dragonMouthClose, timePerFrame: 0.125))
             acting = false
         }
         
@@ -361,10 +404,10 @@ class BossDragonBreatheComponent: ActionComponent {
         let sprite = SKSpriteNode(imageNamed: String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         node.zPosition = shooter.node.zPosition - 1
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -384,7 +427,7 @@ class BossDragonBreatheComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode)
+    func followPath(_ sprite: SKSpriteNode)
     {
         var moveTo = CGPoint()
         if (shotStart + 1 > currentTime)
@@ -397,7 +440,7 @@ class BossDragonBreatheComponent: ActionComponent {
             {
                 moveTo.x = scene.size.width * 0.30
             }
-            moveTo.y = (CGFloat(arc4random()) % scene.size.height * 0.1) + scene.size.height * 0.45
+            moveTo.y = (CGFloat(arc4random()).truncatingRemainder(dividingBy: scene.size.height) * 0.1) + scene.size.height * 0.45
         }
         else
         {
@@ -409,13 +452,13 @@ class BossDragonBreatheComponent: ActionComponent {
             {
                 moveTo.x = scene.size.width * 0.95
             }
-            moveTo.y = (CGFloat(arc4random()) % scene.size.height * 0.9) + scene.size.height * 0.05
+            moveTo.y = (CGFloat(arc4random()).truncatingRemainder(dividingBy: scene.size.height) * 0.9) + scene.size.height * 0.05
         }
-        let action = SKAction.sequence([SKAction.moveTo(moveTo, duration: 0.5), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
-        let action1 = SKAction.sequence([SKAction.waitForDuration(0.75), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: moveTo, duration: 0.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
+        let action1 = SKAction.sequence([SKAction.wait(forDuration: 0.75), SKAction.removeFromParent()])
         
-        sprite.runAction(action)
-        sprite.parent?.runAction(action1)
+        sprite.run(action)
+        sprite.parent?.run(action1)
         shots += 1
     }
     
@@ -424,7 +467,7 @@ class BossDragonFireballComponent: ActionComponent {
     var scene: GameScene!
     var bossSprite: SKSpriteNode!
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
     var dragonMouthOpen = [SKTexture]()
     var dragonMouthClose = [SKTexture]()
     var shootFireBall: SKAction!
@@ -435,21 +478,25 @@ class BossDragonFireballComponent: ActionComponent {
         for i in 0 ..< 4
         {
             dragonMouthOpen.append(SKTexture(imageNamed: "dragonMouth\(i+1)"))
-            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), atIndex: 0)
+            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), at: 0)
         }
         super.init()
-        let action1 = (SKAction.animateWithTextures(dragonMouthOpen, timePerFrame: 0.125))
-        let action2 = SKAction.runBlock({self.fire()})
-        let action3 = (SKAction.animateWithTextures(dragonMouthClose, timePerFrame: 0.125))
+        let action1 = (SKAction.animate(with: dragonMouthOpen, timePerFrame: 0.125))
+        let action2 = SKAction.run({self.fire()})
+        let action3 = (SKAction.animate(with: dragonMouthClose, timePerFrame: 0.125))
         shootFireBall = SKAction.sequence([action1, action2, action3])
         
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         if (acting == false)
         {
             acting = true
             lastShot = currentTime
-            bossSprite.runAction(shootFireBall)
+            bossSprite.run(shootFireBall)
         }
         else if (lastShot + 5 <= currentTime)
         {
@@ -472,24 +519,29 @@ class BossDragonHeadTilt: ActionComponent {
     var bossEntity: BossEntity!
     var bossHeight: CGFloat!
     init(scene: GameScene, entity: BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = entity.sprite
         self.bossEntity = entity
         
     }
-    override func action(currentTime: NSTimeInterval) {
-        if (bossEntity.attack == nil || bossEntity.attack.isKindOfClass(BossDragonBreatheComponent) == false || bossEntity.attack.acting != true)
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
+        if (bossEntity.attack == nil || bossEntity.attack.isKind(of: BossDragonBreatheComponent.self) == false || bossEntity.attack.acting != true)
         {
             if (bossSprite.position.x < scene.size.width * 0.5)
             {
                 var rotateAngle = atan2(Double(Player.entity.sprite.position.y - bossSprite.position.y), Double(Player.entity.sprite.position.x - bossSprite.position.x))
-                if (rotateAngle >= M_PI/6.0)
+                if (rotateAngle >= Double.pi/6.0)
                 {
-                    rotateAngle = M_PI/6.0
+                    rotateAngle = Double.pi/6.0
                 }
-                else if (rotateAngle <= -M_PI/6.0)
+                else if (rotateAngle <= -Double.pi/6.0)
                 {
-                    rotateAngle = -M_PI/6.0
+                    rotateAngle = -Double.pi/6.0
                 }
                 bossSprite.zRotation = CGFloat(rotateAngle)
             }
@@ -497,13 +549,13 @@ class BossDragonHeadTilt: ActionComponent {
             {
             
                 var rotateAngle = atan2(Double(bossSprite.position.y - Player.entity.sprite.position.y), Double(bossSprite.position.x - Player.entity.sprite.position.x))
-                if (rotateAngle >= M_PI/6.0)
+                if (rotateAngle >= Double.pi/6.0)
                 {
-                    rotateAngle = M_PI/6.0
+                    rotateAngle = Double.pi/6.0
                 }
-                else if (rotateAngle <= -M_PI/6.0)
+                else if (rotateAngle <= -Double.pi/6.0)
                 {
-                    rotateAngle = -M_PI/6.0
+                    rotateAngle = -Double.pi/6.0
                 }
                 bossSprite.zRotation = CGFloat(rotateAngle)
             }
@@ -518,11 +570,12 @@ class BossGolemJumpComponent: ActionComponent {
     var golemJumpUp = [SKTexture]()
     var golemJumpDown = [SKTexture]()
     var golemJump: SKAction!
-    var lastJump = NSTimeInterval(0)
-    var lastMoveJump = NSTimeInterval(0)
+    var lastJump = TimeInterval(0)
+    var lastMoveJump = TimeInterval(0)
     var moves = 0
     var direction = 0
     init(scene: GameScene, entity: BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = entity.sprite
         self.bossEntity = entity
@@ -534,7 +587,7 @@ class BossGolemJumpComponent: ActionComponent {
             }
             if (i != 8)
             {
-                golemJumpDown.insert(SKTexture(imageNamed: "golemJump\(i)"), atIndex: 0)
+                golemJumpDown.insert(SKTexture(imageNamed: "golemJump\(i)"), at: 0)
             }
         }
         //let action1 = (SKAction.animateWithTextures(golemJumpUp, timePerFrame: 0.09))
@@ -542,7 +595,11 @@ class BossGolemJumpComponent: ActionComponent {
         //golemJump = SKAction.sequence([action1, action2])
         
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
 //        if (bossEntity.attack == nil || bossEntity.attack.acting != true)
 //        {
 //        if (bossEntity.attack == nil || bossEntity.attack.acting != true)
@@ -607,31 +664,34 @@ class BossGolemRockShoot: ActionComponent {
     var bossSprite: SKSpriteNode!
     var shots = 0
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
     var angle = [CGFloat]()
     var velocity = [CGFloat]()
     var sprites = [SKSpriteNode]()
-    var startTime: NSTimeInterval = 0
+    var startTime: TimeInterval = 0
     
     init(scene: GameScene, entity:BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = entity.sprite
         shooter = entity
-
-        
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         if (acting == false)
         {
             acting = true
             shots = 0
             startTime = currentTime
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * M_PI * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
+            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
             self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
             self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
             self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
@@ -720,10 +780,10 @@ class BossGolemRockShoot: ActionComponent {
         node.bossShooter = shooter
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossGolemRock"), size: Player.entity.sprite.size)
         node.addChild(sprite)
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = false
+        sprite.physicsBody?.isDynamic = false
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -737,19 +797,19 @@ class BossGolemRockShoot: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode, shotNum: Int)
+    func followPath(_ sprite: SKSpriteNode, shotNum: Int)
     {
         if (sprite.position.x + sprite.size.width/2 >= (0.95) * Constants.w || sprite.position.x - sprite.size.width/2 <= (0.05) * Constants.w)
         {
             if (cos(angle[shotNum]) >= 0 && sprite.position.x + sprite.size.width/2 >= (0.95)*Constants.w)
             {
                 let temp = angle[shotNum]
-                angle[shotNum] = CGFloat(M_PI)-temp
+                angle[shotNum] = CGFloat(Double.pi)-temp
             }
             else if (cos(angle[shotNum]) <= 0 &&  sprite.position.x - sprite.size.width/2 <= (0.05)*Constants.w)
             {
                 let temp = angle[shotNum]
-                angle[shotNum] = CGFloat(M_PI)-temp
+                angle[shotNum] = CGFloat(Double.pi)-temp
                 
             }
         }
@@ -809,7 +869,11 @@ class BossTrackingComponent: ActionComponent {
         self.bossEntity = entity
         
     }
-    override func action(currentTime: NSTimeInterval)
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval)
     {
         
         if (bossSprite.physicsBody?.allContactedBodies().count > 0)
@@ -818,7 +882,7 @@ class BossTrackingComponent: ActionComponent {
             {
                 if(Player.entity.lastHit + 0.5 <= currentTime)
                 {
-                    Player.damagePlayer(Double((bossSprite.parent as! BossNode).entity.meleeAttackPower))
+                    Player.damagePlayer(Double((bossSprite.parent as! BossNode).Entity.meleeAttackPower))
                     Player.entity.lastHit = currentTime
                 }
             }
@@ -859,17 +923,22 @@ class GolemDropComponent: ActionComponent {
     var scene: GameScene!
     var bossSprite: SKSpriteNode!
     var shooter: BossEntity!
-    var lastShot: NSTimeInterval = 0
+    var lastShot: TimeInterval = 0
     var points = [CGPoint]()
     var node = ShotNode()
     var landed = false
-    var lastChange = NSTimeInterval(0)
+    var lastChange = TimeInterval(0)
     init(scene: GameScene, entity:BossEntity) {
+        super.init()
         self.scene = scene
         self.bossSprite = entity.sprite
         shooter = entity
     }
-    override func action(currentTime: NSTimeInterval) {
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval) {
         if (acting == false)
         {
             acting = true
@@ -945,7 +1014,7 @@ class GolemDropComponent: ActionComponent {
         node.bossShooter = shooter
         for i in 0 ..< points.count
         {
-            let sprite = SKSpriteNode(color: UIColor.blackColor(), size: Player.entity.sprite.size)
+            let sprite = SKSpriteNode(color: UIColor.black, size: Player.entity.sprite.size)
             sprite.alpha = 0
             node.addChild(sprite)
             
@@ -966,10 +1035,10 @@ class GolemDropComponent: ActionComponent {
             sprite.zPosition = bossSprite.zPosition - 1
             node.addChild(sprite)
             
-            sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
             sprite.physicsBody?.allowsRotation = false
             sprite.physicsBody?.affectedByGravity = false
-            sprite.physicsBody?.dynamic = false
+            sprite.physicsBody?.isDynamic = false
             sprite.physicsBody?.friction = 0
             sprite.physicsBody?.usesPreciseCollisionDetection = true
             sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -1003,12 +1072,12 @@ class BossBarComponent: GKComponent {
     var healthBackgroundSprite: SKSpriteNode!
     init(scene: GameScene) {
         let totalHeight = scene.size.height * 0.04
-        healthBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSizeMake(CGFloat(scene.size.width * 0.25), totalHeight))
-        healthCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSizeMake(CGFloat(scene.size.width * 0.25),totalHeight ))
+        healthBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
+        healthCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
         healthCropSprite.zPosition = (healthBackgroundSprite.zPosition + 1)
         healthNode.addChild(healthBackgroundSprite)
         healthNode.addChild(healthCropSprite)
-        healthNode.position = CGPointMake(scene.size.width * 0.7, scene.size.height - scene.size.height * 0.07)
+        healthNode.position = CGPoint(x: scene.size.width * 0.7, y: scene.size.height - scene.size.height * 0.07)
         healthBackgroundSprite.anchorPoint = CGPoint(x:0,y:0)
         healthCropSprite.anchorPoint = CGPoint(x:0,y:0)
         scene.addChild(healthNode)
@@ -1017,8 +1086,12 @@ class BossBarComponent: GKComponent {
         super.init()
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    func updateBars(health: Double, totalHealth: Double)
+    func updateBars(_ health: Double, totalHealth: Double)
     {
         healthCropSprite.size.width = CGFloat(scene.size.width * 0.25 * CGFloat(Double(health)/Double(totalHealth)))
         if (health <= 0)

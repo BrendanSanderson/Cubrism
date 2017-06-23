@@ -27,14 +27,14 @@ class Constants: NSObject {
     static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
     
-    static func enemyMultiplier(level: Int) -> Double{
+    static func enemyMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 4)/5 , 1.3)
     }
-    static func expMultiplier(level: Int) -> Double{
+    static func expMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 5)/7 , 1.4)
     }
     
-    static func forTailingZero(temp: Double) -> String{
+    static func forTailingZero(_ temp: Double) -> String{
         let tempVar = String(format: "%g", temp)
         return tempVar
     }

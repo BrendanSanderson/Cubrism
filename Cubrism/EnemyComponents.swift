@@ -8,6 +8,30 @@
 
 import SpriteKit
 import GameplayKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class EnemyRandomMovementComponent: ActionComponent {
     var scene: GameScene!
@@ -31,7 +55,11 @@ class EnemyRandomMovementComponent: ActionComponent {
         
     }
 
-    override func action(currentTime: NSTimeInterval)
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func action(_ currentTime: TimeInterval)
     {
             if (moving == false)
             {
@@ -89,7 +117,11 @@ class EnemyTrackingComponent: ActionComponent {
         self.coordinate = sprite.position
         
     }
-    override func action(currentTime: NSTimeInterval)
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval)
     {
         if (enemySprite.physicsBody?.allContactedBodies().count > 0)
         {
@@ -97,7 +129,7 @@ class EnemyTrackingComponent: ActionComponent {
             {
                 if(Player.entity.lastHit + 0.5 <= currentTime)
                 {
-                    Player.damagePlayer(Double((enemySprite.parent as! EnemyNode).entity.meleeAttackPower))
+                    Player.damagePlayer(Double((enemySprite.parent as! EnemyNode).Entity.meleeAttackPower))
                     Player.entity.lastHit = currentTime
                 }
             }
@@ -138,9 +170,9 @@ class EnemyShotTargetingComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotCooldownSeconds: NSTimeInterval = 1
+    let shotCooldownSeconds: TimeInterval = 1
     
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
     
     init(scene: GameScene, entity: EnemyEntity) {
@@ -155,8 +187,12 @@ class EnemyShotTargetingComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (lastShotTime + shotCooldownSeconds <= currentTime) {
             lastShotTime = currentTime
@@ -171,10 +207,10 @@ class EnemyShotTargetingComponent: ActionComponent {
         //let sprite = SKSpriteNode(color: UIColor(red: 77.0/255.0, green: 135.0/255.0, blue: 14.0/255.0, alpha: 1), size: CGSize(width: 5, height: 5))
         let sprite = SKSpriteNode(imageNamed: "enemyShot")
         node.addChild(sprite)
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -191,7 +227,7 @@ class EnemyShotTargetingComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode)
+    func followPath(_ sprite: SKSpriteNode)
     {
         playerSprite = Player.entity.sprite
         var sequence = [SKAction]()
@@ -205,11 +241,11 @@ class EnemyShotTargetingComponent: ActionComponent {
             moveTo.y = 0 - CGFloat(sin(angle) * 500.0)
         }
         //let distance = Double(hypotf(abs(Float(playerSprite.position.x) - Float(enemySprite.position.x)), abs(Float(playerSprite.position.y) - Float(enemySprite.position.y))))
-        let action = SKAction.sequence([SKAction.moveTo(CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 2), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
-        sprite.runAction(SKAction.sequence(sequence))
+        sprite.run(SKAction.sequence(sequence))
     }
     
 }
@@ -223,9 +259,9 @@ class EnemyShotTrackingComponent: ActionComponent {
     var moving = false
     var shooter = EnemyEntity()
     var bullet: SKSpriteNode!
-    let shotLength: NSTimeInterval = 3
+    let shotLength: TimeInterval = 3
     let node = ShotNode()
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
     
     init(scene: GameScene, entity: EnemyEntity) {
@@ -240,8 +276,12 @@ class EnemyShotTrackingComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (bullet.parent == nil) {
             self.fire()
@@ -259,10 +299,10 @@ class EnemyShotTrackingComponent: ActionComponent {
     func fire()
     {
         node.addChild(bullet)
-        bullet.physicsBody = SKPhysicsBody(rectangleOfSize: bullet.size)
+        bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
         bullet.physicsBody?.allowsRotation = false
         bullet.physicsBody?.affectedByGravity = false
-        bullet.physicsBody?.dynamic = true
+        bullet.physicsBody?.isDynamic = true
         bullet.physicsBody?.friction = 0
         bullet.physicsBody?.usesPreciseCollisionDetection = true
         bullet.physicsBody?.categoryBitMask = Constants.enemyTrackingShotCategory
@@ -316,7 +356,7 @@ class EnemyDashMovementComponent: ActionComponent {
     var moving = false
     var moveTo = CGPoint()
     var moveSpeed: Double = 1
-    var finishedMove: NSTimeInterval = 0
+    var finishedMove: TimeInterval = 0
     init(scene: GameScene, sprite: SKNode, speed: Double) {
         super.init()
         moveSpeed = speed
@@ -325,8 +365,12 @@ class EnemyDashMovementComponent: ActionComponent {
         self.coordinate = sprite.position
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (moving == false && finishedMove + 1 <= currentTime)
         {
@@ -407,9 +451,9 @@ class EnemyShotTrippleComponent: ActionComponent {
     var shots = 0
     var shooter: EnemyEntity!
     var direction = 0
-    let shotCooldownSeconds: NSTimeInterval = 1
+    let shotCooldownSeconds: TimeInterval = 1
     
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     
     init(scene: GameScene, entity: EnemyEntity) {
         super.init()
@@ -420,8 +464,12 @@ class EnemyShotTrippleComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (shots == 0 && lastShotTime + shotCooldownSeconds <= currentTime) {
             lastShotTime = currentTime
@@ -451,10 +499,10 @@ class EnemyShotTrippleComponent: ActionComponent {
         {
             let sprite = SKSpriteNode(imageNamed: "enemyTrippleShot")
             node.addChild(sprite)
-            sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
             sprite.physicsBody?.allowsRotation = false
             sprite.physicsBody?.affectedByGravity = false
-            sprite.physicsBody?.dynamic = true
+            sprite.physicsBody?.isDynamic = true
             sprite.physicsBody?.friction = 0
             sprite.physicsBody?.usesPreciseCollisionDetection = true
             sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -493,7 +541,7 @@ class EnemyShotTrippleComponent: ActionComponent {
         
     }
     
-    func followPath(sprite: SKSpriteNode)
+    func followPath(_ sprite: SKSpriteNode)
     {
         var sequence = [SKAction]()
         moveTo.x = 0
@@ -515,11 +563,11 @@ class EnemyShotTrippleComponent: ActionComponent {
             moveTo.x = -500
         }
         
-        let action = SKAction.sequence([SKAction.moveTo(CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.waitForDuration(3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
-        sprite.runAction(SKAction.sequence(sequence))
+        sprite.run(SKAction.sequence(sequence))
     }
     
 }
@@ -530,11 +578,11 @@ class EnemyBombDroppingComponent: ActionComponent {
     var coordinate: CGPoint!
     var moving = false
     var shooter = EnemyEntity()
-    let shotLength: NSTimeInterval = 3
+    let shotLength: TimeInterval = 3
     var nodes = [SKSpriteNode]()
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
-    var lastDamageDealt: NSTimeInterval = 0
+    var lastDamageDealt: TimeInterval = 0
     
     
     init(scene: GameScene, entity: EnemyEntity) {
@@ -546,8 +594,12 @@ class EnemyBombDroppingComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (lastShotTime + 2 <= currentTime)
         {
@@ -561,10 +613,10 @@ class EnemyBombDroppingComponent: ActionComponent {
         let bomb = SKSpriteNode(imageNamed: "bomberShot")
         node.addChild(bomb)
         scene.addChild(node)
-        bomb.physicsBody = SKPhysicsBody(rectangleOfSize: bomb.size)
+        bomb.physicsBody = SKPhysicsBody(rectangleOf: bomb.size)
         bomb.physicsBody?.allowsRotation = false
         bomb.physicsBody?.affectedByGravity = false
-        bomb.physicsBody?.dynamic = false
+        bomb.physicsBody?.isDynamic = false
         bomb.physicsBody?.friction = 0
         bomb.physicsBody?.usesPreciseCollisionDetection = true
         bomb.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -573,13 +625,13 @@ class EnemyBombDroppingComponent: ActionComponent {
         bomb.position = enemySprite.position
         nodes.append(bomb)
         let textures = [SKTexture(imageNamed: "bombLit1"), SKTexture(imageNamed: "bombLit2"), SKTexture(imageNamed: "bombLit3")]
-        let changeSkin = SKAction.animateWithTextures(textures, timePerFrame: 1)
-        bomb.runAction(changeSkin)
-        let action = SKAction.sequence([SKAction.waitForDuration(4), SKAction.runBlock({self.explode(bomb.position)}), SKAction.setTexture(SKTexture(imageNamed: "bossDragonShot1")), SKAction.waitForDuration(0.33), SKAction.runBlock({self.explode(bomb.position)}), SKAction.waitForDuration(0.33), SKAction.runBlock({self.explode(bomb.position)}), SKAction.waitForDuration(0.33), SKAction.runBlock({self.explode(bomb.position)}), SKAction.removeFromParent()])
-        bomb.runAction(action)
+        let changeSkin = SKAction.animate(with: textures, timePerFrame: 1)
+        bomb.run(changeSkin)
+        let action = SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run({self.explode(bomb.position)}), SKAction.setTexture(SKTexture(imageNamed: "bossDragonShot1")), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.removeFromParent()])
+        bomb.run(action)
     }
     
-    func explode(position: CGPoint)
+    func explode(_ position: CGPoint)
     {
         var moveTo = CGPoint()
         let explodeNode = ShotNode()
@@ -587,7 +639,7 @@ class EnemyBombDroppingComponent: ActionComponent {
         var moveTos = [CGPoint]()
         for i in 0 ..< 16
         {
-            let angle = Float(Double(i) * M_PI/8.0)
+            let angle = Float(Double(i) * Double.pi/8.0)
             moveTo.y = position.y + CGFloat(sinf(angle) * 25.0)
             moveTo.x = position.x + CGFloat(cosf(angle) * 25.0)
             fire(position, node: explodeNode)
@@ -596,20 +648,20 @@ class EnemyBombDroppingComponent: ActionComponent {
         scene.addChild(explodeNode)
         for i in 0 ..< explodeNode.children.count
         {
-            let action = SKAction.sequence([SKAction.moveTo(moveTos[i], duration: 0.5), SKAction.removeFromParent()])
-            explodeNode.children[i].runAction(action)
+            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: 0.5), SKAction.removeFromParent()])
+            explodeNode.children[i].run(action)
         }
     }
-    func fire(start: CGPoint, node: ShotNode)
+    func fire(_ start: CGPoint, node: ShotNode)
     {
         
         let sprite = SKSpriteNode(imageNamed: String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         sprite.position = start
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -628,11 +680,11 @@ class EnemySludgeDroppingComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotLength: NSTimeInterval = 3
+    let shotLength: TimeInterval = 3
     var nodes = [SKSpriteNode]()
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
-    var lastDamageDealt: NSTimeInterval = 0
+    var lastDamageDealt: TimeInterval = 0
     
     init(scene: GameScene, entity: EnemyEntity) {
         super.init()
@@ -643,8 +695,12 @@ class EnemySludgeDroppingComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (lastShotTime + 1.5 <= currentTime)
         {
@@ -674,10 +730,10 @@ class EnemySludgeDroppingComponent: ActionComponent {
         let sludge = SKSpriteNode(imageNamed: "enemySludge")
         node.addChild(sludge)
         scene.addChild(node)
-        sludge.physicsBody = SKPhysicsBody(rectangleOfSize: sludge.size)
+        sludge.physicsBody = SKPhysicsBody(rectangleOf: sludge.size)
         sludge.physicsBody?.allowsRotation = false
         sludge.physicsBody?.affectedByGravity = false
-        sludge.physicsBody?.dynamic = false
+        sludge.physicsBody?.isDynamic = false
         sludge.physicsBody?.friction = 0
         sludge.physicsBody?.usesPreciseCollisionDetection = true
         sludge.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -699,9 +755,9 @@ class EnemyRingShotComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotCooldownSeconds: NSTimeInterval = 1
+    let shotCooldownSeconds: TimeInterval = 1
     
-    var lastShotTime: NSTimeInterval = 0
+    var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
     
     init(scene: GameScene, entity: EnemyEntity) {
@@ -716,8 +772,12 @@ class EnemyRingShotComponent: ActionComponent {
         
         
     }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    override func action(currentTime: NSTimeInterval)
+    override func action(_ currentTime: TimeInterval)
     {
         if (lastShotTime + shotCooldownSeconds <= currentTime) {
             lastShotTime = currentTime
@@ -731,10 +791,10 @@ class EnemyRingShotComponent: ActionComponent {
         let ringNode = ShotNode()
         ringNode.shooter = shooter
         var moveTos = [CGPoint]()
-        let startAngle = Float(Float(arc4random()) / Float(UINT32_MAX)) * Float(M_PI/8.0)
+        let startAngle = Float(Float(arc4random()) / Float(UINT32_MAX)) * Float(Double.pi/8.0)
         for i in 0 ..< 16
         {
-            let angle = Float(Double(i) * M_PI/8.0) + startAngle
+            let angle = Float(Double(i) * Double.pi/8.0) + startAngle
             moveTo.y = enemySprite.position.y + CGFloat(sinf(angle) * 1000.0)
             moveTo.x = enemySprite.position.x + CGFloat(cosf(angle) * 1000.0)
             fire(ringNode)
@@ -743,20 +803,20 @@ class EnemyRingShotComponent: ActionComponent {
         scene.addChild(ringNode)
         for i in 0 ..< ringNode.children.count
         {
-            let action = SKAction.sequence([SKAction.moveTo(moveTos[i], duration: 7.5), SKAction.removeFromParent()])
-            ringNode.children[i].runAction(action)
+            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: 7.5), SKAction.removeFromParent()])
+            ringNode.children[i].run(action)
         }
     }
-    func fire(node: ShotNode)
+    func fire(_ node: ShotNode)
     {
         
         let sprite = SKSpriteNode(imageNamed: String(format: "enemyRingShot", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         sprite.position = enemySprite.position
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
         sprite.physicsBody?.affectedByGravity = false
-        sprite.physicsBody?.dynamic = true
+        sprite.physicsBody?.isDynamic = true
         sprite.physicsBody?.friction = 0
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
@@ -779,12 +839,16 @@ class EnemyDyingComponent: ActionComponent {
         self.sprite = sprite
         super.init()
     }
-    override func action(currentTime: NSTimeInterval)
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func action(_ currentTime: TimeInterval)
     {
         sprite.alpha -= 0.05
         if sprite.alpha <= 0.1
         {
-            self.entity?.removeComponentForClass(EnemyDyingComponent)
+            self.entity?.removeComponent(ofType: EnemyDyingComponent.self)
             sprite.parent?.removeFromParent()
         }
     }
