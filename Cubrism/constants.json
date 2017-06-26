@@ -1,0 +1,28 @@
+{
+  "player": {
+    "shield" : {
+      "base" : 100.0,
+      "exp" : 1.1,
+      "boostMult" : 1.0,
+      "regen" : {
+        "base" : 0.3,
+        "exp" : 1.0,
+        "boostMult" : 0.1
+      }
+    },
+    "health" : {
+      "base" : 100.0,
+      "exp" : 1.2,
+      "boostMult": 1.0
+    },
+    "attack" : {
+      "base": 100.0,
+      "exp": 1.1,
+      "boostMult" : 1.0,
+      "speed" : {
+        "base" : 0.5,
+        "boostMult" : -0.02
+      }
+    }
+  }
+}
