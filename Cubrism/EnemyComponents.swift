@@ -41,17 +41,17 @@ class EnemyRandomMovementComponent: ActionComponent {
     var moveTo = CGPoint()
     var moveSpeed: Double = 1
     var distanceMultiplier = CGFloat(1)
-    init(scene: GameScene, sprite: SKNode, speed: Double) {
+    init(entity: EnemyEntity, speed: Double) {
         super.init()
         moveSpeed = speed
-        self.scene = scene
-        self.enemySprite = sprite
-        self.coordinate = sprite.position
+        self.scene = entity.scene
+        self.enemySprite = entity.sprite
+        self.coordinate = entity.sprite.position
         
     }
-    convenience init(scene: GameScene, sprite: SKNode, speed: Double, distanceMult: CGFloat) {
-        self.init(scene: scene, sprite: sprite, speed: speed)
-        distanceMultiplier = distanceMult
+    convenience init(entity:EnemyEntity, variables:[Double]) {
+        self.init(entity:entity, speed: variables[0])
+        distanceMultiplier = CGFloat(variables[1])
         
     }
 
@@ -109,12 +109,12 @@ class EnemyTrackingComponent: ActionComponent {
     var enemySprite: SKSpriteNode!
     var coordinate: CGPoint!
     var moveSpeed = 2.5
-    init(scene: GameScene, sprite: SKSpriteNode, speed: Double) {
+    init(entity: EnemyEntity, speed: Double) {
         super.init()
-        self.scene = scene
-        self.enemySprite = sprite
+        self.scene = entity.scene
+        self.enemySprite = entity.sprite
         moveSpeed = speed
-        self.coordinate = sprite.position
+        self.coordinate = entity.sprite.position
         
     }
 
@@ -170,7 +170,7 @@ class EnemyShotTargetingComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotCooldownSeconds: TimeInterval = 1
+    var shotCooldownSeconds: TimeInterval = 1
     
     var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
@@ -183,7 +183,8 @@ class EnemyShotTargetingComponent: ActionComponent {
         self.coordinate = shooter.sprite.position
         self.playerSprite = Player.entity.sprite
         lastShotTime = scene.time
-        
+        let componentDict = (entity.componentDict["shotTargeting"] as? [String:Any])!
+        shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
         
         
     }
@@ -259,10 +260,12 @@ class EnemyShotTrackingComponent: ActionComponent {
     var moving = false
     var shooter = EnemyEntity()
     var bullet: SKSpriteNode!
-    let shotLength: TimeInterval = 3
+    var shotLength: TimeInterval = 5
     let node = ShotNode()
     var lastShotTime: TimeInterval = 0
+    var shotCooldownSeconds = 6.0
     var playerSprite: SKSpriteNode!
+    var speed = 3.0
     
     init(scene: GameScene, entity: EnemyEntity) {
         super.init()
@@ -272,6 +275,10 @@ class EnemyShotTrackingComponent: ActionComponent {
         self.coordinate = shooter.sprite.position
         node.shooter = shooter
         bullet = SKSpriteNode(imageNamed: "enemyTrackingShot")
+        let componentDict = (entity.componentDict["shotTracking"] as? [String:Any])!
+        shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
+        shotLength = (componentDict["shotLength"] as? TimeInterval)!
+        speed = (componentDict["speed"] as? Double)!
         scene.addChild(node)
         
         
@@ -283,15 +290,15 @@ class EnemyShotTrackingComponent: ActionComponent {
     
     override func action(_ currentTime: TimeInterval)
     {
-        if (bullet.parent == nil) {
+        if (lastShotTime + shotCooldownSeconds < currentTime) {
             self.fire()
             lastShotTime = currentTime
         }
-        else if (lastShotTime + 5 >= currentTime)
+        else if (lastShotTime + shotLength >= currentTime)
         {
             self.followPath()
         }
-        else
+        else if (bullet.parent != nil)
         {
             bullet.removeFromParent()
         }
@@ -314,8 +321,8 @@ class EnemyShotTrackingComponent: ActionComponent {
     {
         let playerSprite = Player.entity.sprite
         let angle = abs(Double(atan(Double(playerSprite.position.y - bullet.position.y)/Double(playerSprite.position.x - bullet.position.x))))
-        let moveX = abs(CGFloat(cos(angle) * 3))
-        let moveY = abs(CGFloat(sin(angle) * 3))
+        let moveX = abs(CGFloat(cos(angle) * speed))
+        let moveY = abs(CGFloat(sin(angle) * speed))
         let rotateAngle = atan2(Double(playerSprite.position.y - bullet.position.y), Double(playerSprite.position.x - bullet.position.x))
         bullet.zRotation = CGFloat(rotateAngle)
 //        else if (playerSprite.position.y - bullet.position.y > 0)
@@ -357,12 +364,12 @@ class EnemyDashMovementComponent: ActionComponent {
     var moveTo = CGPoint()
     var moveSpeed: Double = 1
     var finishedMove: TimeInterval = 0
-    init(scene: GameScene, sprite: SKNode, speed: Double) {
+    init(entity: EnemyEntity, speed: Double) {
         super.init()
         moveSpeed = speed
-        self.scene = scene
-        self.enemySprite = sprite
-        self.coordinate = sprite.position
+        self.scene = entity.scene
+        self.enemySprite = entity.sprite
+        self.coordinate = entity.sprite.position
         
     }
 
@@ -451,7 +458,8 @@ class EnemyShotTrippleComponent: ActionComponent {
     var shots = 0
     var shooter: EnemyEntity!
     var direction = 0
-    let shotCooldownSeconds: TimeInterval = 1
+    var shotCooldownSeconds: TimeInterval = 1
+    var shotLength = 4.0
     
     var lastShotTime: TimeInterval = 0
     
@@ -461,7 +469,9 @@ class EnemyShotTrippleComponent: ActionComponent {
         self.enemySprite = entity.sprite
         self.shooter = entity
         lastShotTime = scene.time
-        
+        let componentDict = (entity.componentDict["shotTripple"] as? [String:Any])!
+        shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
+        shotLength = (componentDict["shotLength"] as? TimeInterval)!
         
     }
 
@@ -563,7 +573,7 @@ class EnemyShotTrippleComponent: ActionComponent {
             moveTo.x = -500
         }
         
-        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: shotLength), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
@@ -583,7 +593,7 @@ class EnemyBombDroppingComponent: ActionComponent {
     var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
     var lastDamageDealt: TimeInterval = 0
-    
+    var shotCooldown = 2.0
     
     init(scene: GameScene, entity: EnemyEntity) {
         super.init()
@@ -591,7 +601,8 @@ class EnemyBombDroppingComponent: ActionComponent {
         self.shooter = entity
         self.enemySprite = shooter.sprite
         self.coordinate = shooter.sprite.position
-        
+        let componentDict = (entity.componentDict["shotTracking"] as? [String:Any])!
+        shotCooldown = (componentDict["shotCooldown"] as? TimeInterval)!
         
     }
 
@@ -601,7 +612,7 @@ class EnemyBombDroppingComponent: ActionComponent {
     
     override func action(_ currentTime: TimeInterval)
     {
-        if (lastShotTime + 2 <= currentTime)
+        if (lastShotTime + shotCooldown <= currentTime)
         {
             self.drop()
             lastShotTime = currentTime
@@ -619,7 +630,7 @@ class EnemyBombDroppingComponent: ActionComponent {
         bomb.physicsBody?.isDynamic = false
         bomb.physicsBody?.friction = 0
         bomb.physicsBody?.usesPreciseCollisionDetection = true
-        bomb.physicsBody?.categoryBitMask = Constants.enemyShotCategory
+        bomb.physicsBody?.categoryBitMask = Constants.enemyStatusShotCategory
         bomb.physicsBody?.contactTestBitMask = Constants.playerCategory
         bomb.physicsBody?.collisionBitMask = Constants.wallCategory
         bomb.position = enemySprite.position
@@ -680,7 +691,7 @@ class EnemySludgeDroppingComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotLength: TimeInterval = 3
+    var shotCooldownSeconds = 1.5
     var nodes = [SKSpriteNode]()
     var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
@@ -692,9 +703,9 @@ class EnemySludgeDroppingComponent: ActionComponent {
         self.shooter = entity
         self.enemySprite = shooter.sprite
         self.coordinate = shooter.sprite.position
-        
-        
-    }
+        let componentDict = (entity.componentDict["shotTracking"] as? [String:Any])!
+        shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
+            }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -702,7 +713,7 @@ class EnemySludgeDroppingComponent: ActionComponent {
     
     override func action(_ currentTime: TimeInterval)
     {
-        if (lastShotTime + 1.5 <= currentTime)
+        if (lastShotTime + shotCooldownSeconds <= currentTime)
         {
             self.drop()
             lastShotTime = currentTime
@@ -736,7 +747,7 @@ class EnemySludgeDroppingComponent: ActionComponent {
         sludge.physicsBody?.isDynamic = false
         sludge.physicsBody?.friction = 0
         sludge.physicsBody?.usesPreciseCollisionDetection = true
-        sludge.physicsBody?.categoryBitMask = Constants.enemyShotCategory
+        sludge.physicsBody?.categoryBitMask = Constants.enemyStatusShotCategory
         sludge.physicsBody?.contactTestBitMask = Constants.playerCategory
         sludge.physicsBody?.collisionBitMask = Constants.wallCategory
         sludge.position = enemySprite.position
@@ -755,7 +766,9 @@ class EnemyRingShotComponent: ActionComponent {
     var moveTo = CGPoint()
     var moving = false
     var shooter = EnemyEntity()
-    let shotCooldownSeconds: TimeInterval = 1
+    var shotCooldownSeconds: TimeInterval = 1.5
+    var shotLength = 7.5
+    var shotNumber = 16
     
     var lastShotTime: TimeInterval = 0
     var playerSprite: SKSpriteNode!
@@ -768,10 +781,12 @@ class EnemyRingShotComponent: ActionComponent {
         self.coordinate = shooter.sprite.position
         self.playerSprite = Player.entity.sprite
         lastShotTime = scene.time
+        let componentDict = (entity.componentDict["ringShot"] as? [String:Any])!
+        shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
+        shotLength = (componentDict["shotLength"] as? TimeInterval)!
+        shotNumber = (componentDict["shotNumber"] as? Int)!
         
-        
-        
-    }
+        }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -791,10 +806,10 @@ class EnemyRingShotComponent: ActionComponent {
         let ringNode = ShotNode()
         ringNode.shooter = shooter
         var moveTos = [CGPoint]()
-        let startAngle = Float(Float(arc4random()) / Float(UINT32_MAX)) * Float(Double.pi/8.0)
-        for i in 0 ..< 16
+        let startAngle = Float(Float(arc4random()) / Float(UINT32_MAX)) * Float(2*Double.pi/Double(shotNumber))
+        for i in 0 ..< shotNumber
         {
-            let angle = Float(Double(i) * Double.pi/8.0) + startAngle
+            let angle = Float(Double(i) * 2*Double.pi/Double(shotNumber)) + startAngle
             moveTo.y = enemySprite.position.y + CGFloat(sinf(angle) * 1000.0)
             moveTo.x = enemySprite.position.x + CGFloat(cosf(angle) * 1000.0)
             fire(ringNode)
@@ -803,7 +818,7 @@ class EnemyRingShotComponent: ActionComponent {
         scene.addChild(ringNode)
         for i in 0 ..< ringNode.children.count
         {
-            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: 7.5), SKAction.removeFromParent()])
+            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: shotLength), SKAction.removeFromParent()])
             ringNode.children[i].run(action)
         }
     }

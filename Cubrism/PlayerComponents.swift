@@ -30,7 +30,7 @@ class PlayerShootComponent: GKComponent {
         
         joystick.position = CGPoint(x: scene.size.width - joystick.radius -  30, y: joystick.radius + 30)
         scene.addChild(joystick)
-        joystick.startHandler = { [unowned self] in
+        joystick.startHandler = { //[unowned self] in
             scene.started = true
         
         }

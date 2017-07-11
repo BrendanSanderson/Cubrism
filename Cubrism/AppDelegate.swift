@@ -55,6 +55,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "LevelCompleted")
             UserDefaults.standard.synchronize()
         }
+        if(Constants.dev == true)
+        {
+            let completedLevel = 50
+            UserDefaults.standard.set(completedLevel, forKey:
+                "LevelCompleted")
+            let level = 45
+            UserDefaults.standard.set(level, forKey: "Level")
+            UserDefaults.standard.synchronize()
+            let experience = 350000
+            UserDefaults.standard.set(experience, forKey: "Experience")
+            UserDefaults.standard.synchronize()
+            Player.level = 45
+            let totaExperience = 350000
+            UserDefaults.standard.set(totaExperience, forKey:
+                "TotalExperience")
+            UserDefaults.standard.synchronize()
+        }
+        do {
+            let file = Bundle.main.url(forResource: "constants", withExtension: "json")
+            let data = try Data(contentsOf: file!)
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
+            let jsonDict = json as? [String: Any]
+            UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
+            UserDefaults.standard.synchronize()
+            
+        }
+        catch {
+            print(error.localizedDescription)
+        }
+        
         if UserDefaults.standard.object(forKey: "Gear") == nil
         {
             let gear : [String : [String : AnyObject]] = ["Power Core": Equipment(t: "Power Core").toDictionary(), "Armor Core": Equipment(t: "Armor Core").toDictionary(), "Pulsar": Equipment(t:"Pulsar").toDictionary(), "Special Pulsar": Equipment(t: "Special Pulsar").toDictionary(), "Shield": Equipment(t: "Shield").toDictionary(), "Attachment 1": Equipment(t: "Attachment").toDictionary(), "Attachment 2": Equipment(t: "Attachment").toDictionary()]
@@ -69,7 +99,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.synchronize()
         }
         Player.gearDict = UserDefaults.standard.object(forKey: "Gear") as! [String:[String : AnyObject]]
+        Player.readConstants()
         Player.updateInventory()
+        Player.updateEquipment()
+        Player.updatePlayer()
         self.window?.rootViewController = view;
         self.window?.makeKeyAndVisible()
         Constants.updateMerchantInventory()

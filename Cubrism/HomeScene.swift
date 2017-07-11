@@ -2,7 +2,7 @@
 //  GameScene.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/3/16.
+//  Created by Brendan Sanderson on 3/3/16.
 //  Copyright (c) 2016 Brendan. All rights reserved.
 //
 

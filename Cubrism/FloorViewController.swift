@@ -17,13 +17,14 @@ class FloorViewController: UIViewController {
     var skView = SKView()
     var scene: RoomScene!
     var level = 0
+    var world = 0
     var levelExp = 0
     var max = UInt32(6)
     var min = UInt32(4)
     var homeView: HomeViewController!
     var enemyPoints = 4
     
-    convenience init(min: UInt32, max: UInt32, level:Int)
+    convenience init(min: UInt32, max: UInt32, level:Int, world:Int)
     {
         self.init()
         self.level = level
@@ -289,30 +290,31 @@ class FloorViewController: UIViewController {
     func getDrops() -> [Item]
     {
         var d = [Item]()
-        let cubrixels = Int(arc4random_uniform(UInt32((level * 10))))
+        let l = level + 10*(world-1)
+        let cubrixels = Int(arc4random_uniform(UInt32((l * 10))))
         d.append(Item(t: "Cubrixel", q: cubrixels, s: true))
         
-        let pt1 = 50 - level
-        let pt2 = 50 + level
-        let pt3 = level
+        let pt1 = 50 - l
+        let pt2 = 50 + l
+        let pt3 = l
         let pt4 = Int(Double(level) / 2.0)
         let num = Int(arc4random_uniform(UInt32(100)))
         if num <= (pt1)
         {
-            d.append(Equipment(tie: 1, lev: level))
+            d.append(Equipment(tie: 1, lev: l))
         }
         else if (num <= pt2 + pt1)
         {
-            d.append(Equipment(tie: 2, lev: level))
+            d.append(Equipment(tie: 2, lev: l))
         }
         let num2 = Int(arc4random_uniform(UInt32(100)))
         if num2 <= (pt3)
         {
-            d.append(Equipment(tie: 3, lev: level))
+            d.append(Equipment(tie: 3, lev: l))
         }
         else if (num2 <= pt3 + pt4)
         {
-            d.append(Equipment(tie: 4, lev: level))
+            d.append(Equipment(tie: 4, lev: l))
         }
         return d
     }

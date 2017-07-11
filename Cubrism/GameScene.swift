@@ -7,7 +7,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var vending = false
     var vender: VendorPopUpNode!
     var doorAccessed = String()
-    var world = 1
+    var world = Player.level/10 + 1
     override func didMove(to view: SKView) {
         self.scaleMode = .resizeFill
         view.isMultipleTouchEnabled = true
@@ -17,7 +17,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createGrid()
         self.physicsWorld.contactDelegate = self
         super.didMove(to: view)
-        
+        if(Player.currentViewController != nil)
+        {
+            world = Player.currentViewController.world
+        }
     }
     override func update(_ currentTime: TimeInterval) {
         time = currentTime
@@ -76,7 +79,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if  button.name == "pause"{
                 if vending == false
                 {
-                    self.addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+                    if (self.isKind(of: HomeScene.self))
+                    {
+                        self.addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Reset"))
+                    }
+                    else
+                    {
+                       self.addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+                    }
                 }
                 else
                 {
@@ -135,7 +145,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             (Player.currentScene as? RoomScene)?.viewController.goToRoomScene()
            // NSNotificationCenter.defaultCenter().postNotificationName("GoToRoomScene", object: self)
         }
-        else if (mask1 == Constants.playerCategory && mask2 == Constants.enemyShotCategory)
+        else if (mask1 == Constants.playerCategory && (mask2 == Constants.enemyShotCategory || mask2 == Constants.enemyStatusShotCategory))
         {
             
             if (secondBody.node?.parent != nil)

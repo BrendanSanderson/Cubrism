@@ -132,10 +132,10 @@ class BossEntity: DynamicEntity {
             effectAttackPower = 25
             
         }
-        health = Double(1000.0 * Constants.enemyMultiplier(level))
+        health = Double(1000.0 * Constants.bossHealthMultiplier(level))
         currentHealth = health
-        rangeAttackPower = Int(Double(rangeMult) * Constants.enemyMultiplier(level))
-        meleeAttackPower = Int(Double(meleeMult) * Constants.enemyMultiplier(level))
+        rangeAttackPower = Int(Double(rangeMult) * Constants.bossDamageMultiplier(level))
+        meleeAttackPower = Int(Double(meleeMult) * Constants.bossDamageMultiplier(level))
         effectAttackPower = Int(Double(effectAttackPower) * Constants.enemyMultiplier(level))
         exp = (exp * Constants.expMultiplier(level))
     }
@@ -210,6 +210,20 @@ class BossEntity: DynamicEntity {
             self.addComponent(actions[0])
             scene.killEnemy(50.0)
             alive = false
+            for i in scene.children
+            {
+                if (i is ShotNode)
+                {
+                    i.removeFromParent()
+                }
+            }
+            for i in (scene as! RoomScene).entites
+            {
+                if (i is EnemyEntity)
+                {
+                    (i as! EnemyEntity).damageEnemy((i as! EnemyEntity).health)
+                }
+            }
             if (scene as! RoomScene).name == "bossRoom"
             {
                 (scene as! RoomScene).addTeleporter(CGPoint(x: scene.size.width/2, y: scene.size.height/2))

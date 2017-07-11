@@ -345,7 +345,7 @@ class ShopPopUpNode: VendorPopUpNode {
             leftDividerLine.zPosition = 1001
             
             let inventoryRegion = CGSize(width: mainFrame.size.width * 0.455, height: mainFrame.size.height * 0.90625)
-            let inventoryCenter = CGPoint(x: mainFrame.size.width * 0.2425, y: 0)
+            //let inventoryCenter = CGPoint(x: mainFrame.size.width * 0.2425, y: 0)
             let invBotLeft = CGPoint(x: mainFrame.size.width * 0.015, y: mainFrame.size.height * -0.45251)
             let marginWidth = (inventoryRegion.width - 160.0)/6
             let marginHeight = (inventoryRegion.height - 192.0)/7

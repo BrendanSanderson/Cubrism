@@ -237,9 +237,9 @@ class BossElectricFieldComponent: ActionComponent {
             sprite.physicsBody?.isDynamic = false
             sprite.physicsBody?.friction = 0
             sprite.physicsBody?.usesPreciseCollisionDetection = true
-            sprite.physicsBody?.categoryBitMask = Constants.enemyShotCategory
+            sprite.physicsBody?.categoryBitMask = Constants.enemyStatusShotCategory
             sprite.physicsBody?.contactTestBitMask = Constants.playerCategory
-            sprite.physicsBody?.collisionBitMask = Constants.teleporterCategory
+            sprite.physicsBody?.collisionBitMask = Constants.wallCategory
         }
         scene.addChild(node)
 

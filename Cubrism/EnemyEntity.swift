@@ -23,14 +23,17 @@ class EnemyEntity: DynamicEntity {
     var rangeAttackPower = 25
     var experience = 5.0
     var level = 1
+    let enemyDict = (UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any])?["enemy"] as? [String: Any]
+    var componentDict: [String:Any]
     override init()
     {
+        componentDict = (enemyDict?["component"] as? [String: Any])!
         super.init()
     }
     
-    init(scene: GameScene, eType: String, lev: Int, elite: Bool)
+    convenience init(scene: GameScene, eType: String, lev: Int, elite: Bool)
     {
-        super.init()
+        self.init()
         self.scene = scene
         self.type = eType
         node.entity = self
@@ -79,35 +82,19 @@ class EnemyEntity: DynamicEntity {
         var healthMultiplier = 1.0
         var rangeAttackMultiplier = 1.0
         var meleeAttackMultiplier = 1.0
-        if eType == "Melee"
-        {
-            self.sprite = SKSpriteNode(imageNamed: "meleeEnemy")
-            let trackingComponent = EnemyTrackingComponent(scene: scene, sprite: sprite, speed: 2.0)
-            addComponent(trackingComponent)
-            actions.append(trackingComponent)
-            healthMultiplier = 1.5
-            meleeAttackMultiplier = 2.0
-            experience = 5.0
+        var speed = 2.0
+        let jType = String(describing: eType.characters.first!)
+            .lowercased() + eType.substring(from: eType.characters.index(of: eType.characters.dropFirst().first!)!)
+        let specificEnemyDict = enemyDict?[jType] as? [String: Any]
+        healthMultiplier = (specificEnemyDict?["healthMult"] as? Double)!
+        rangeAttackMultiplier = (specificEnemyDict?["rangeAttackMult"] as? Double)!
+        meleeAttackMultiplier = (specificEnemyDict?["meleeAttackMult"] as? Double)!
+        experience = (specificEnemyDict?["experience"] as? Double)!
+        if let s = specificEnemyDict?["speed"] as? Double {
+            speed = s
         }
-        else if eType == "Suicide"
-        {
-            self.sprite = SKSpriteNode(imageNamed: "suicideEnemy")
-            let trackingComponent = EnemyTrackingComponent(scene: scene, sprite: sprite, speed: 10.0)
-            addComponent(trackingComponent)
-            actions.append(trackingComponent)
-            healthMultiplier = 0.01
-            meleeAttackMultiplier = 4.0
-            experience = 5.0
-        }
-        else if eType == "DragonFireball"
-        {
+        if(eType == "DragonFireball") {
             self.sprite = SKSpriteNode(imageNamed: "bossDragonFireball")
-            let trackingComponent = EnemyTrackingComponent(scene: scene, sprite: sprite, speed: 4.0)
-            addComponent(trackingComponent)
-            actions.append(trackingComponent)
-            healthMultiplier = 1.0
-            meleeAttackMultiplier = 4.0
-            experience = 0.0
             if (scene as! RoomScene).doors[0].direction == 1
             {
                 sprite.position = CGPoint(x: scene.size.width * 0.15, y: scene.size.height/2)
@@ -117,95 +104,72 @@ class EnemyEntity: DynamicEntity {
                 sprite.position = CGPoint(x: scene.size.width * 0.85, y: scene.size.height/2)
             }
         }
-            
+        else {self.sprite = SKSpriteNode(imageNamed: jType+"Enemy")}
+        
+        if eType == "Suicide" || eType == "DragonFireball" || eType == "Speed"
+        {
+            let trackingComponent = EnemyTrackingComponent(entity: self, speed: speed)
+            addComponent(trackingComponent)
+            actions.append(trackingComponent)
+        }
         else if eType == "Dash"
         {
-            self.sprite = SKSpriteNode(imageNamed: "dashEnemy")
-            let dashComponent = EnemyDashMovementComponent(scene: scene, sprite: sprite, speed: 10.00)
+            let dashComponent = EnemyDashMovementComponent(entity: self, speed: speed)
             addComponent(dashComponent)
             actions.append(dashComponent)
-            meleeAttackMultiplier = 2.0
-            experience = 10.0
         }
             
         else if eType == "Range"
         {
-            self.sprite = SKSpriteNode(imageNamed: "rangeEnemy")
-            let movementComponent = EnemyRandomMovementComponent(scene: scene, sprite: sprite, speed: 0.75)
+            let movementComponent = EnemyRandomMovementComponent(entity:self, speed: speed)
             let shootingComponent = EnemyShotTargetingComponent(scene: scene, entity: self)
             addComponent(movementComponent)
             actions.append(movementComponent)
             addComponent(shootingComponent)
             actions.append(shootingComponent)
-            meleeAttackMultiplier = 0.5
-            experience = 5.0
         }
         else if (type == "RangeTracking")
         {
-            self.sprite = SKSpriteNode(imageNamed: "rangeTrackingEnemy")
-            let movementComponent = EnemyRandomMovementComponent(scene: scene, sprite: sprite, speed: 0.33)
+            let movementComponent = EnemyRandomMovementComponent(entity:self, speed: speed)
             let shootingComponent = EnemyShotTrackingComponent(scene: scene, entity: self)
             addComponent(movementComponent)
             actions.append(movementComponent)
             addComponent(shootingComponent)
             actions.append(shootingComponent)
-            meleeAttackMultiplier = 0.5
-            rangeAttackMultiplier = 4.0
-            experience = 10.0
         }
         else if (type == "RangeTripple")
         {
-            self.sprite = SKSpriteNode(imageNamed: "rangeTrippleEnemy")
-            let movementComponent = EnemyRandomMovementComponent(scene: scene, sprite: sprite, speed: 0.4, distanceMult: 0.33)
+            let movementComponent = EnemyRandomMovementComponent(entity:self, variables: [speed,0.33])
             let shootingComponent = EnemyShotTrippleComponent(scene: scene, entity: self)
             addComponent(movementComponent)
             actions.append(movementComponent)
             addComponent(shootingComponent)
             actions.append(shootingComponent)
-            healthMultiplier = 2.0
-            meleeAttackMultiplier = 0.5
-            rangeAttackMultiplier = 0.75
-            experience = 10.0
         }
         else if (type == "Sludge")
         {
-            self.sprite = SKSpriteNode(imageNamed: "sludgeEnemy")
-            let movementComponent = EnemyRandomMovementComponent(scene: scene, sprite: sprite, speed: 0.5)
+            let movementComponent = EnemyRandomMovementComponent(entity:self, speed: speed)
             let sludgeComponent = EnemySludgeDroppingComponent(scene: scene, entity: self)
             addComponent(movementComponent)
             actions.append(movementComponent)
             addComponent(sludgeComponent)
             actions.append(sludgeComponent)
-            healthMultiplier = 4.0
-            meleeAttackMultiplier = 0.5
-            rangeAttackMultiplier = 1.0
-            experience = 7.5
         }
         else if (type == "Bomber")
         {
-            self.sprite = SKSpriteNode(imageNamed: "bomberEnemy")
-            let movementComponent = EnemyRandomMovementComponent(scene: scene, sprite: sprite, speed: 2)
+            let movementComponent = EnemyRandomMovementComponent(entity: self, speed: speed)
             let bomberComponent = EnemyBombDroppingComponent(scene: scene, entity: self)
             addComponent(movementComponent)
             actions.append(movementComponent)
             addComponent(bomberComponent)
             actions.append(bomberComponent)
-            healthMultiplier = 2.0
-            meleeAttackMultiplier = 0.5
-            rangeAttackMultiplier = 0.25
-            experience = 7.5
         }
         
         else if (type == "RangeRing")
         {
-            self.sprite = SKSpriteNode(imageNamed: "rangeRingEnemy")
             let ringShotComponent = EnemyRingShotComponent(scene: scene, entity: self)
             addComponent(ringShotComponent)
             actions.append(ringShotComponent)
-            healthMultiplier = 1.0
-            meleeAttackMultiplier = 0.5
-            rangeAttackMultiplier = 0.5
-            experience = 7.5
         }
 
         else
@@ -216,10 +180,10 @@ class EnemyEntity: DynamicEntity {
         {
             self.sprite.size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
         }
-        health = Int(100.0 * healthMultiplier * pow(Double(level), 0.8))
+        health = Int(Player.healthBase * healthMultiplier * pow(Double(level), 0.8))
         currentHealth = health
-        rangeAttackPower = Int(25.0 * rangeAttackMultiplier * Constants.enemyMultiplier(level))
-        meleeAttackPower = Int(25.0 * meleeAttackMultiplier * Constants.enemyMultiplier(level))
+        rangeAttackPower = Int(Player.attackPowerBase * rangeAttackMultiplier * Constants.enemyMultiplier(level))
+        meleeAttackPower = Int(Player.attackPowerBase * meleeAttackMultiplier * Constants.enemyMultiplier(level))
         experience = (experience * Constants.expMultiplier(level))
     }
     

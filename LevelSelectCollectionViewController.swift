@@ -135,15 +135,15 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        if indexPath.section == 4
-        {
-            homeView.floorView.min = UInt32(1)
-            homeView.floorView.max = UInt32(1)
-            homeView.floorView.level = Player.level
-            self.dismiss(animated: false, completion: nil)
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
-        }
-        else if indexPath.item <= (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
+//        if indexPath.section == 4
+//        {
+//            homeView.floorView.min = UInt32(1)
+//            homeView.floorView.max = UInt32(1)
+//            homeView.floorView.level = Player.level
+//            self.dismiss(animated: false, completion: nil)
+//            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
+//        }
+        if indexPath.item <= (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
             
         if let path = Bundle.main.path(forResource: "levels", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
             let level = dict[indexPath.item] as? NSDictionary
@@ -151,6 +151,12 @@ class LevelSelectCollectionViewController: UICollectionViewController {
             homeView.floorView.min = UInt32(((level?.value(forKey: "min")) as? Int)!)
             homeView.floorView.max = UInt32(((level?.value(forKey: "max")) as? Int)!)
             homeView.floorView.level = ((level?.value(forKey: "level")) as? Int)!
+            if (Constants.dev == true && ((level?.value(forKey: "level")) as? Int)! == 10)
+            {
+                homeView.floorView.min = 1
+                homeView.floorView.max = 1
+            }
+            homeView.floorView.world = indexPath.section + 1
             
             self.dismiss(animated: false, completion: nil)
             NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
@@ -189,18 +195,14 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         let h = self.view.frame.size.height
         let imageView1 = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
         imageView1.image = UIImage(named: "background1")
-        
         let imageView2 = UIImageView(frame: CGRect(x: w, y: 0, width: w, height: h))
         imageView2.image = UIImage(named: "background2")
-        
         let imageView3 = UIImageView(frame: CGRect(x: 2.0 * w, y: 0, width: w, height: h))
         imageView3.image = UIImage(named: "background3")
         let imageView4 = UIImageView(frame: CGRect(x: 3.0 * w, y: 0, width: w, height: h))
-        imageView4.image = UIImage(named: "background3")
-        
-        
+        imageView4.image = UIImage(named: "background4")
         let imageView5 = UIImageView(frame: CGRect(x: 4.0 * w, y: 0, width: w, height: h))
-        imageView5.image = UIImage(named: "background1")
+        imageView5.image = UIImage(named: "background5")
         
         self.collectionView?.addSubview(imageView1)
         self.collectionView?.addSubview(imageView2)

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */; };
+		27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27562A571F05AC5D00915990 /* Launch Screen.storyboard */; };
+		27C8CCD81F01847300C8D806 /* constants.json in Resources */ = {isa = PBXBuildFile; fileRef = 27C8CCD71F01847300C8D806 /* constants.json */; };
 		BA017BBD1C9694A2003B64BC /* EnemyComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA017BBC1C9694A2003B64BC /* EnemyComponents.swift */; };
 		BA0B06081CA3759A003CE50D /* LevelSelectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */; };
 		BA20C8CE1C889E0800EE234D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA20C8CD1C889E0800EE234D /* AppDelegate.swift */; };
@@ -68,6 +70,8 @@
 
 /* Begin PBXFileReference section */
 		2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
+		27562A571F05AC5D00915990 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		27C8CCD71F01847300C8D806 /* constants.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = constants.json; sourceTree = "<group>"; };
 		BA017BBC1C9694A2003B64BC /* EnemyComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnemyComponents.swift; sourceTree = "<group>"; };
 		BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectNode.swift; sourceTree = "<group>"; };
 		BA20C8CA1C889E0800EE234D /* Cubrism.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cubrism.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -163,6 +167,7 @@
 		BA20C8CC1C889E0800EE234D /* Cubrism */ = {
 			isa = PBXGroup;
 			children = (
+				27562A571F05AC5D00915990 /* Launch Screen.storyboard */,
 				BA20C8CD1C889E0800EE234D /* AppDelegate.swift */,
 				BA20C8D31C889E0800EE234D /* HomeViewController.swift */,
 				BAC28FE71CA667DB003E07ED /* LevelSelectCollectionViewController.swift */,
@@ -174,6 +179,7 @@
 				BAD8DE8B1C9DCBA50041EA3C /* Objects */,
 				BAA3D3561C8D158D0054BA31 /* Entities and Components */,
 				BA20C8D81C889E0800EE234D /* Assets.xcassets */,
+				27C8CCD71F01847300C8D806 /* constants.json */,
 				BAACCDF51CD5776F001FEB25 /* items.plist */,
 				BA20C8DD1C889E0800EE234D /* Info.plist */,
 				BAD62F831C96496D00B9A5AD /* ActionComponent.swift */,
@@ -315,7 +321,7 @@
 				TargetAttributes = {
 					BA20C8C91C889E0800EE234D = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = QV5DCZA4G6;
+						DevelopmentTeam = 9B6HY96UG5;
 						LastSwiftMigration = 0830;
 					};
 					BA20C8E11C889E0900EE234D = {
@@ -358,6 +364,8 @@
 				BA20C8D91C889E0800EE234D /* Assets.xcassets in Resources */,
 				BAACCDF61CD5776F001FEB25 /* items.plist in Resources */,
 				BAD560521C9A5F99000BBB38 /* bosses.plist in Resources */,
+				27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */,
+				27C8CCD81F01847300C8D806 /* constants.json in Resources */,
 				BADF41A31CA8A5ED00EF9C15 /* border 3.jpg in Resources */,
 				BA26D26C1C9925C800C1FFBB /* rooms.plist in Resources */,
 				BAD1AF521CA8E66A00AD0290 /* levels.plist in Resources */,
@@ -544,6 +552,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9B6HY96UG5;
 				INFOPLIST_FILE = Cubrism/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -561,6 +570,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9B6HY96UG5;
 				INFOPLIST_FILE = Cubrism/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

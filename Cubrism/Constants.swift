@@ -2,7 +2,7 @@
 //  Constants.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/13/16.
+//  Created by Brendan Sanderson on 3/13/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -18,6 +18,7 @@ class Constants: NSObject {
     static let teleporterCategory = UInt32(64)
     static let doorCategory =  UInt32(128)
     static let wallCategory = UInt32(256)
+    static let enemyStatusShotCategory = UInt32(512)
     static var aspectMultiplier = 1
     
     static var w: CGFloat!
@@ -26,9 +27,15 @@ class Constants: NSObject {
     static var uW: CGFloat!
     static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
-    
+    static var dev = true;
     static func enemyMultiplier(_ level: Int) -> Double{
-        return pow((Double(level) + 4)/5 , 1.3)
+        return pow((Double(level) + 3)/4 , 1.3)
+    }
+    static func bossHealthMultiplier(_ level: Int) -> Double{
+        return pow((Double(level) + 2)/3 , 1.4)
+    }
+    static func bossDamageMultiplier(_ level: Int) -> Double{
+        return pow((Double(level) + 2)/3 , 1.3)
     }
     static func expMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 5)/7 , 1.4)

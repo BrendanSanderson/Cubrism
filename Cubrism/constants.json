@@ -1,28 +1,126 @@
 {
-  "player": {
-    "shield" : {
-      "base" : 100.0,
-      "exp" : 1.1,
-      "boostMult" : 1.0,
-      "regen" : {
-        "base" : 0.3,
-        "exp" : 1.0,
-        "boostMult" : 0.1
-      }
+    "player": {
+        "shield" : {
+            "base" : 100.0,
+            "exp" : 1.1,
+            "boostMult" : 1.0,
+            "regen" : {
+                "base" : 0.3,
+                "exp" : 1.0,
+                "boostMult" : 0.1
+            }
+        },
+        "health" : {
+            "base" : 100.0,
+            "exp" : 1.2,
+            "boostMult": 1.0
+        },
+        "attack" : {
+            "base": 100.0,
+            "exp": 1.1,
+            "boostMult" : 1.0,
+            "speed" : {
+                "base" : 0.5,
+                "boostMult" : -0.02
+            }
+        },
+        "defenceBoostMult" : 0.25
     },
-    "health" : {
-      "base" : 100.0,
-      "exp" : 1.2,
-      "boostMult": 1.0
-    },
-    "attack" : {
-      "base": 100.0,
-      "exp": 1.1,
-      "boostMult" : 1.0,
-      "speed" : {
-        "base" : 0.5,
-        "boostMult" : -0.02
-      }
+    "enemy" : {
+        "melee" : {
+            "healthMult" : 1.5,
+            "rangeAttackMult" :1.0,
+            "meleeAttackMult" : 2.0,
+            "experience" : 5.0,
+            "speed" : 2.0
+        },
+        "suicide" : {
+            "healthMult" : 0.01,
+            "rangeAttackMult" :1.0,
+            "meleeAttackMult" : 4.0,
+            "experience" : 5.0,
+            "speed" : 10.0
+        },
+        "dragonFireball" : {
+            "healthMult" : 1.0,
+            "rangeAttackMult" : 1.0,
+            "meleeAttackMult" : 4.0,
+            "experience" : 0.0,
+            "speed" : 3.0
+        },
+        "dash" : {
+            "healthMult" : 1.0,
+            "rangeAttackMult" : 1.0,
+            "meleeAttackMult" : 2.0,
+            "experience" : 7.5,
+            "speed" : 10.0
+        },
+        "range" : {
+            "healthMult" : 1.0,
+            "rangeAttackMult" : 1.0,
+            "meleeAttackMult" : 0.5,
+            "experience" : 5.0,
+            "speed" : 0.75
+        },
+        "rangeTracking" : {
+            "healthMult" : 1.0,
+            "rangeAttackMult" : 4.0,
+            "meleeAttackMult" : 0.5,
+            "experience" : 7.5,
+            "speed" : 10.0
+        },
+        "rangeTripple" : {
+            "healthMult" : 2.0,
+            "rangeAttackMult" : 0.75,
+            "meleeAttackMult" : 0.5,
+            "experience" : 10.0,
+            "speed" : 0.4
+        },
+        "sludge" : {
+            "healthMult" : 3.0,
+            "rangeAttackMult" : 1.0,
+            "meleeAttackMult" : 0.5,
+            "experience" : 7.5,
+            "speed" : 0.5
+        },
+        "bomber" : {
+            "healthMult" : 2.0,
+            "rangeAttackMult" : 0.5,
+            "meleeAttackMult" : 0.25,
+            "experience" : 7.5,
+            "speed" : 2
+        },
+        "rangeRing" : {
+            "healthMult" : 1.0,
+            "rangeAttackMult" : 0.5,
+            "meleeAttackMult" : 0.5,
+            "experience" : 7.5,
+            "speed" : 0
+        },
+        "component" : {
+            "shotTargeting" : {
+                "shotCooldown" : 1.0
+            },
+            "shotTracking" : {
+                "shotCooldown" : 6.0,
+                "shotLength" : 5.0,
+                "speed" : 3.0
+            },
+            "shotTripple" : {
+                "shotCooldown" : 1.0,
+                "shotLength" : 4.0
+            },
+            "bombDropping" : {
+                "shotCooldown" : 2.0
+            },
+            "sludgeDropping" : {
+                "shotCooldown" : 3.0
+            },
+            "ringShot" : {
+                "shotCooldown" : 1.5,
+                "shotLength" : 7.5,
+                "shotNumber" : 16
+            }
+        }
     }
-  }
 }

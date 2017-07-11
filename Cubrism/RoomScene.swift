@@ -43,6 +43,7 @@ class RoomScene: GameScene {
         killedEnemies = 0
         addEntities()
         addDoors()
+        world = viewController.world
         super.didMove(to: view)
         Player.damagePlayer(0)
     }

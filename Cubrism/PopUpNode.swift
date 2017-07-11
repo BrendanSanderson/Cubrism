@@ -113,6 +113,12 @@ class PopUpNode: SKNode {
         gameScene.addChild(PopUpNode(scene: gameScene, text: "Are You Sure?", button1Text: "Yes", button2Text: "No"))
         
     }
+    func reset(_ sender: UIButton!) {
+        remove()
+        
+        gameScene.addChild(PopUpNode(scene: gameScene, text: "Are You Sure?", button1Text: "Yes", button2Text: "No"))
+        
+    }
     func no(_ sender: UIButton!) {
         remove()
         

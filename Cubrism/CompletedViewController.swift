@@ -118,11 +118,11 @@ class CompletedViewController: UIViewController {
         }
         if (numDrops > 2)
         {
-            if drops[1].isKind(of: Equipment.self)
+            if drops[2].isKind(of: Equipment.self)
             {
-                equipment3tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
+                equipment3tier.image = UIImage (named: "tier\((drops[2] as! Equipment).tier)")
             }
-            equipment2.image = UIImage(named: drops[2].type)
+            equipment3.image = UIImage(named: drops[2].type)
         }
         
 //        let equipment4 = UIImageView(frame: CGRect(x: view.frame.width * 0.3 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))

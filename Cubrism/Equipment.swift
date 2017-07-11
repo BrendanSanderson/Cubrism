@@ -81,27 +81,31 @@ class Equipment: Item {
         
         if type == "Shield"
         {
-            self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.shield = 1 + 500 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             self.shieldRegen = 10 * ((multip * Double(level))/75) * (Player.playerMultiplier(level, mult: 1.2) - Player.playerMultiplier(level, mult: 1.1))
         }
         else if type == "Power Core"
         {
-            self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-            self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.attackPower = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.defence = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             
-            self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.shield = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
         }
         else if type == "Pulsar"
         {
-            self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-            self.attackSpeed = Double(tier * level/10)
+            self.attackPower = 1 + 500 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+        }
+            
+        else if type == "Special Pulsar"
+        {
+            self.attackSpeed = Double(tier * level/25)
         }
             
         else if type == "Armor Core"
         {
             self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-            self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.defence = 1 + 150 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             
         }
         else if type == "Attachment"
@@ -128,17 +132,15 @@ class Equipment: Item {
             }
             if subType == "AttackPower"
             {
-                self.attackPower = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-                self.attackSpeed = Double(tier * level/10)
+                self.attackPower = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
             }
             else if subType == "Defence"
             {
-                self.defence = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
-                
+                self.defence = 1 + 25 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             }
             else if subType == "Shield"
             {
-                self.shield = 1 + 625 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+                self.shield = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
             }
             else if subType == "Health"
             {

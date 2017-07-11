@@ -2,7 +2,7 @@
 //  Player.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/14/16.
+//  Created by Brendan Sanderson on 3/14/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -15,8 +15,16 @@ class Player: NSObject {
     static var currentShield = 100.0
     static var currentHealth = 100.0
     static var attackPower = 25.0
+    static var attackPowerBase = 100.0
+    static var attackPowerExp = 1.1
+    static var shieldBase = 100.0
+    static var shieldExp = 1.1
+    static var healthBase = 100.0
+    static var healthExp = 1.2
     static var attackSpeed = 25.0
     static var shieldRegen = 0.3
+    static var shieldRegenExp = 1.0
+    static var shieldRegenBase = 0.3
     static var level = UserDefaults.standard.object(forKey: "Level") as! Int
     static var entity = PlayerEntity()
     static var defence = 0.0
@@ -29,26 +37,37 @@ class Player: NSObject {
     static var inventoryDict = UserDefaults.standard.object(forKey: "Inventory") as! [[String : AnyObject]]
     static var inventory = UserDefaults.standard.object(forKey: "Inventory") as! [Item]
     static var attackPowerBoost = 0.0
+    static var attackPowerBoostMult = 1.0
     static var attackSpeedBoost = 0.0
+    static var attackSpeedBoostMult = 1.0
     static var defenceBoost = 0.0
     static var shieldBoost = 0.0
+    static var shieldBoostMult = 1.0
     static var healthBoost = 0.0
+    static var healthBoostMult = 1.0
     static var shieldRegenBoost = 0.0
+    static var shieldRegenBoostMult = 1.0
     static var shotCoolDownSeconds = 0.5
+    static var defenceBoostMult = 0.25
     static var alive = true
     static var expGained = 0
     
     static func updatePlayer()
     
     {
-        
         alive = true
-        health = 100.0 * Player.playerMultiplier(level, mult: 1.2) + healthBoost
-        shield = 100.0 * Player.playerMultiplier(level, mult: 1.1) + shieldBoost
-        defence = defenceBoost
-        attackPower = 2500.0 * Player.playerMultiplier(level, mult: 1.1) + attackPowerBoost
-        shieldRegen = 0.3 * (Player.playerMultiplier(level, mult: 1.0) + shieldRegenBoost/10.0)
-        shotCoolDownSeconds = 0.5 - (attackSpeedBoost/40)
+        defence = defenceBoost * defenceBoostMult
+        health = healthBase * Player.playerMultiplier(level, mult: healthExp) + healthBoost * healthBoostMult
+        shield = shieldBase * Player.playerMultiplier(level, mult: shieldExp) + shieldBoost * shieldBoostMult
+        attackPower = attackPowerBase * Player.playerMultiplier(level, mult: attackPowerExp) + attackPowerBoost * attackPowerBoostMult
+        shieldRegen = shieldRegenBase * (Player.playerMultiplier(level, mult: shieldRegenExp) + shieldRegenBoost * shieldRegenBoostMult)
+        if (Constants.dev)
+        {
+            health = 10000000.0
+            shield = 21000000.0
+            attackPower = 10000000.0
+        }
+        shotCoolDownSeconds = shotCoolDownSeconds - (attackSpeedBoost*attackSpeedBoostMult)
         currentHealth = health
         currentShield = shield
         if totalExp < totalExpToLevel(Player.level)
@@ -100,8 +119,11 @@ class Player: NSObject {
     }
     static func damagePlayer(_ damage: Double)
     {
-        let dam = damage - defence/10.0
-        
+        var dam = damage - defence/10.0
+        if (dam < 0)
+        {
+            dam = 0
+        }
         if (currentShield >= dam)
         {
             currentShield -= dam
@@ -272,5 +294,35 @@ class Player: NSObject {
         UserDefaults.standard.set(inventoryDict, forKey:
             "Inventory")
         UserDefaults.standard.synchronize()
+    }
+    static func readConstants() {
+        let jsonDict = UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any]
+        if let playerDict = jsonDict?["player"] as? [String: Any]
+        {
+            let attackDict = playerDict["attack"] as? [String: Any]
+            attackPowerBoostMult = (attackDict?["boostMult"] as? Double)!
+            attackPowerExp = (attackDict?["exp"] as? Double)!
+            attackPowerExp = (attackDict?["base"] as? Double)!
+            let attackSpeedDict = attackDict?["speed"] as? [String: Any]
+            attackSpeedBoostMult = (attackSpeedDict?["boostMult"] as? Double)!
+            shotCoolDownSeconds = (attackSpeedDict?["base"] as? Double)!
+            
+            let shieldDict = playerDict["shield"] as? [String: Any]
+            shieldBase = (shieldDict?["base"] as? Double)!
+            shieldBoostMult = (shieldDict?["boostMult"] as? Double)!
+            shieldExp = (shieldDict?["exp"] as? Double)!
+            let shieldRegenDict = shieldDict?["regen"] as? [String: Any]
+            shieldRegenBoostMult = (shieldRegenDict?["boostMult"] as? Double)!
+            shieldRegenExp = (shieldRegenDict?["exp"] as? Double)!
+            shieldRegenBase = (shieldRegenDict?["base"] as? Double)!
+            
+            let healthDict = playerDict["health"] as? [String: Any]
+            healthBase = (healthDict?["base"] as? Double)!
+            healthBoostMult = (healthDict?["boostMult"] as? Double)!
+            healthExp = (healthDict?["exp"] as? Double)!
+            
+            defenceBoostMult = (playerDict["defenceBoostMult"] as? Double)!
+            self.updatePlayer()
+        }
     }
 }

@@ -50,7 +50,7 @@ class PlayerEntity: DynamicEntity {
         sprite.physicsBody?.categoryBitMask = Constants.playerCategory
         sprite.physicsBody?.collisionBitMask = Constants.doorCategory | Constants.wallCategory | Constants.enemyCategory | Constants.bossCategory | Constants.enemyShotCategory
         
-        sprite.physicsBody?.contactTestBitMask = Constants.doorCategory | Constants.enemyShotCategory | Constants.enemyCategory | Constants.bossCategory | Constants.wallCategory | Constants.enemyShotCategory
+        sprite.physicsBody?.contactTestBitMask = Constants.doorCategory | Constants.enemyShotCategory | Constants.enemyCategory | Constants.bossCategory | Constants.wallCategory | Constants.enemyStatusShotCategory
         scene.addChild(node)
         lastHit = scene.time
     }
