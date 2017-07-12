@@ -1,0 +1,7 @@
+{
+    "MONGO_USERNAME": "public",
+    "MONGO_PASSWORD": "public",
+    "MONGO_HOST": "ds143181.mlab.com",
+    "MONGO_PORT": "43181",
+    "MONGO_DB_NAME": "cubrism"
+}

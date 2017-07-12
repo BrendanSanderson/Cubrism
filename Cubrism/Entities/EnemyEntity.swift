@@ -106,7 +106,7 @@ class EnemyEntity: DynamicEntity {
         }
         else {self.sprite = SKSpriteNode(imageNamed: jType+"Enemy")}
         
-        if eType == "Suicide" || eType == "DragonFireball" || eType == "Speed"
+        if eType == "Suicide" || eType == "DragonFireball" || eType == "Melee"
         {
             let trackingComponent = EnemyTrackingComponent(entity: self, speed: speed)
             addComponent(trackingComponent)
@@ -184,7 +184,7 @@ class EnemyEntity: DynamicEntity {
         currentHealth = health
         rangeAttackPower = Int(Player.attackPowerBase * rangeAttackMultiplier * Constants.enemyMultiplier(level))
         meleeAttackPower = Int(Player.attackPowerBase * meleeAttackMultiplier * Constants.enemyMultiplier(level))
-        experience = (experience * Constants.expMultiplier(level))
+        experience = (experience * Constants.expMultiplier(level) * pow(Double(level), 0.8))
     }
     
     

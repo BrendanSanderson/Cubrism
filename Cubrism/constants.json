@@ -32,7 +32,7 @@
             "rangeAttackMult" :1.0,
             "meleeAttackMult" : 2.0,
             "experience" : 5.0,
-            "speed" : 2.0
+            "speed" : 1.5
         },
         "suicide" : {
             "healthMult" : 0.01,
@@ -67,7 +67,7 @@
             "rangeAttackMult" : 4.0,
             "meleeAttackMult" : 0.5,
             "experience" : 7.5,
-            "speed" : 10.0
+            "speed" : 0.75
         },
         "rangeTripple" : {
             "healthMult" : 2.0,
@@ -88,7 +88,7 @@
             "rangeAttackMult" : 0.5,
             "meleeAttackMult" : 0.25,
             "experience" : 7.5,
-            "speed" : 2
+            "speed" : 1.0
         },
         "rangeRing" : {
             "healthMult" : 1.0,
@@ -111,10 +111,10 @@
                 "shotLength" : 4.0
             },
             "bombDropping" : {
-                "shotCooldown" : 2.0
+                "shotCooldown" : 1.5
             },
             "sludgeDropping" : {
-                "shotCooldown" : 3.0
+                "shotCooldown" : 1.5
             },
             "ringShot" : {
                 "shotCooldown" : 1.5,

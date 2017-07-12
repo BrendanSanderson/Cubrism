@@ -132,7 +132,7 @@ class BossEntity: DynamicEntity {
             effectAttackPower = 25
             
         }
-        health = Double(1000.0 * Constants.bossHealthMultiplier(level))
+        health = Double(2000.0 * Constants.bossHealthMultiplier(level))
         currentHealth = health
         rangeAttackPower = Int(Double(rangeMult) * Constants.bossDamageMultiplier(level))
         meleeAttackPower = Int(Double(meleeMult) * Constants.bossDamageMultiplier(level))

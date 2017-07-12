@@ -65,7 +65,8 @@ class Player: NSObject {
         {
             health = 10000000.0
             shield = 21000000.0
-            attackPower = 10000000.0
+            attackPower = 21000000.0
+            defence = 10000000000.0
         }
         shotCoolDownSeconds = shotCoolDownSeconds - (attackSpeedBoost*attackSpeedBoostMult)
         currentHealth = health
@@ -302,7 +303,7 @@ class Player: NSObject {
             let attackDict = playerDict["attack"] as? [String: Any]
             attackPowerBoostMult = (attackDict?["boostMult"] as? Double)!
             attackPowerExp = (attackDict?["exp"] as? Double)!
-            attackPowerExp = (attackDict?["base"] as? Double)!
+            attackPowerBase = (attackDict?["base"] as? Double)!
             let attackSpeedDict = attackDict?["speed"] as? [String: Any]
             attackSpeedBoostMult = (attackSpeedDict?["boostMult"] as? Double)!
             shotCoolDownSeconds = (attackSpeedDict?["base"] as? Double)!

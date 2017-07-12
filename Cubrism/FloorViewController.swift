@@ -55,6 +55,7 @@ class FloorViewController: UIViewController {
         
         skView = SKView(frame: self.view.frame)
         self.view.addSubview(skView)
+        self.level = (world-1) * 10 + level
         skView.showsFPS = false
         skView.showsNodeCount = true
         /* Sprite Kit applies additional optimizations to improve rendering performance */
