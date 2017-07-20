@@ -124,6 +124,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.synchronize()
         }
         Player.gearDict = UserDefaults.standard.object(forKey: "Gear") as! [String:[String : AnyObject]]
+        if UserDefaults.standard.object(forKey: "equipUpdated") == nil
+        {
+            Player.balanceEquipment()
+            UserDefaults.standard.set(1, forKey: "equipUpdated")
+            UserDefaults.standard.synchronize()
+        }
         Player.readConstants()
         Player.updateInventory()
         Player.updateEquipment()

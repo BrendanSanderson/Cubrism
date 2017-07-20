@@ -326,4 +326,39 @@ class Player: NSObject {
             self.updatePlayer()
         }
     }
+    
+    static func balanceEquipment()
+    {
+        var d = [Item]()
+        for i in inventory
+        {
+            if (i.isKind(of: Equipment.self))
+            {
+                let e = i as! Equipment
+                d.append(Equipment(t: e.type, lev: e.level, tie: e.tier, st: ""))
+            }
+            else
+            {
+                d.append(i)
+            }
+        }
+        
+        inventory = d
+        var e = gear["Power Core"]!
+        gear["Power Core"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Armor Core"]!
+        gear["Armor Core"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Pulser"]!
+        gear["Pulser"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Special Pulser"]!
+        gear["Special Pulser"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Shield"]!
+        gear["Shield"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Attachment 1"]!
+        gear["Attachment 1"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Attachment 2"]!
+        gear["Attachment 2"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        
+        Player.saveItems()
+    }
 }
