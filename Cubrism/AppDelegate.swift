@@ -55,36 +55,61 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "LevelCompleted")
             UserDefaults.standard.synchronize()
         }
-        if(Constants.dev == true)
+//        if(Constants.dev == true)
+//        {
+//            let completedLevel = 50
+//            UserDefaults.standard.set(completedLevel, forKey:
+//                "LevelCompleted")
+//            let level = 45
+//            UserDefaults.standard.set(level, forKey: "Level")
+//            UserDefaults.standard.synchronize()
+//            let experience = 350000
+//            UserDefaults.standard.set(experience, forKey: "Experience")
+//            UserDefaults.standard.synchronize()
+//            Player.level = 45
+//            let totaExperience = 350000
+//            UserDefaults.standard.set(totaExperience, forKey:
+//                "TotalExperience")
+//            UserDefaults.standard.synchronize()
+//        }
+        if UserDefaults.standard.object(forKey: "LevelCompleted") == nil
         {
-            let completedLevel = 50
-            UserDefaults.standard.set(completedLevel, forKey:
-                "LevelCompleted")
-            let level = 45
-            UserDefaults.standard.set(level, forKey: "Level")
-            UserDefaults.standard.synchronize()
-            let experience = 350000
-            UserDefaults.standard.set(experience, forKey: "Experience")
-            UserDefaults.standard.synchronize()
-            Player.level = 45
-            let totaExperience = 350000
-            UserDefaults.standard.set(totaExperience, forKey:
-                "TotalExperience")
-            UserDefaults.standard.synchronize()
-        }
-        do {
-            let file = Bundle.main.url(forResource: "constants", withExtension: "json")
-            let data = try Data(contentsOf: file!)
-            let json = try JSONSerialization.jsonObject(with: data, options: [])
-            let jsonDict = json as? [String: Any]
-            UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
-            UserDefaults.standard.synchronize()
+            do {
+                let file = Bundle.main.url(forResource: "constants", withExtension: "json")
+                let data = try Data(contentsOf: file!)
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                let jsonDict = json as? [String: Any]
+                Constants.jsonDict = jsonDict
+                UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
+                UserDefaults.standard.synchronize()
             
+            }
+            catch {
+                print(error.localizedDescription)
+            }
         }
-        catch {
-            print(error.localizedDescription)
+        else {
+            Constants.jsonDict = UserDefaults.standard.object(forKey: "jsonConstants") as! [String : Any]
         }
-        
+        let session = URLSession.shared
+        let url = URL(string: "https://quarkbackend.com/getfile/brendansanderson/constants-json")!
+        let task = session.dataTask(with: url) { (data, _, _) -> Void in
+            if let data = data {
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    let jsonDict = json as? [String: Any]
+                    Constants.jsonDict = jsonDict
+                    EnemyEntity.enemyDict = jsonDict?["enemy"] as? [String: Any]
+                    Player.readConstants()
+                    UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
+                    UserDefaults.standard.synchronize()
+                }
+                catch {
+                    print(error.localizedDescription)
+                }
+            }
+        }
+        task.resume()
         if UserDefaults.standard.object(forKey: "Gear") == nil
         {
             let gear : [String : [String : AnyObject]] = ["Power Core": Equipment(t: "Power Core").toDictionary(), "Armor Core": Equipment(t: "Armor Core").toDictionary(), "Pulsar": Equipment(t:"Pulsar").toDictionary(), "Special Pulsar": Equipment(t: "Special Pulsar").toDictionary(), "Shield": Equipment(t: "Shield").toDictionary(), "Attachment 1": Equipment(t: "Attachment").toDictionary(), "Attachment 2": Equipment(t: "Attachment").toDictionary()]

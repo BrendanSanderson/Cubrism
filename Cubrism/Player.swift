@@ -15,7 +15,7 @@ class Player: NSObject {
     static var currentShield = 100.0
     static var currentHealth = 100.0
     static var attackPower = 25.0
-    static var attackPowerBase = 100.0
+    static var attackPowerBase = 25.0
     static var attackPowerExp = 1.1
     static var shieldBase = 100.0
     static var shieldExp = 1.1
@@ -61,13 +61,13 @@ class Player: NSObject {
         shield = shieldBase * Player.playerMultiplier(level, mult: shieldExp) + shieldBoost * shieldBoostMult
         attackPower = attackPowerBase * Player.playerMultiplier(level, mult: attackPowerExp) + attackPowerBoost * attackPowerBoostMult
         shieldRegen = shieldRegenBase * (Player.playerMultiplier(level, mult: shieldRegenExp) + shieldRegenBoost * shieldRegenBoostMult)
-        if (Constants.dev)
-        {
-            health = 10000000.0
-            shield = 21000000.0
-            attackPower = 21000000.0
-            defence = 10000000000.0
-        }
+//        if (Constants.dev)
+//        {
+//            health = 10000000.0
+//            shield = 21000000.0
+//            attackPower = 21000000.0
+//            defence = 10000000000.0
+//        }
         shotCoolDownSeconds = shotCoolDownSeconds - (attackSpeedBoost*attackSpeedBoostMult)
         currentHealth = health
         currentShield = shield
@@ -297,7 +297,7 @@ class Player: NSObject {
         UserDefaults.standard.synchronize()
     }
     static func readConstants() {
-        let jsonDict = UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any]
+        let jsonDict = Constants.jsonDict
         if let playerDict = jsonDict?["player"] as? [String: Any]
         {
             let attackDict = playerDict["attack"] as? [String: Any]

@@ -16,7 +16,7 @@
             "boostMult": 1.0
         },
         "attack" : {
-            "base": 100.0,
+            "base": 25.0,
             "exp": 1.1,
             "boostMult" : 1.0,
             "speed" : {
@@ -122,5 +122,26 @@
                 "shotNumber" : 16
             }
         }
+    },
+    "boss" : {
+        "golem" : {
+            "meleeBase": 100
+            "healthBase": 2000
+            "rangeBase" : 50
+            "effectBase" : 25
+        },
+        "generator" : {
+            "meleeBase": 50
+            "healthBase": 2000
+            "rangeBase" : 25
+            "effectBase" : 10
+        },
+        "dragon" : {
+            "meleeBase": 25
+            "healthBase": 2000
+            "rangeBase" : 50
+            "effectBase" : 10
+        }
+        
     }
 }

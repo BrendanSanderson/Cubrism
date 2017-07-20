@@ -81,20 +81,27 @@ class Equipment: Item {
         
         if type == "Shield"
         {
-            self.shield = 1 + 500 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
-            self.shieldRegen = 10 * ((multip * Double(level))/75) * (Player.playerMultiplier(level, mult: 1.2) - Player.playerMultiplier(level, mult: 1.1))
+            self.shield = 1 + (multip/2.0) *
+            (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+            self.shieldRegen = 10 * (multip/2.0) * (Player.playerMultiplier(level, mult: 1.2) - Player.playerMultiplier(level, mult: 1.1))
         }
         else if type == "Power Core"
         {
-            self.attackPower = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-            self.defence = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.attackPower = 1 + (multip/8.0) *
+                (((Player.attackPowerBase * Constants.enemyMultiplier(level)) - 0.25 * Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+
+            self.defence = 1 + 1 + (multip/8.0) *
+                (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             
-            self.shield = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
-            self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.shield = (multip/8.0) *
+                (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+            self.health = 1 + (multip/8.0) *
+                (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
         }
         else if type == "Pulsar"
         {
-            self.attackPower = 1 + 500 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+            self.attackPower = 1 + (multip/2.0) *
+                (((Player.attackPowerBase * Constants.enemyMultiplier(level)) - 0.25 * Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
         }
             
         else if type == "Special Pulsar"
@@ -104,8 +111,10 @@ class Equipment: Item {
             
         else if type == "Armor Core"
         {
-            self.health = 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
-            self.defence = 1 + 150 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+            self.health = 1 + (multip/2.0) *
+            ((4.0 * (Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+            self.defence = 1 + (multip/4.0) *
+                (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             
         }
         else if type == "Attachment"
@@ -132,19 +141,23 @@ class Equipment: Item {
             }
             if subType == "AttackPower"
             {
-                self.attackPower = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+                self.attackPower = 1 + (multip/8.0) *
+                    (((Player.attackPowerBase * Constants.enemyMultiplier(level)) - 0.25 * Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Defence"
             {
-                self.defence = 1 + 25 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+                self.defence = 1 + (multip/8.0) *
+                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Shield"
             {
-                self.shield = 1 + 100 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.1))
+                self.shield = (multip/8.0) *
+                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Health"
             {
-                self.health = 1 + 50 * ((multip * Double(level))/75) * (Constants.enemyMultiplier(level) - Player.playerMultiplier(level, mult: 1.2))
+                self.health = 1 + (multip/8.0) *
+                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
         }
         

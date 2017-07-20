@@ -18,14 +18,13 @@ class PlayerShootComponent: GKComponent {
     var playerSprite = SKNode()
     var velocity = CGPoint()
     var lastShotTime: TimeInterval = 0
-    var shotIsPending: Bool = false
+    let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
     init(scene: GameScene, pNode: SKNode) {
         super.init()
         self.scene = scene
         self.playerNode = pNode
         self.playerSprite = self.playerNode.childNode(withName: "playerSprite")!
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8), UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.8)))
-        let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
 
         
         joystick.position = CGPoint(x: scene.size.width - joystick.radius -  30, y: joystick.radius + 30)
@@ -33,6 +32,9 @@ class PlayerShootComponent: GKComponent {
         joystick.startHandler = { //[unowned self] in
             scene.started = true
         
+        }
+        joystick.stopHandler = { //[unowned self] in
+            Player.entity.shooting = false
         }
         joystick.trackingHandler = { [unowned scene] data in
             self.velocity = data.velocity
@@ -46,10 +48,15 @@ class PlayerShootComponent: GKComponent {
                     self.velocity.y = CGFloat(sin(angle) * 50.0)
                     if (data.velocity.x < 0.0)
                     {
+                        Player.entity.cannonSprite.zRotation = CGFloat(Double.pi+angle)
                         self.velocity.x = -self.velocity.x
                         self.velocity.y = -self.velocity.y
                     }
-                    self.shotIsPending = true
+                    else
+                    {
+                        Player.entity.cannonSprite.zRotation = CGFloat(angle)
+                    }
+                    Player.entity.shooting = true
                     self.ShotIfNeeded(scene.time)
                 }
             }
@@ -62,8 +69,7 @@ class PlayerShootComponent: GKComponent {
     }
     
     func ShotIfNeeded(_ currentTime: TimeInterval) {
-        if shotIsPending && (lastShotTime + TimeInterval(Player.shotCoolDownSeconds) <= currentTime) {
-            shotIsPending = false
+        if Player.entity.shooting && (lastShotTime + TimeInterval(Player.shotCoolDownSeconds) <= currentTime) {
             lastShotTime = currentTime
             self.fire(self.velocity)
         }
@@ -114,6 +120,7 @@ class PlayerMovementComponent: GKComponent {
     var node: SKNode!
     var coordinate: CGPoint!
     var playerSprite: SKSpriteNode!
+    let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
     init(scene: GameScene, node: SKNode, sprite:SKSpriteNode) {
         super.init()
         self.scene = scene
@@ -121,23 +128,56 @@ class PlayerMovementComponent: GKComponent {
         playerSprite = sprite
         self.coordinate = self.node.position
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.3), UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8)))
-        let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.4), UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)))
         
         joystick.position = CGPoint(x: joystick.radius + 30, y: joystick.radius + 30)
         scene.addChild(joystick)
         joystick.startHandler = { [unowned self] in
-            scene.started = true
+            self.scene.started = true
+            Player.entity.moving = true
+            
+        }
+        joystick.stopHandler = {
+            Player.entity.moving = false
             
         }
         joystick.trackingHandler = { [unowned scene] data in
             
-            if (scene.isPaused == false)
+            if (scene.isPaused == false && Player.entity.moving == true)
             {
-            self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (data.velocity.x * 0.15), y: self.playerSprite.position.y + (data.velocity.y * 0.15))
+                self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (data.velocity.x * 0.15), y: self.playerSprite.position.y + (data.velocity.y * 0.15))
+                if (Player.entity.shooting == false)
+                {
+                    if (data.velocity.y != 0.0 && data.velocity.x != 0.0)
+                        {
+                        var angle = CGFloat(atan(Double(data.velocity.y)/Double(data.velocity.x)))
+                        if (data.velocity.x < 0.0)
+                        {
+                            angle += CGFloat.pi
+                        }
+                        else if (data.velocity.y < 0.0)
+                        {
+                            angle += CGFloat.pi * 2.0
+                            }
+                        if Player.entity.cannonSprite.zRotation < 0
+                        {
+                                Player.entity.cannonSprite.zRotation += CGFloat.pi * 2.0
+                        }
+                        let cAngle = Player.entity.cannonSprite.zRotation.truncatingRemainder(dividingBy: 360)
+                        let diff = Swift.abs(cAngle - angle).truncatingRemainder(dividingBy: 360)
+                        let r = diff > 180 ? 360 - diff : diff
+                        let sign = (cAngle - angle >= 180) ? 1.0 : -1.0
+                        if(r <= CGFloat.pi/10)
+                        {
+                            Player.entity.cannonSprite.zRotation = angle
+                        }
+                        else
+                        {
+                            Player.entity.cannonSprite.zRotation += CGFloat(sign) * CGFloat.pi/10
+                        }
+                    }
+                }
             }
         }
-        
-        
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -169,7 +209,7 @@ class ExpBarComponent: GKComponent {
         self.scene = scene
         levelLabel = SKLabelNode(text: String(format: "%i", Player.level))
 //        levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: scene.size.height * 0.025), size: CGSize(width: scene.frame.width * 0.045, height: scene.frame.height * 0.05)))
-        levelLabel.fontName = "Copperplate-Bold"
+        levelLabel.fontName = Constants.font
         levelLabel.fontSize = 28
         levelLabel.fontColor = UIColor.white
         levelLabel.horizontalAlignmentMode = .right

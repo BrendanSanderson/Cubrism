@@ -12,6 +12,7 @@ class CompletedViewController: UIViewController {
     var expGained = 10
     var level = 0
     var drops = [Item]()
+    let font = Constants.font
     override func viewDidLoad() {
         createGUI()
         
@@ -26,25 +27,25 @@ class CompletedViewController: UIViewController {
         
         let completeLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.1), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.20)))
         completeLabel.text = "Floor Complete!"
-        completeLabel.font = UIFont(name: "Copperplate-Bold", size: 48)
+        completeLabel.font = UIFont(name: font, size: 48)
         completeLabel.textAlignment = .center
         view.addSubview(completeLabel)
         
         let expGainedLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.3), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
+        expGainedLabel.font = UIFont(name: font, size: 18)
         expGainedLabel.text = String(format: "Experience Gained: %i", expGained)
         expGainedLabel.textAlignment = .center
         view.addSubview(expGainedLabel)
         
         let expGainedLabel2 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.4), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel2.font = UIFont(name: "Copperplate-Bold", size: 18)
+        expGainedLabel2.font = UIFont(name: font, size: 18)
         expGainedLabel2.text = String(format: "Experience: %i", Player.totalExp)
         expGainedLabel2.textAlignment = .center
         view.addSubview(expGainedLabel2)
 
         
         let expGainedLabel3 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.5), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel3.font = UIFont(name: "Copperplate-Bold", size: 18)
+        expGainedLabel3.font = UIFont(name: font, size: 18)
         expGainedLabel3.text = String(format: "Experience To Next: %i", (Player.expToLevel(Player.level)) - Player.exp)
         expGainedLabel3.textAlignment = .center
         view.addSubview(expGainedLabel3)
@@ -56,7 +57,7 @@ class CompletedViewController: UIViewController {
         view.addSubview(expBar)
         
         let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.6), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
-        levelLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
+        levelLabel.font = UIFont(name: font, size: 18)
         levelLabel.text = String(format: "Level: %i", Player.level)
         levelLabel.textAlignment = .center
         view.addSubview(levelLabel)
@@ -64,7 +65,7 @@ class CompletedViewController: UIViewController {
         
         
         let equipmentLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.725), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
-        equipmentLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
+        equipmentLabel.font = UIFont(name: font, size: 18)
         equipmentLabel.text = String(format: "Loot:")
         equipmentLabel.textAlignment = .center
         view.addSubview(equipmentLabel)
@@ -138,7 +139,7 @@ class CompletedViewController: UIViewController {
         let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.1)))
         button.setTitle("Continue", for: UIControlState())
         button.setTitleColor(UIColor.black, for: UIControlState())
-        button.titleLabel!.font = UIFont(name: "Copperplate-Bold", size: 32)
+        button.titleLabel!.font = UIFont(name: font, size: 32)
         view.addSubview(button)
         
         let contineMethod: Selector = NSSelectorFromString("goToHome:")

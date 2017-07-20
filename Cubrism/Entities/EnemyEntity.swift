@@ -23,11 +23,11 @@ class EnemyEntity: DynamicEntity {
     var rangeAttackPower = 25
     var experience = 5.0
     var level = 1
-    let enemyDict = (UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any])?["enemy"] as? [String: Any]
+    static var enemyDict = Constants.jsonDict?["enemy"] as? [String: Any]
     var componentDict: [String:Any]
     override init()
     {
-        componentDict = (enemyDict?["component"] as? [String: Any])!
+        componentDict = (EnemyEntity.enemyDict?["component"] as? [String: Any])!
         super.init()
     }
     
@@ -85,7 +85,7 @@ class EnemyEntity: DynamicEntity {
         var speed = 2.0
         let jType = String(describing: eType.characters.first!)
             .lowercased() + eType.substring(from: eType.characters.index(of: eType.characters.dropFirst().first!)!)
-        let specificEnemyDict = enemyDict?[jType] as? [String: Any]
+        let specificEnemyDict = EnemyEntity.enemyDict?[jType] as? [String: Any]
         healthMultiplier = (specificEnemyDict?["healthMult"] as? Double)!
         rangeAttackMultiplier = (specificEnemyDict?["rangeAttackMult"] as? Double)!
         meleeAttackMultiplier = (specificEnemyDict?["meleeAttackMult"] as? Double)!
@@ -180,11 +180,11 @@ class EnemyEntity: DynamicEntity {
         {
             self.sprite.size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
         }
-        health = Int(Player.healthBase * healthMultiplier * pow(Double(level), 0.8))
+        health = Int(Player.healthBase * healthMultiplier * Constants.enemyMultiplier(level))
         currentHealth = health
         rangeAttackPower = Int(Player.attackPowerBase * rangeAttackMultiplier * Constants.enemyMultiplier(level))
         meleeAttackPower = Int(Player.attackPowerBase * meleeAttackMultiplier * Constants.enemyMultiplier(level))
-        experience = (experience * Constants.expMultiplier(level) * pow(Double(level), 0.8))
+        experience = (experience * Constants.expMultiplier(level))
     }
     
     

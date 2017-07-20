@@ -8,6 +8,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var vender: VendorPopUpNode!
     var doorAccessed = String()
     var world = Player.level/10 + 1
+    let button = SKSpriteNode(imageNamed: "pauseButton")
     override func didMove(to view: SKView) {
         self.scaleMode = .resizeFill
         view.isMultipleTouchEnabled = true
@@ -63,8 +64,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sn.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         self.addChild(sn)
         
-        
-        let button = SKSpriteNode(imageNamed: "pauseButton")
         button.position = CGPoint(x: size.width * 0.975, y: size.height * 0.95)
         button.name = "pause"
         scene?.addChild(button)
@@ -75,8 +74,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (self.isPaused == false)
         {
             let touch = touches.first
-            let button = atPoint(touch!.location(in: self))
-            if  button.name == "pause"{
+            let but = atPoint(touch!.location(in: self))
+            if  but.name == "pause"{
                 if vending == false
                 {
                     if (self.isKind(of: HomeScene.self))
@@ -91,6 +90,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 else
                 {
                     self.vender.removeFromParent()
+                    button.texture = SKTexture(imageNamed: "pauseButton")
                     vending = false
                     Player.saveItems()
                     Player.updateEquipment()
@@ -126,11 +126,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 
                 }
                 //NSNotificationCenter.defaultCenter().postNotificationName("GoToFloorViewController", object: self)
+                Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
+                Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
+                Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.disabled = true
+                Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.removeFromParent()
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelSelectCollectionViewController"), object: self)
                 
             }
             else if (self.isKind(of: RoomScene.self) == true)
             {
+                Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
+                Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
+                Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.disabled = true
+                Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.removeFromParent()
                 self.physicsWorld.contactDelegate = nil
                 //self.addChild(PopUpNode(scene: self, text: "You Won!", button1Text: "Retry", button2Text: "Leave"))
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToCompletedViewController"), object: self)
@@ -140,6 +148,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         else if (mask1 == Constants.playerCategory && mask2 == Constants.doorCategory)
         {
             self.physicsWorld.contactDelegate = nil
+            Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
+            Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
+            Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.disabled = true
+            Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.removeFromParent()
             doorAccessed = (secondBody.node?.parent!.name)!
             NSLog("door")
             (Player.currentScene as? RoomScene)?.viewController.goToRoomScene()
@@ -217,6 +229,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             secondBody.node?.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.playerCategory
             }
         }
+        else if (mask1 == Constants.playerCategory && mask2 == Constants.bossCategory)
+        {
+            if secondBody.node != nil && secondBody.node?.parent != nil
+            {
+                secondBody.node?.physicsBody?.contactTestBitMask = Constants.playerShotCategory
+                let node = secondBody.node?.parent as! BossNode
+                if(Player.entity.lastHit + 0.5 <= time)
+                {
+                    Player.damagePlayer(Double(node.Entity.meleeAttackPower))
+                    Player.entity.lastHit = time
+                }
+                secondBody.node?.physicsBody?.contactTestBitMask = Constants.playerShotCategory | Constants.playerCategory
+            }
+        }
             
         else if (mask1 == Constants.playerCategory && mask2 == Constants.wallCategory)
         {
@@ -226,6 +252,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 {
                     (secondBody.node as! VendorNode).Entity.act()
                     vending = true
+                    button.texture = SKTexture(imageNamed: "closeButton")
                     self.vender = (secondBody.node as! VendorNode).Entity.popUp
                 }
             }

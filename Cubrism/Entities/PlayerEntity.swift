@@ -14,7 +14,9 @@ class PlayerEntity: DynamicEntity {
     var node = SKNode()
     var sprite = SKSpriteNode()
     var lastHit = TimeInterval(0)
-    
+    var cannonSprite = SKSpriteNode()
+    var shooting = false
+    var moving = true
     convenience init(scene: GameScene)
     {
         
@@ -30,10 +32,14 @@ class PlayerEntity: DynamicEntity {
         super.init()
         
         sprite = SKSpriteNode (imageNamed: "playerIcon")
+        cannonSprite = SKSpriteNode (imageNamed: "playerCannon")
         sprite.name = "playerSprite"
         sprite.position = position
         sprite.zPosition = 100
+        cannonSprite.zPosition = 101
+        cannonSprite.zRotation = CGFloat(Double.pi/2.0)
         node.addChild(sprite)
+        sprite.addChild(cannonSprite)
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         addComponent(PlayerMovementComponent(scene: scene, node: node, sprite: sprite))
         addComponent(PlayerShootComponent(scene: scene, pNode: node))

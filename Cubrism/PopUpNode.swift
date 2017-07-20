@@ -39,6 +39,7 @@ class PopUpNode: SKNode {
         addChild(mainFrame)
         gameScene = scene
         scene.isPaused = true
+        scene.button.texture = nil
 //        button1.titleLabel!.textAlignment = .Center
 //        button2.titleLabel!.textAlignment = .Center
         button1.backgroundColor = UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1)
@@ -51,9 +52,9 @@ class PopUpNode: SKNode {
 //        button2.backgroundColor = UIColor.redColor()
         label.textAlignment = .center
         label.text = text
-        button1.titleLabel!.font = UIFont(name: "Copperplate-Bold", size: 18)
-        button2.titleLabel!.font = UIFont(name: "Copperplate-Bold", size: 18)
-        label.font = UIFont(name: "Copperplate-Bold", size: 32)
+        button1.titleLabel!.font = UIFont(name: Constants.font, size: 18)
+        button2.titleLabel!.font = UIFont(name: Constants.font, size: 18)
+        label.font = UIFont(name: Constants.font, size: 32)
         
         scene.view?.addSubview(button1)
         scene.view?.addSubview(button2)
@@ -79,8 +80,8 @@ class PopUpNode: SKNode {
         }
         
         expLeftLabel.text = String(format: "Exp To Level: %i", (Player.expToLevel(Player.level) - Player.exp))
-        expLeftLabel.font = UIFont(name: "Copperplate-Bold", size: 20)
-        expLabel.font = UIFont(name: "Copperplate-Bold", size: 20)
+        expLeftLabel.font = UIFont(name: Constants.font, size: 20)
+        expLabel.font = UIFont(name: Constants.font, size: 20)
         
         scene.view?.addSubview(expLabel)
         scene.view?.addSubview(expLeftLabel)
@@ -93,7 +94,7 @@ class PopUpNode: SKNode {
         
         
         let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: scene.frame.width * 0.24, y: scene.frame.height * 0.525), size: CGSize(width: scene.frame.width * 0.1, height: scene.frame.height * 0.05)))
-        levelLabel.font = UIFont(name: "Copperplate-Bold", size: 18)
+        levelLabel.font = UIFont(name: Constants.font, size: 18)
         levelLabel.text = String(format: "%i", Player.level)
         levelLabel.textAlignment = .right
         scene.view!.addSubview(levelLabel)
@@ -103,6 +104,7 @@ class PopUpNode: SKNode {
     func play(_ sender: UIButton!) {
         remove()
         gameScene.isPaused = false
+        gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
         
         
     }
@@ -131,6 +133,7 @@ class PopUpNode: SKNode {
         if (gameScene.isKind(of: HomeScene.self))
         {
             gameScene.isPaused = false
+            gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "ResetHomeViewController"), object: self)
             let level = 1
             UserDefaults.standard.set(level, forKey: "Level")
@@ -196,6 +199,7 @@ class PopUpNode: SKNode {
         if (gameScene.isKind(of: HomeScene.self))
         {
             gameScene.isPaused = false
+            gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "ResetHomeViewController"), object: self)
         }
         else

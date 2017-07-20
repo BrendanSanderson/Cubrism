@@ -20,7 +20,7 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         if UserDefaults.standard.object(forKey: "Level") == nil
         {
-    
+
             let level = 0
             let experience = 0
             let totaExperience = 0
@@ -29,8 +29,6 @@ class HomeViewController: UIViewController {
             UserDefaults.standard.set(totaExperience, forKey: "TotaExperience")
             UserDefaults.standard.synchronize()
         }
-        
-        
         
         floorView = FloorViewController()
         floorView.homeView = self

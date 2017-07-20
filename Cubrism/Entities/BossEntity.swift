@@ -27,6 +27,7 @@ class BossEntity: DynamicEntity {
     var exp = 50.0
     var lastShot:TimeInterval = 0
     var type: String!
+    static var bossDict = Constants.jsonDict?["boss"] as? [String: Any]
     override init()
     {
             super.init()
@@ -61,15 +62,18 @@ class BossEntity: DynamicEntity {
     }
     func setUpBoss (_ properties: NSDictionary)
     {
-        var rangeMult = 50
-        var effectMult = 10
-        var meleeMult = 25
+        let name = properties.value(forKey: "name") as? String!
+        let specifcBossDict = BossEntity.bossDict?[name!] as? [String: Any]
+        let rangeBase = specifcBossDict?["rangeBase"] as! Int
+        let effectBase = specifcBossDict?["effectBase"] as! Int
+        let meleeBase = specifcBossDict?["meleeBase"] as! Int
+        let healthBase = specifcBossDict?["healthBase"] as! Int
         self.sprite = SKSpriteNode(texture: SKTexture(imageNamed: (properties.value(forKey: "image") as? String)!), size: CGSize(width: (properties.value(forKey: "size") as? Int)!, height: (properties.value(forKey: "size") as? Int)!))
         if (properties.value(forKey: "position") as? String)! == "center"
         {
             sprite.position = CGPoint(x: scene.frame.width/2.0, y: scene.frame.height/2.0)
         }
-        if (properties.value(forKey: "name") as? String!) == "generator"
+        if (name == "generator")
         {
             let comp = BossSprayComponent(scene: scene, sprite: sprite, entity: self)
             addComponent(comp)
@@ -83,7 +87,7 @@ class BossEntity: DynamicEntity {
             sprite.size = CGSize(width: scene.frame.height * 0.2, height: scene.frame.height * 0.2)
 
         }
-        else if (properties.value(forKey: "name") as? String!) == "dragon"
+        else if (name == "dragon")
         {
             sprite.size = CGSize(width: scene.frame.height * 0.3 * (10.0/7.0), height: scene.frame.height * 0.3)
             let comp = BossDragonBreatheComponent(scene: scene, sprite: sprite, entity: self)
@@ -110,7 +114,7 @@ class BossEntity: DynamicEntity {
                 sprite.position = CGPoint(x: scene.frame.width - sprite.size.height/2.5, y: scene.frame.height/2.0)
             }
         }
-        else if (properties.value(forKey: "name") as? String!) == "golem"
+        else if (name == "golem")
         {
             let comp = GolemDropComponent(scene: scene, entity: self)
             addComponent(comp)
@@ -128,15 +132,13 @@ class BossEntity: DynamicEntity {
             let comp3 = BossTrackingComponent(scene: scene, entity: self, speed: 1.5)
             addComponent(comp3)
             constantActions.append(comp3)
-            meleeMult = 100
-            effectAttackPower = 25
             
         }
-        health = Double(2000.0 * Constants.bossHealthMultiplier(level))
+        health = Double(Double(healthBase) * Constants.bossHealthMultiplier(level))
         currentHealth = health
-        rangeAttackPower = Int(Double(rangeMult) * Constants.bossDamageMultiplier(level))
-        meleeAttackPower = Int(Double(meleeMult) * Constants.bossDamageMultiplier(level))
-        effectAttackPower = Int(Double(effectAttackPower) * Constants.enemyMultiplier(level))
+        rangeAttackPower = Int(Double(rangeBase) * Constants.bossDamageMultiplier(level))
+        meleeAttackPower = Int(Double(meleeBase) * Constants.bossDamageMultiplier(level))
+        effectAttackPower = Int(Double(effectBase) * Constants.enemyMultiplier(level))
         exp = (exp * Constants.expMultiplier(level))
     }
     

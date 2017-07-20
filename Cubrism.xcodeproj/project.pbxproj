@@ -170,6 +170,40 @@
 			name = Components;
 			sourceTree = "<group>";
 		};
+		27FC7A331F16999800F7CE89 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				BA20C8D11C889E0800EE234D /* HomeScene.swift */,
+				BA22A8FD1C8E161500D52174 /* RoomScene.swift */,
+				BAD884511C94BB620018BDDE /* GameScene.swift */,
+			);
+			name = Scenes;
+			sourceTree = "<group>";
+		};
+		27FC7A341F1699A200F7CE89 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				BA20C8D31C889E0800EE234D /* HomeViewController.swift */,
+				276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */,
+				BA22A8FB1C8E15BB00D52174 /* FloorViewController.swift */,
+				BA5AE4D41CA0F81F00BFF1E1 /* CompletedViewController.swift */,
+			);
+			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		27FC7A351F1699B300F7CE89 /* Plists */ = {
+			isa = PBXGroup;
+			children = (
+				BAACCDF51CD5776F001FEB25 /* items.plist */,
+				BA20C8DD1C889E0800EE234D /* Info.plist */,
+				BA696BD11CB41EDD00D7C6DE /* Enemies.plist */,
+				BAD560511C9A5F99000BBB38 /* bosses.plist */,
+				BA26D26B1C9925C800C1FFBB /* rooms.plist */,
+				BAD1AF511CA8E66A00AD0290 /* levels.plist */,
+			);
+			name = Plists;
+			sourceTree = "<group>";
+		};
 		BA20C8C11C889E0700EE234D = {
 			isa = PBXGroup;
 			children = (
@@ -195,24 +229,15 @@
 			children = (
 				27562A571F05AC5D00915990 /* Launch Screen.storyboard */,
 				BA20C8CD1C889E0800EE234D /* AppDelegate.swift */,
-				BA20C8D31C889E0800EE234D /* HomeViewController.swift */,
-				BA22A8FB1C8E15BB00D52174 /* FloorViewController.swift */,
-				BA5AE4D41CA0F81F00BFF1E1 /* CompletedViewController.swift */,
-				276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */,
-				BA20C8D11C889E0800EE234D /* HomeScene.swift */,
-				BA22A8FD1C8E161500D52174 /* RoomScene.swift */,
-				BAD884511C94BB620018BDDE /* GameScene.swift */,
+				BAD62F7F1C95F26800B9A5AD /* Constants.swift */,
+				27FC7A341F1699A200F7CE89 /* ViewControllers */,
+				27FC7A331F16999800F7CE89 /* Scenes */,
 				27FC7A261F16994200F7CE89 /* Components */,
 				27FC7A191F16991F00F7CE89 /* Entities */,
+				27FC7A351F1699B300F7CE89 /* Plists */,
 				BAD8DE8B1C9DCBA50041EA3C /* Objects */,
 				BA20C8D81C889E0800EE234D /* Assets.xcassets */,
 				27C8CCD71F01847300C8D806 /* constants.json */,
-				BAACCDF51CD5776F001FEB25 /* items.plist */,
-				BA20C8DD1C889E0800EE234D /* Info.plist */,
-				BA696BD11CB41EDD00D7C6DE /* Enemies.plist */,
-				BAD560511C9A5F99000BBB38 /* bosses.plist */,
-				BA26D26B1C9925C800C1FFBB /* rooms.plist */,
-				BAD1AF511CA8E66A00AD0290 /* levels.plist */,
 			);
 			path = Cubrism;
 			sourceTree = "<group>";
@@ -239,7 +264,6 @@
 			isa = PBXGroup;
 			children = (
 				BAC28FE51CA65AD5003E07ED /* LevelCell.swift */,
-				BAD62F7F1C95F26800B9A5AD /* Constants.swift */,
 				BA71AF991C9A7B02004E2847 /* PopUpNode.swift */,
 				2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */,
 				BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */,

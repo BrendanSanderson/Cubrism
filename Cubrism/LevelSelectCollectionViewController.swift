@@ -116,8 +116,8 @@ class LevelSelectCollectionViewController: UICollectionViewController {
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
             
             
-            [bottomImage!.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))];
-            [topImage!.draw(in: CGRect(x: 0,y: 0,width: size.width, height: size.height))];
+            bottomImage!.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height));
+            topImage!.draw(in: CGRect(x: 0,y: 0,width: size.width, height: size.height));
             
             
             let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
@@ -151,11 +151,11 @@ class LevelSelectCollectionViewController: UICollectionViewController {
             homeView.floorView.min = UInt32(((level?.value(forKey: "min")) as? Int)!)
             homeView.floorView.max = UInt32(((level?.value(forKey: "max")) as? Int)!)
             homeView.floorView.level = ((level?.value(forKey: "level")) as? Int)!
-            if (Constants.dev == true && ((level?.value(forKey: "level")) as? Int)! == 10)
-            {
-                homeView.floorView.min = 1
-                homeView.floorView.max = 1
-            }
+//            if (Constants.dev == true && ((level?.value(forKey: "level")) as? Int)! == 10)
+//            {
+//                homeView.floorView.min = 1
+//                homeView.floorView.max = 1
+//            }
             homeView.floorView.world = indexPath.section + 1
             
             self.dismiss(animated: false, completion: nil)

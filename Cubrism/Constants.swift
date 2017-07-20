@@ -20,16 +20,17 @@ class Constants: NSObject {
     static let wallCategory = UInt32(256)
     static let enemyStatusShotCategory = UInt32(512)
     static var aspectMultiplier = 1
-    
+    static let font = "Copperplate-Bold"
     static var w: CGFloat!
     static var h: CGFloat!
     static var uH: CGFloat!
     static var uW: CGFloat!
+    static var jsonDict: [String: Any]!
     static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
-    static var dev = true;
+    //static var dev = true;
     static func enemyMultiplier(_ level: Int) -> Double{
-        return pow((Double(level) + 3)/4 , 1.3)
+        return pow((Double(level) + 3)/4 , 1.4)
     }
     static func bossHealthMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 2)/3 , 1.4)
