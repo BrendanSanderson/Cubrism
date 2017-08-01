@@ -1,8 +1,8 @@
 //
-//  PopUpNode.swift
+//  VendorPopUpNode.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/16/16.
+//  Created by Brendan Sanderson on 3/16/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -87,6 +87,7 @@ class VendorPopUpNode: SKNode
         labels[0].zPosition = 1002
         labels[0].text = "No Selection"
         labels[0].fontSize = 24
+        labels[0].fontColor = Constants.lightColor
         addChild(labels[0])
         
         
@@ -103,6 +104,7 @@ class VendorPopUpNode: SKNode
             labels[i].zPosition = 1002
             labels[i].text = ""
             labels[i].fontSize = 18
+            labels[i].fontColor = Constants.lightColor
             addChild(labels[i])
         }
         
@@ -111,7 +113,7 @@ class VendorPopUpNode: SKNode
 }
 class BankPopUpNode: VendorPopUpNode {
     var gameScene: GameScene!
-    var selectedSquare = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1), size: CGSize(width: 40, height: 40))
+    var selectedSquare = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: 40, height: 40))
     let width = 5
     let height = 6
     let size = CGSize(width: 32, height: 32)
@@ -135,9 +137,9 @@ class BankPopUpNode: VendorPopUpNode {
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
         mainFrame = SKSpriteNode(imageNamed: "popUp")
         mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
-        mainFrame.zPosition = 1000
-        let centerLine = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103/255.0, blue: 111/255.0, alpha: 1), size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
-        let leftDividerLine = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103/255.0, blue: 111/255.0, alpha: 1), size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
+        mainFrame.zPosition = 999
+        let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
+        let leftDividerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
         leftDividerLine.position = CGPoint(x: mainFrame.size.width * -0.25, y: mainFrame.size.height * -0.175)
         centerLine.zPosition = 1001
         leftDividerLine.zPosition = 1001
@@ -179,8 +181,13 @@ class BankPopUpNode: VendorPopUpNode {
         
         let playerBackground = SKSpriteNode(texture: SKTexture(imageNamed: "playerIcon"), size: CGSize(width: mainFrame.size.height * 0.55, height: mainFrame.size.height * 0.55))
         playerBackground.position = playerCenter
-        playerBackground.zPosition = 1001
+        playerBackground.zPosition = 1000
         addChild(playerBackground)
+        let playerCannonBackground = SKSpriteNode(texture: SKTexture(imageNamed: "playerCannon"), size: CGSize(width: mainFrame.size.height * 0.6, height: mainFrame.size.height * 0.6))
+        playerCannonBackground.position = playerCenter
+        playerCannonBackground.zPosition = 1001
+        playerCannonBackground.position = playerCenter
+        addChild(playerCannonBackground)
         
         powerSquare.zPosition = 1003
         armorSquare.zPosition = 1003
@@ -316,7 +323,7 @@ class BankPopUpNode: VendorPopUpNode {
 }
 class ShopPopUpNode: VendorPopUpNode {
         var gameScene: GameScene!
-        var selectedSquare = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1), size: CGSize(width: 40, height: 40))
+    var selectedSquare = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: 40, height: 40))
         let width = 5
         let height = 6
         let vWidth = 5
@@ -337,9 +344,9 @@ class ShopPopUpNode: VendorPopUpNode {
             self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
             mainFrame = SKSpriteNode(imageNamed: "popUp")
             mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
-            mainFrame.zPosition = 1000
-            let centerLine = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103/255.0, blue: 111/255.0, alpha: 1), size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
-            let leftDividerLine = SKSpriteNode(color: UIColor(red: 8.0/255.0, green: 103/255.0, blue: 111/255.0, alpha: 1), size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
+            mainFrame.zPosition = 999
+            let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
+            let leftDividerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
             leftDividerLine.position = CGPoint(x: mainFrame.size.width * -0.25, y: mainFrame.size.height * -0.175)
             centerLine.zPosition = 1001
             leftDividerLine.zPosition = 1001

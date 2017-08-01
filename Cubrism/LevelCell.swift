@@ -1,5 +1,5 @@
 //
-//  levelCellCollectionViewCell.swift
+//  levelCell.swift
 //  Cubrism
 //
 //  Created by Brendan Sanderson on 3/25/16.

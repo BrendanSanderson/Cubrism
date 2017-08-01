@@ -1,8 +1,8 @@
 //
-//  GameViewController.swift
+//  FloorViewController.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/3/16.
+//  Created by Brendan Sanderson on 3/3/16.
 //  Copyright (c) 2016 Brendan. All rights reserved.
 //
 
@@ -57,7 +57,7 @@ class FloorViewController: UIViewController {
         self.view.addSubview(skView)
         self.level = (world-1) * 10 + level
         skView.showsFPS = false
-        skView.showsNodeCount = true
+        skView.showsNodeCount = false
         /* Sprite Kit applies additional optimizations to improve rendering performance */
         skView.ignoresSiblingOrder = true
         
@@ -254,18 +254,18 @@ class FloorViewController: UIViewController {
     func goToCompletedViewController(_ notification: Notification)
     {
         self.skView.presentScene(nil)
-        var levelGap = Player.level - self.level
-        var augExp = levelExp
-        if (levelGap > 5)
-        {
-            levelGap = 5
-        }
-        if (levelGap > 0)
-        {
-            augExp = levelExp/(levelGap)
-        }
+//        var levelGap = Player.level - self.level
+//        var augExp = levelExp
+//        if (levelGap > 5)
+//        {
+//            levelGap = 5
+//        }
+//        if (levelGap > 1)
+//        {
+//            augExp = levelExp/(levelGap/2)
+//        }
         
-        Player.augmentExperience(augExp)
+        Player.augmentExperience(levelExp)
         
         let drops = self.getDrops()
         
@@ -273,7 +273,7 @@ class FloorViewController: UIViewController {
         
         
         let completeViewController = CompletedViewController()
-        completeViewController.expGained = augExp
+        completeViewController.expGained = levelExp
         completeViewController.drops = drops
         
         if ((UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) < level)

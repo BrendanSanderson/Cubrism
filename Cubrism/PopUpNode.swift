@@ -2,7 +2,7 @@
 //  PopUpNode.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/16/16.
+//  Created by Brendan Sanderson on 3/16/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -42,12 +42,12 @@ class PopUpNode: SKNode {
         scene.button.texture = nil
 //        button1.titleLabel!.textAlignment = .Center
 //        button2.titleLabel!.textAlignment = .Center
-        button1.backgroundColor = UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1)
-       button2.backgroundColor = UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1)
+        button1.backgroundColor = Constants.darkColor
+       button2.backgroundColor = Constants.darkColor
         button1.setTitle(button1Text, for: UIControlState())
         button2.setTitle(button2Text, for: UIControlState())
-        button1.setTitleColor(UIColor.white, for: UIControlState())
-        button2.setTitleColor(UIColor.white, for: UIControlState())
+        button1.setTitleColor(Constants.lightColor, for: UIControlState())
+        button2.setTitleColor(Constants.lightColor, for: UIControlState())
 //        button1.backgroundColor = UIColor.redColor()
 //        button2.backgroundColor = UIColor.redColor()
         label.textAlignment = .center
@@ -55,7 +55,7 @@ class PopUpNode: SKNode {
         button1.titleLabel!.font = UIFont(name: Constants.font, size: 18)
         button2.titleLabel!.font = UIFont(name: Constants.font, size: 18)
         label.font = UIFont(name: Constants.font, size: 32)
-        
+        label.textColor = UIColor(red:0.01, green:0.82, blue:0.96, alpha:1.0)
         scene.view?.addSubview(button1)
         scene.view?.addSubview(button2)
         scene.view?.addSubview(label)
@@ -66,8 +66,10 @@ class PopUpNode: SKNode {
         button2.addTarget(self, action: b2Method, for: .touchUpInside)
         
         let expLabel = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.4, width: mainFrame.size.width, height: scene.size.height * 0.1))
+        expLabel.textColor = Constants.darkColor
         
         let expLeftLabel = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.45, width: mainFrame.size.width, height: scene.size.height * 0.1))
+        expLeftLabel.textColor = Constants.darkColor
         expLabel.textAlignment = .center
         expLeftLabel.textAlignment = .center
         if (text == "You are Dead.")
@@ -80,23 +82,24 @@ class PopUpNode: SKNode {
         }
         
         expLeftLabel.text = String(format: "Exp To Level: %i", (Player.expToLevel(Player.level) - Player.exp))
-        expLeftLabel.font = UIFont(name: Constants.font, size: 20)
-        expLabel.font = UIFont(name: Constants.font, size: 20)
+        expLeftLabel.font = UIFont(name: Constants.font, size: 16)
+        expLabel.font = UIFont(name: Constants.font, size: 18)
         
         scene.view?.addSubview(expLabel)
         scene.view?.addSubview(expLeftLabel)
         
         let expBar = UIProgressView(frame: CGRect(origin: CGPoint(x: scene.size.width * 0.35, y: scene.frame.height * 0.55), size: CGSize(width: scene.size.width * 0.3, height: mainFrame.frame.height * 0.1)))
         expBar.progress = Float(Player.exp)/Float(Player.expToLevel(Player.level))
-        expBar.progressTintColor = UIColor.orange
-        expBar.trackTintColor = UIColor.black
+        expBar.progressTintColor = Constants.lightColor
+        expBar.trackTintColor = Constants.darkColor
         scene.view!.addSubview(expBar)
         
         
         let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: scene.frame.width * 0.24, y: scene.frame.height * 0.525), size: CGSize(width: scene.frame.width * 0.1, height: scene.frame.height * 0.05)))
-        levelLabel.font = UIFont(name: Constants.font, size: 18)
+        levelLabel.font = UIFont(name: Constants.fontB, size: 18)
         levelLabel.text = String(format: "%i", Player.level)
         levelLabel.textAlignment = .right
+        levelLabel.textColor = Constants.darkColor
         scene.view!.addSubview(levelLabel)
         
     }

@@ -1,5 +1,5 @@
 //
-//  EnemyNode.swift
+//  Nodes.swift
 //  Cubrism
 //
 //  Created by Brendan Sanderson on 3/14/16.
@@ -100,12 +100,22 @@ class ItemNode: SelectNode {
     init (i: Item)
     {
         self.item = i
-        super.init(texture: SKTexture(imageNamed: i.type), size: CGSize(width: 32, height: 32))
+        if(i.isKind(of: Equipment.self) && (i as! Equipment).tier > 1)
+        {
+            let e = i as! Equipment
+            let imgName = e.type + String(e.variant)
+            super.init(texture: SKTexture(imageNamed: imgName), size: CGSize(width: 32, height: 32))
+        }
+        else
+        {
+            super.init(texture: SKTexture(imageNamed: i.type), size: CGSize(width: 32, height: 32))
+        }
         if i.quantity > 1
         {
             quantity = SKLabelNode(text: String(i.quantity))
             quantity.fontSize = 8
             quantity.fontName = "Arial"
+            quantity.fontColor = UIColor.black
             quantity.horizontalAlignmentMode = .right
             
             quantity.position = CGPoint(x: 14, y: -14)
@@ -135,10 +145,10 @@ class SellNode: SKSpriteNode
     var cost: SKLabelNode!
     init(s : CGSize)
     {
-        super.init(texture: nil, color: UIColor(red: 8.0/255.0, green: 103.0/255.0, blue: 111.0/255.0, alpha: 1), size: s)
+        super.init(texture: nil, color: Constants.darkColor, size: s)
         text = SKLabelNode(text: String("N/A"))
         text.fontSize = 24
-        text.fontColor = UIColor.white
+        text.fontColor = Constants.lightColor
         text.fontName = "Arial"
         text.horizontalAlignmentMode = .center
         text.verticalAlignmentMode = .center
@@ -147,7 +157,7 @@ class SellNode: SKSpriteNode
         
         cost = SKLabelNode(text: String(""))
         cost.fontSize = 12
-        cost.fontColor = UIColor.white
+        cost.fontColor = Constants.lightColor
         cost.fontName = "Arial"
         cost.horizontalAlignmentMode = .right
         cost.verticalAlignmentMode = .bottom

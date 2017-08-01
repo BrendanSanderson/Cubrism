@@ -2,7 +2,7 @@
 //  CompletedViewController.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/21/16.
+//  Created by Brendan Sanderson on 3/21/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -29,18 +29,21 @@ class CompletedViewController: UIViewController {
         completeLabel.text = "Floor Complete!"
         completeLabel.font = UIFont(name: font, size: 48)
         completeLabel.textAlignment = .center
+        completeLabel.textColor = Constants.lightColor
         view.addSubview(completeLabel)
         
         let expGainedLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.3), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
         expGainedLabel.font = UIFont(name: font, size: 18)
         expGainedLabel.text = String(format: "Experience Gained: %i", expGained)
         expGainedLabel.textAlignment = .center
+        expGainedLabel.textColor = Constants.darkColor
         view.addSubview(expGainedLabel)
         
         let expGainedLabel2 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.4), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
         expGainedLabel2.font = UIFont(name: font, size: 18)
         expGainedLabel2.text = String(format: "Experience: %i", Player.totalExp)
         expGainedLabel2.textAlignment = .center
+        expGainedLabel2.textColor = Constants.darkColor
         view.addSubview(expGainedLabel2)
 
         
@@ -48,18 +51,20 @@ class CompletedViewController: UIViewController {
         expGainedLabel3.font = UIFont(name: font, size: 18)
         expGainedLabel3.text = String(format: "Experience To Next: %i", (Player.expToLevel(Player.level)) - Player.exp)
         expGainedLabel3.textAlignment = .center
+        expGainedLabel3.textColor = Constants.darkColor
         view.addSubview(expGainedLabel3)
         
         let expBar = UIProgressView(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.625), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.05)))
         expBar.progress = Float(Player.exp)/Float(Player.expToLevel(Player.level))
-        expBar.progressTintColor = UIColor.orange
-        expBar.trackTintColor = UIColor.black
+        expBar.progressTintColor = Constants.lightColor
+        expBar.trackTintColor = Constants.darkColor
         view.addSubview(expBar)
         
         let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.6), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
         levelLabel.font = UIFont(name: font, size: 18)
         levelLabel.text = String(format: "Level: %i", Player.level)
         levelLabel.textAlignment = .center
+        levelLabel.textColor = Constants.darkColor
         view.addSubview(levelLabel)
         
         
@@ -67,6 +72,7 @@ class CompletedViewController: UIViewController {
         let equipmentLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.725), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
         equipmentLabel.font = UIFont(name: font, size: 18)
         equipmentLabel.text = String(format: "Loot:")
+        equipmentLabel.textColor = Constants.darkColor
         equipmentLabel.textAlignment = .center
         view.addSubview(equipmentLabel)
         
@@ -136,9 +142,11 @@ class CompletedViewController: UIViewController {
         
         
         
-        let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.1)))
+        let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.32, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.38, height: view.frame.height * 0.1)))
         button.setTitle("Continue", for: UIControlState())
-        button.setTitleColor(UIColor.black, for: UIControlState())
+        button.layer.cornerRadius = 5
+        button.backgroundColor = Constants.darkColor
+        button.setTitleColor(Constants.lightColor, for: UIControlState())
         button.titleLabel!.font = UIFont(name: font, size: 32)
         view.addSubview(button)
         

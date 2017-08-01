@@ -2,7 +2,7 @@
 //  Item.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 4/30/16.
+//  Created by Brendan Sanderson on 4/30/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 

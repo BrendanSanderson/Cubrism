@@ -143,22 +143,22 @@ class Player: NSObject {
         if (currentHealth <= 0 && alive == true)
         {
             entity.component(ofType: HealthBarComponent.self)!.updateBars(0, health: 0)
-            currentViewController.levelExp = currentViewController.levelExp/2
+            currentViewController.levelExp = Int(Double(currentViewController.levelExp)/1.2)
             
-            var levelGap = Player.level - currentViewController.level
-            var augExp = currentViewController.levelExp
-            if (levelGap > 5)
-            {
-                levelGap = 5
-            }
-            if (levelGap > 0)
-            {
-                augExp = (currentViewController.levelExp)/(levelGap)
-            }
+//            var levelGap = Player.level - currentViewController.level
+//            var augExp = currentViewController.levelExp
+//            if (levelGap > 5)
+//            {
+//                levelGap = 5
+//            }
+//            if (levelGap > 0)
+//            {
+//                augExp = (currentViewController.levelExp)/(levelGap)
+//            }
+//            
+            expGained = currentViewController.levelExp
             
-            expGained = augExp
-            
-            Player.augmentExperience(augExp)
+            Player.augmentExperience(currentViewController.levelExp)
             augmentExperience(currentViewController.levelExp)
             currentScene.addChild(PopUpNode(scene: currentScene, text: "You are Dead.", button1Text: "Retry", button2Text: "Leave"))
             alive = false
@@ -330,16 +330,16 @@ class Player: NSObject {
     static func balanceEquipment()
     {
         var d = [Item]()
-        for i in inventory
+        for i in 0 ..< inventory.count
         {
-            if (i.isKind(of: Equipment.self))
+            if (inventory[i].isKind(of: Equipment.self))
             {
-                let e = i as! Equipment
+                let e = inventory[i] as! Equipment
                 d.append(Equipment(t: e.type, lev: e.level, tie: e.tier, st: ""))
             }
             else
             {
-                d.append(i)
+                d.append(inventory[i])
             }
         }
         
@@ -348,10 +348,10 @@ class Player: NSObject {
         gear["Power Core"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
         e = gear["Armor Core"]!
         gear["Armor Core"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
-        e = gear["Pulser"]!
-        gear["Pulser"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
-        e = gear["Special Pulser"]!
-        gear["Special Pulser"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Pulsar"]!
+        gear["Pulsar"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
+        e = gear["Special Pulsar"]!
+        gear["Special Pulsar"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
         e = gear["Shield"]!
         gear["Shield"] = Equipment(t: e.type, lev: e.level, tie: e.tier, st: "")
         e = gear["Attachment 1"]!

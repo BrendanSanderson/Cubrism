@@ -1,8 +1,8 @@
 //
-//  GameViewController.swift
+//  HomeViewController.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/3/16.
+//  Created by Brendan Sanderson on 3/3/16.
 //  Copyright (c) 2016 Brendan. All rights reserved.
 //
 
@@ -73,7 +73,7 @@ class HomeViewController: UIViewController {
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)
         skView.showsFPS = false
-        skView.showsNodeCount = true
+        skView.showsNodeCount = false
         scene.viewController = self
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .resizeFill

@@ -20,7 +20,8 @@ class Constants: NSObject {
     static let wallCategory = UInt32(256)
     static let enemyStatusShotCategory = UInt32(512)
     static var aspectMultiplier = 1
-    static let font = "Copperplate-Bold"
+    static let font = "Comfortaa-Regular"
+    static let fontB = "Comfortaa-Bold"
     static var w: CGFloat!
     static var h: CGFloat!
     static var uH: CGFloat!
@@ -28,6 +29,8 @@ class Constants: NSObject {
     static var jsonDict: [String: Any]!
     static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
+    static let lightColor = UIColor(red:0.01, green:0.82, blue:0.96, alpha:1.0)
+    static let darkColor = UIColor(red:0.01, green:0.11, blue:0.58, alpha:1.0)
     //static var dev = true;
     static func enemyMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 3)/4 , 1.4)
@@ -39,7 +42,7 @@ class Constants: NSObject {
         return pow((Double(level) + 2)/3 , 1.3)
     }
     static func expMultiplier(_ level: Int) -> Double{
-        return pow((Double(level) + 5)/7 , 1.4)
+        return pow((Double(level) + 6)/7 , 2.5)
     }
     
     static func forTailingZero(_ temp: Double) -> String{

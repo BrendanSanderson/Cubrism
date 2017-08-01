@@ -2,7 +2,7 @@
 //  BossEntity.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/16/16.
+//  Created by Brendan Sanderson on 3/16/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 

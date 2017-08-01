@@ -2,7 +2,7 @@
 //  VendorEntity.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 4/1/16.
+//  Created by Brendan Sanderson on 4/1/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 

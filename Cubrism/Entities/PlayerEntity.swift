@@ -2,7 +2,7 @@
 //  PlayerEntity.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/6/16.
+//  Created by Brendan Sanderson on 3/6/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 

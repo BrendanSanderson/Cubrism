@@ -2,7 +2,7 @@
 //  Equipment.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/25/16.
+//  Created by Brendan Sanderson on 3/25/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -18,9 +18,10 @@ class Equipment: Item {
     var level = 1
     var tier = 1
     var price = 0
+    var variant = 0
     var subType = ""
     
-    init(t: String, lev: Int, tie: Int, st: String)
+    init(t: String, lev: Int, tie: Int, st: String, v: Int)
     {
         super.init(t: t)
         level = lev
@@ -34,9 +35,17 @@ class Equipment: Item {
         {
             type = "Power Core"
         }
+        self.variant = v
         price = level * tier * 3
         self.setStats()
     }
+    convenience init (t: String, lev: Int, tie: Int, st: String)
+    {
+        let v = Int(arc4random_uniform(4))
+        self.init(t: t, lev: lev, tie: tie, st: st, v: v)
+    }
+    
+    
 //    convenience init(t: String, lev: Int, tie: Int)
 //    {
 //        self.init(t: t, lev: 1, tie: 1, st: "")
@@ -141,23 +150,23 @@ class Equipment: Item {
             }
             if subType == "AttackPower"
             {
-                self.attackPower = 1 + (multip/8.0) *
+                self.attackPower = 1 + (multip/10.0) *
                     (((Player.attackPowerBase * Constants.enemyMultiplier(level)) - 0.25 * Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Defence"
             {
-                self.defence = 1 + (multip/8.0) *
-                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+                self.defence = 1 + (multip/10.0) *
+                    (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Shield"
             {
-                self.shield = (multip/8.0) *
-                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+                self.shield = 1 + (multip/10.0) *
+                    (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
             else if subType == "Health"
             {
-                self.health = 1 + (multip/8.0) *
-                    (((2.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
+                self.health = 1 + (multip/10.0) *
+                    (((4.0 * Player.attackPowerBase * Constants.enemyMultiplier(level)) - Player.healthBase * Player.playerMultiplier(level, mult: Player.healthExp)))
             }
         }
         
@@ -183,6 +192,7 @@ class Equipment: Item {
         dic["level"] = level as AnyObject
         dic["tier"] = tier as AnyObject
         dic["subType"] = subType as AnyObject
+        dic["variant"] = variant as AnyObject
         return dic
     }
     convenience init(dic: [String: AnyObject])
@@ -190,10 +200,18 @@ class Equipment: Item {
         var tSubType = ""
         if dic["subType"] != nil
         {
+            if dic["subType"] as! String != ""
+            {
+             print(dic["subType"] as! String)
+            }
             tSubType = (dic["subType"] as? String)!
         }
-        NSLog(tSubType)
-        self.init(t: (dic["type"] as? String)!, lev: (dic["level"] as? Int)!, tie: (dic["tier"] as? Int)!, st: tSubType)
+        var v = Int(arc4random_uniform(4))
+        if dic["variant"] != nil
+        {
+            v = dic["variant"] as! Int
+        }
+        self.init(t: (dic["type"] as? String)!, lev: (dic["level"] as? Int)!, tie: (dic["tier"] as? Int)!, st: tSubType, v: v)
     }
 
 }

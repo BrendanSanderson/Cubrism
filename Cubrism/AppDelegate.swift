@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/3/16.
+//  Created by Brendan Sanderson on 3/3/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -124,15 +124,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.synchronize()
         }
         Player.gearDict = UserDefaults.standard.object(forKey: "Gear") as! [String:[String : AnyObject]]
+        Player.readConstants()
+        Player.updateInventory()
+        Player.updateEquipment()
         if UserDefaults.standard.object(forKey: "equipUpdated") == nil
         {
             Player.balanceEquipment()
             UserDefaults.standard.set(1, forKey: "equipUpdated")
             UserDefaults.standard.synchronize()
         }
-        Player.readConstants()
-        Player.updateInventory()
-        Player.updateEquipment()
         Player.updatePlayer()
         self.window?.rootViewController = view;
         self.window?.makeKeyAndVisible()

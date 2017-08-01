@@ -2,7 +2,7 @@
 //  PlayerShootComponent.swift
 //  Cubrism
 //
-//  Created by Henry Sanderson on 3/11/16.
+//  Created by Brendan Sanderson on 3/11/16.
 //  Copyright © 2016 Brendan. All rights reserved.
 //
 
@@ -209,8 +209,8 @@ class ExpBarComponent: GKComponent {
         self.scene = scene
         levelLabel = SKLabelNode(text: String(format: "%i", Player.level))
 //        levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: scene.size.height * 0.025), size: CGSize(width: scene.frame.width * 0.045, height: scene.frame.height * 0.05)))
-        levelLabel.fontName = Constants.font
-        levelLabel.fontSize = 28
+        levelLabel.fontName = Constants.fontB
+        levelLabel.fontSize = 24
         levelLabel.fontColor = UIColor.white
         levelLabel.horizontalAlignmentMode = .right
         levelLabel.verticalAlignmentMode = .center

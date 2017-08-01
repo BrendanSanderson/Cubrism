@@ -10,6 +10,9 @@
 		2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */; };
 		27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27562A571F05AC5D00915990 /* Launch Screen.storyboard */; };
 		276704781F16959100A85D8B /* LevelSelectCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */; };
+		277661151F2157B90033D987 /* Comfortaa-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 277661121F2157B80033D987 /* Comfortaa-Bold.ttf */; };
+		277661161F2157B90033D987 /* Comfortaa-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 277661131F2157B80033D987 /* Comfortaa-Light.ttf */; };
+		277661171F2157B90033D987 /* Comfortaa-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 277661141F2157B90033D987 /* Comfortaa-Regular.ttf */; };
 		27C8CCD81F01847300C8D806 /* constants.json in Resources */ = {isa = PBXBuildFile; fileRef = 27C8CCD71F01847300C8D806 /* constants.json */; };
 		27FC7A201F16993C00F7CE89 /* BossEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FC7A1A1F16993C00F7CE89 /* BossEntity.swift */; };
 		27FC7A211F16993C00F7CE89 /* DoorEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FC7A1B1F16993C00F7CE89 /* DoorEntity.swift */; };
@@ -72,6 +75,9 @@
 		2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		27562A571F05AC5D00915990 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectCollectionViewController.swift; sourceTree = "<group>"; };
+		277661121F2157B80033D987 /* Comfortaa-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Comfortaa-Bold.ttf"; path = "Comfortaa/Comfortaa-Bold.ttf"; sourceTree = "<group>"; };
+		277661131F2157B80033D987 /* Comfortaa-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Comfortaa-Light.ttf"; path = "Comfortaa/Comfortaa-Light.ttf"; sourceTree = "<group>"; };
+		277661141F2157B90033D987 /* Comfortaa-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Comfortaa-Regular.ttf"; path = "Comfortaa/Comfortaa-Regular.ttf"; sourceTree = "<group>"; };
 		27C8CCD71F01847300C8D806 /* constants.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = constants.json; sourceTree = "<group>"; };
 		27FC7A1A1F16993C00F7CE89 /* BossEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BossEntity.swift; path = Entities/BossEntity.swift; sourceTree = "<group>"; };
 		27FC7A1B1F16993C00F7CE89 /* DoorEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DoorEntity.swift; path = Entities/DoorEntity.swift; sourceTree = "<group>"; };
@@ -200,6 +206,9 @@
 				BAD560511C9A5F99000BBB38 /* bosses.plist */,
 				BA26D26B1C9925C800C1FFBB /* rooms.plist */,
 				BAD1AF511CA8E66A00AD0290 /* levels.plist */,
+				277661121F2157B80033D987 /* Comfortaa-Bold.ttf */,
+				277661131F2157B80033D987 /* Comfortaa-Light.ttf */,
+				277661141F2157B90033D987 /* Comfortaa-Regular.ttf */,
 			);
 			name = Plists;
 			sourceTree = "<group>";
@@ -387,13 +396,16 @@
 			files = (
 				BA20C8D91C889E0800EE234D /* Assets.xcassets in Resources */,
 				BAACCDF61CD5776F001FEB25 /* items.plist in Resources */,
+				277661151F2157B90033D987 /* Comfortaa-Bold.ttf in Resources */,
 				BAD560521C9A5F99000BBB38 /* bosses.plist in Resources */,
+				277661171F2157B90033D987 /* Comfortaa-Regular.ttf in Resources */,
 				27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */,
 				27C8CCD81F01847300C8D806 /* constants.json in Resources */,
 				BADF41A31CA8A5ED00EF9C15 /* border 3.jpg in Resources */,
 				BA26D26C1C9925C800C1FFBB /* rooms.plist in Resources */,
 				BAD1AF521CA8E66A00AD0290 /* levels.plist in Resources */,
 				BA696BD21CB41EDD00D7C6DE /* Enemies.plist in Resources */,
+				277661161F2157B90033D987 /* Comfortaa-Light.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
