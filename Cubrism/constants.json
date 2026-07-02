@@ -125,21 +125,21 @@
     },
     "boss" : {
         "golem" : {
-            "meleeBase": 100
-            "healthBase": 2000
-            "rangeBase" : 50
+            "meleeBase": 100,
+            "healthBase": 2000,
+            "rangeBase" : 50,
             "effectBase" : 25
         },
         "generator" : {
-            "meleeBase": 50
-            "healthBase": 2000
-            "rangeBase" : 25
+            "meleeBase": 50,
+            "healthBase": 2000,
+            "rangeBase" : 25,
             "effectBase" : 10
         },
         "dragon" : {
-            "meleeBase": 25
-            "healthBase": 2000
-            "rangeBase" : 50
+            "meleeBase": 25,
+            "healthBase": 2000,
+            "rangeBase" : 50,
             "effectBase" : 10
         }
         

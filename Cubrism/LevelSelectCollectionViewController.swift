@@ -7,25 +7,26 @@
 //
 
 import UIKit
-class LevelSelectCollectionViewController: UICollectionViewController {
+class LevelSelectCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
 //    init() {
 //        super.init(nibName: "LevelSelectCollectionViewController", bundle: nil)
 //    }
     var pageControl = UIPageControl()
     var homeView = HomeViewController()
+    private let numberOfWorlds = 5
+    private var backgroundViews = [UIImageView]()
+    private var backImageView = UIImageView()
+    private var lastLayoutSize = CGSize.zero
     override func loadView() {
-        self.view = UIView(frame: UIScreen.main.bounds)
+        self.view = UIView()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = UICollectionView.ScrollDirection.horizontal
-        flowLayout.minimumLineSpacing = self.view.frame.width * 0.05
-        flowLayout.minimumInteritemSpacing = self.view.frame.width * 0.05
-        flowLayout.sectionInset = UIEdgeInsets(top: self.view.frame.height * 0.3, left: self.view.frame.width * 0.2, bottom: self.view.frame.height * 0.3, right: self.view.frame.width * 0.2)
-        self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: flowLayout)
+        flowLayout.scrollDirection = .horizontal
+        self.collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: flowLayout)
         addBackgrounds()
         
         self.collectionView!.showsHorizontalScrollIndicator = false;
@@ -46,25 +47,27 @@ class LevelSelectCollectionViewController: UICollectionViewController {
          //self.collectionView!.registerNib(UINib(nibName:"LevelCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
         // Do any additional setup after loading the view.
         
-        let w = self.view.frame.size.width
-        let h = self.view.frame.size.height
-        let frame = CGRect(x: 0, y: h - 60, width: w, height: 60)
-        self.pageControl = UIPageControl(frame: frame)
+        self.pageControl = UIPageControl()
         
         self.pageControl.addTarget(self, action: #selector(pageControlChanged(_:)), for: UIControl.Event.valueChanged)
         
-        self.pageControl.numberOfPages = 5;
+        self.pageControl.numberOfPages = numberOfWorlds;
         self.pageControl.autoresizingMask = UIView.AutoresizingMask.flexibleHeight
         self.view.addSubview(self.pageControl)
         
         
-        let backImage = UIImageView(frame: CGRect(x: w * 0.9 , y: w * 0.05, width: w * 0.05, height: w * 0.05))
-        backImage.image = UIImage(named: "backButton")
+        backImageView.image = UIImage(named: "backButton")
         let tapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(LevelSelectCollectionViewController.back(_:)))
-        backImage.isUserInteractionEnabled = true
-        backImage.addGestureRecognizer(tapGestureRecognizer)
-        self.view.addSubview(backImage)
+        backImageView.isUserInteractionEnabled = true
+        backImageView.addGestureRecognizer(tapGestureRecognizer)
+        self.view.addSubview(backImageView)
+        layoutLevelSelectViews()
         
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        layoutLevelSelectViews()
     }
 
     override func didReceiveMemoryWarning() {
@@ -89,7 +92,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 5
+        return numberOfWorlds
     }
 
 
@@ -168,8 +171,8 @@ class LevelSelectCollectionViewController: UICollectionViewController {
     
     
     func collectionView(_ collectionView: UICollectionView,
-                                   layout collectionViewLayout: UICollectionViewLayout,
-                                          sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize
     {
         return CGSize(width: collectionView.bounds.size.width * 0.08, height: collectionView.bounds.size.height * 0.15)
         //return collectionView.bounds.size
@@ -191,35 +194,60 @@ class LevelSelectCollectionViewController: UICollectionViewController {
 
     func addBackgrounds()
     {
-        let w = self.view.frame.size.width
-        let h = self.view.frame.size.height
-        let imageView1 = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
-        imageView1.image = UIImage(named: "background1")
-        let imageView2 = UIImageView(frame: CGRect(x: w, y: 0, width: w, height: h))
-        imageView2.image = UIImage(named: "background2")
-        let imageView3 = UIImageView(frame: CGRect(x: 2.0 * w, y: 0, width: w, height: h))
-        imageView3.image = UIImage(named: "background3")
-        let imageView4 = UIImageView(frame: CGRect(x: 3.0 * w, y: 0, width: w, height: h))
-        imageView4.image = UIImage(named: "background4")
-        let imageView5 = UIImageView(frame: CGRect(x: 4.0 * w, y: 0, width: w, height: h))
-        imageView5.image = UIImage(named: "background5")
-        
-        self.collectionView?.addSubview(imageView1)
-        self.collectionView?.addSubview(imageView2)
-        self.collectionView?.addSubview(imageView3)
-        self.collectionView?.addSubview(imageView4)
-        self.collectionView?.addSubview(imageView5)
+        for world in 1...numberOfWorlds {
+            let imageView = UIImageView()
+            imageView.image = UIImage(named: "background\(world)")
+            backgroundViews.append(imageView)
+            self.collectionView?.addSubview(imageView)
+        }
         
     }
     func moveBackgroundsToBack()
     {
-        for i in 0 ..< self.collectionView!.subviews.count
-        {
-            if ((self.collectionView?.subviews[i].isKind(of: UIImageView.self)) != nil)
-            {
-                self.collectionView?.sendSubviewToBack((self.collectionView?.subviews[i])!)
-            }
+        for backgroundView in backgroundViews {
+            self.collectionView?.sendSubviewToBack(backgroundView)
         }
+    }
+
+    private func layoutLevelSelectViews() {
+        let w = self.view.bounds.size.width
+        let h = self.view.bounds.size.height
+        if w <= 0 || h <= 0 {
+            return
+        }
+        let sizeChanged = self.view.bounds.size != lastLayoutSize
+
+        self.collectionView?.frame = self.view.bounds
+        self.pageControl.frame = CGRect(x: 0, y: h - 60, width: w, height: 60)
+
+        let backSize = min(w, h) * 0.08
+        backImageView.frame = CGRect(x: w - backSize - (w * 0.05), y: h * 0.08, width: backSize, height: backSize)
+
+        for (index, imageView) in backgroundViews.enumerated() {
+            imageView.frame = CGRect(x: CGFloat(index) * w, y: 0, width: w, height: h)
+        }
+
+        if sizeChanged, let flowLayout = self.collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
+            let cellSize = CGSize(width: w * 0.08, height: h * 0.15)
+            let columns = CGFloat(4)
+            let rows = CGFloat(3)
+            let lineSpacing = w * 0.05
+            let interitemSpacing = w * 0.05
+            let horizontalInset = max(0, (w - (columns * cellSize.width) - ((columns - 1) * lineSpacing)) / 2)
+            let verticalInset = max(0, (h - (rows * cellSize.height) - ((rows - 1) * interitemSpacing)) / 2)
+
+            flowLayout.minimumLineSpacing = lineSpacing
+            flowLayout.minimumInteritemSpacing = interitemSpacing
+            flowLayout.sectionInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
+            flowLayout.invalidateLayout()
+        }
+
+        let contentOffset = CGPoint(x: w * CGFloat(pageControl.currentPage), y: 0)
+        if self.collectionView?.contentOffset != contentOffset {
+            self.collectionView?.contentOffset = contentOffset
+        }
+        lastLayoutSize = self.view.bounds.size
+        moveBackgroundsToBack()
     }
     // MARK: UICollectionViewDelegate
 

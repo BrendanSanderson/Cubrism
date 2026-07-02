@@ -91,6 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         else {
             Constants.jsonDict = UserDefaults.standard.object(forKey: "jsonConstants") as! [String : Any]
         }
+        EnemyEntity.refreshEnemyDictionary()
         let session = URLSession.shared
         let url = URL(string: "https://quarkbackend.com/getfile/brendansanderson/constants-json")!
         let task = session.dataTask(with: url) { (data, _, _) -> Void in
@@ -99,7 +100,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let json = try JSONSerialization.jsonObject(with: data, options: [])
                     let jsonDict = json as? [String: Any]
                     Constants.jsonDict = jsonDict
-                    EnemyEntity.enemyDict = jsonDict?["enemy"] as? [String: Any]
+                    EnemyEntity.refreshEnemyDictionary()
                     Player.readConstants()
                     UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
                     UserDefaults.standard.synchronize()

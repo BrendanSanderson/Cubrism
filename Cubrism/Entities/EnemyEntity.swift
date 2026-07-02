@@ -25,8 +25,15 @@ class EnemyEntity: DynamicEntity {
     var level = 1
     static var enemyDict = Constants.jsonDict?["enemy"] as? [String: Any]
     var componentDict: [String:Any]
+    static func refreshEnemyDictionary() {
+        enemyDict = Constants.jsonDict?["enemy"] as? [String: Any]
+    }
+
     override init()
     {
+        if EnemyEntity.enemyDict == nil {
+            EnemyEntity.refreshEnemyDictionary()
+        }
         componentDict = (EnemyEntity.enemyDict?["component"] as? [String: Any])!
         super.init()
     }

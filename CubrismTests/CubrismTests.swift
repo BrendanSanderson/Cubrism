@@ -11,6 +11,32 @@ import XCTest
 
 class CubrismTests: XCTestCase {
 
+    func testBundledConstantsCanPopulateEnemyDictionary() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "constants", withExtension: "json"))
+        let data = try Data(contentsOf: url)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data, options: []) as? [String: Any])
+
+        Constants.jsonDict = json
+        EnemyEntity.enemyDict = nil
+        EnemyEntity.refreshEnemyDictionary()
+
+        XCTAssertNotNil(EnemyEntity.enemyDict?["component"] as? [String: Any])
+    }
+
+    func testLevelSelectUsesOneFullWidthPagePerWorld() {
+        let controller = LevelSelectCollectionViewController()
+        controller.loadViewIfNeeded()
+        controller.view.frame = CGRect(x: 0, y: 0, width: 1024, height: 768)
+        controller.view.layoutIfNeeded()
+        controller.collectionView.collectionViewLayout.invalidateLayout()
+        controller.collectionView.layoutIfNeeded()
+
+        let pageCount = CGFloat(controller.numberOfSections(in: controller.collectionView))
+        let expectedWidth = controller.collectionView.bounds.width * pageCount
+
+        XCTAssertEqual(controller.collectionView.collectionViewLayout.collectionViewContentSize.width, expectedWidth, accuracy: 1.0)
+    }
+
     func testWASDKeysDriveMovementVelocityOnly() {
         var controls = KeyboardControlState()
 
