@@ -143,10 +143,10 @@ class CompletedViewController: UIViewController {
         
         
         let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.32, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.38, height: view.frame.height * 0.1)))
-        button.setTitle("Continue", for: UIControlState())
+        button.setTitle("Continue", for: UIControl.State.normal)
         button.layer.cornerRadius = 5
         button.backgroundColor = Constants.darkColor
-        button.setTitleColor(Constants.lightColor, for: UIControlState())
+        button.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
         button.titleLabel!.font = UIFont(name: font, size: 32)
         view.addSubview(button)
         
@@ -155,7 +155,7 @@ class CompletedViewController: UIViewController {
 
     }
     
-    func goToHome(_ sender: UIButton!) {
+    @objc func goToHome(_ sender: UIButton!) {
         self.dismiss(animated: false, completion: nil)
         NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToHomeViewController"), object: self)
     }

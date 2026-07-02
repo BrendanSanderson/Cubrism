@@ -21,7 +21,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         super.viewDidLoad()
         
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = UICollectionViewScrollDirection.horizontal
+        flowLayout.scrollDirection = UICollectionView.ScrollDirection.horizontal
         flowLayout.minimumLineSpacing = self.view.frame.width * 0.05
         flowLayout.minimumInteritemSpacing = self.view.frame.width * 0.05
         flowLayout.sectionInset = UIEdgeInsets(top: self.view.frame.height * 0.3, left: self.view.frame.width * 0.2, bottom: self.view.frame.height * 0.3, right: self.view.frame.width * 0.2)
@@ -51,10 +51,10 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         let frame = CGRect(x: 0, y: h - 60, width: w, height: 60)
         self.pageControl = UIPageControl(frame: frame)
         
-        self.pageControl.addTarget(self, action: #selector(pageControlChanged(_:)), for: UIControlEvents.valueChanged)
+        self.pageControl.addTarget(self, action: #selector(pageControlChanged(_:)), for: UIControl.Event.valueChanged)
         
         self.pageControl.numberOfPages = 5;
-        self.pageControl.autoresizingMask = UIViewAutoresizing.flexibleHeight
+        self.pageControl.autoresizingMask = UIView.AutoresizingMask.flexibleHeight
         self.view.addSubview(self.pageControl)
         
         
@@ -71,7 +71,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    func back(_ img: AnyObject)
+    @objc func back(_ img: AnyObject)
     {
         self.dismiss(animated: false, completion: nil)
     }
@@ -174,7 +174,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         return CGSize(width: collectionView.bounds.size.width * 0.08, height: collectionView.bounds.size.height * 0.15)
         //return collectionView.bounds.size
     }
-    func pageControlChanged(_ sender: UIPageControl)
+    @objc func pageControlChanged(_ sender: UIPageControl)
     {
     
         let pageControl = sender
@@ -217,7 +217,7 @@ class LevelSelectCollectionViewController: UICollectionViewController {
         {
             if ((self.collectionView?.subviews[i].isKind(of: UIImageView.self)) != nil)
             {
-                self.collectionView?.sendSubview(toBack: (self.collectionView?.subviews[i])!)
+                self.collectionView?.sendSubviewToBack((self.collectionView?.subviews[i])!)
             }
         }
     }

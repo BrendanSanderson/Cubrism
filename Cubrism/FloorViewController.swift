@@ -246,12 +246,12 @@ class FloorViewController: UIViewController {
             return CGPoint(x: self.view.frame.width * 0.9 - 32, y: position.y)
         }
     }
-    func goToHomeViewController(_ notification: Notification)
+    @objc func goToHomeViewController(_ notification: Notification)
     {
         self.skView.presentScene(nil)
         self.dismiss(animated: false, completion: nil)
     }
-    func goToCompletedViewController(_ notification: Notification)
+    @objc func goToCompletedViewController(_ notification: Notification)
     {
         self.skView.presentScene(nil)
 //        var levelGap = Player.level - self.level

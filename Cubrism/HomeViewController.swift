@@ -106,32 +106,32 @@ class HomeViewController: UIViewController {
     override var prefersStatusBarHidden : Bool {
         return true
     }
-    func resetHomeViewController(_ notification: Notification){
+    @objc func resetHomeViewController(_ notification: Notification){
     
         self.skView.presentScene(nil)
         self.viewDidLoad()
     }
     
-    func goToFloorViewController(_ notification: Notification){
+    @objc func goToFloorViewController(_ notification: Notification){
     // Perform a segue or present ViewController directly
     let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
     self.view.addSubview(loadingView)
-        self.view.bringSubview(toFront: loadingView)
+        self.view.bringSubviewToFront(loadingView)
     floorView.max = UInt32(6)
     floorView.max = UInt32(4)
     floorView.level = 1
     self.present(floorView, animated: false, completion: nil)
     }
     
-    func goToLevelSelectCollectionViewController(_ notification: Notification){
+    @objc func goToLevelSelectCollectionViewController(_ notification: Notification){
         self.present(levelSelectView, animated: false, completion: nil)
     }
     
-    func restartFloorViewController(_ notification: Notification){
+    @objc func restartFloorViewController(_ notification: Notification){
         self.present(floorView, animated: false, completion: nil)
     }
     
-    func goToLevelFloorViewController(_ notification: Notification){
+    @objc func goToLevelFloorViewController(_ notification: Notification){
         
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)

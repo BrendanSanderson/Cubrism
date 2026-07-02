@@ -165,7 +165,7 @@ open class AnalogJoystick: SKNode {
         
         disabled = false
         let velocityLoop = CADisplayLink(target: self, selector: #selector(AnalogJoystick.listen))
-        velocityLoop.add(to: RunLoop.current, forMode: RunLoopMode.commonModes)
+        velocityLoop.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
     }
     
     convenience init(diameters: (substrate: CGFloat, stick: CGFloat?), colors: (substrate: UIColor?, stick: UIColor?)? = nil, images: (substrate: UIImage?, stick: UIImage?)? = nil) {
@@ -190,7 +190,7 @@ open class AnalogJoystick: SKNode {
         super.init(coder: aDecoder)
     }
     
-    func listen() {
+    @objc func listen() {
         
         if tracking { trackingHandler?(data) }
     }

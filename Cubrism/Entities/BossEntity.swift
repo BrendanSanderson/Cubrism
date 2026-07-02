@@ -39,14 +39,14 @@ class BossEntity: DynamicEntity {
         self.scene = scene
         node.entity = self
         level = (scene as! RoomScene).viewController.level
-        type = properties.value(forKey: "name") as? String!
+        type = properties.value(forKey: "name") as? String
         setUpBoss(properties)
         node.addChild(sprite)
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         sprite.zPosition = 10
         addComponent(BossBarComponent(scene: scene))
         sprite.physicsBody?.isDynamic = false
-        if (properties.value(forKey: "name") as? String!) == "golem"
+        if (properties.value(forKey: "name") as? String) == "golem"
         {
             sprite.physicsBody?.isDynamic = true
         }
@@ -62,12 +62,12 @@ class BossEntity: DynamicEntity {
     }
     func setUpBoss (_ properties: NSDictionary)
     {
-        let name = properties.value(forKey: "name") as? String!
-        let specifcBossDict = BossEntity.bossDict?[name!] as? [String: Any]
-        let rangeBase = specifcBossDict?["rangeBase"] as! Int
-        let effectBase = specifcBossDict?["effectBase"] as! Int
-        let meleeBase = specifcBossDict?["meleeBase"] as! Int
-        let healthBase = specifcBossDict?["healthBase"] as! Int
+        let name = properties.value(forKey: "name") as! String
+        let specifcBossDict = BossEntity.bossDict?[name] as! [String: Any]
+        let rangeBase = specifcBossDict["rangeBase"] as! Int
+        let effectBase = specifcBossDict["effectBase"] as! Int
+        let meleeBase = specifcBossDict["meleeBase"] as! Int
+        let healthBase = specifcBossDict["healthBase"] as! Int
         self.sprite = SKSpriteNode(texture: SKTexture(imageNamed: (properties.value(forKey: "image") as? String)!), size: CGSize(width: (properties.value(forKey: "size") as? Int)!, height: (properties.value(forKey: "size") as? Int)!))
         if (properties.value(forKey: "position") as? String)! == "center"
         {

@@ -83,8 +83,7 @@ class EnemyEntity: DynamicEntity {
         var rangeAttackMultiplier = 1.0
         var meleeAttackMultiplier = 1.0
         var speed = 2.0
-        let jType = String(describing: eType.characters.first!)
-            .lowercased() + eType.substring(from: eType.characters.index(of: eType.characters.dropFirst().first!)!)
+        let jType = eType.prefix(1).lowercased() + String(eType.dropFirst())
         let specificEnemyDict = EnemyEntity.enemyDict?[jType] as? [String: Any]
         healthMultiplier = (specificEnemyDict?["healthMult"] as? Double)!
         rangeAttackMultiplier = (specificEnemyDict?["rangeAttackMult"] as? Double)!

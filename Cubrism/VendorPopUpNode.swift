@@ -60,7 +60,7 @@ class VendorPopUpNode: SKNode
             }
             else
             {
-                if let q = selectedNode.quantity.text as String! {labels[1].text = "x \(q)"}
+                if let q = selectedNode.quantity.text {labels[1].text = "x \(q)"}
                 labels[2].text = ""
                 labels[3].text = ""
                 labels[4].text = ""
@@ -584,5 +584,4 @@ class ShopPopUpNode: VendorPopUpNode {
     }
     
         }
-
 

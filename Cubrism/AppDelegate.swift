@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         self.window = UIWindow(frame: UIScreen.main.bounds)
         let view = HomeViewController()
@@ -72,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                "TotalExperience")
 //            UserDefaults.standard.synchronize()
 //        }
-        if UserDefaults.standard.object(forKey: "LevelCompleted") == nil
+        if UserDefaults.standard.object(forKey: "jsonConstants") == nil
         {
             do {
                 let file = Bundle.main.url(forResource: "constants", withExtension: "json")
@@ -164,4 +164,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-

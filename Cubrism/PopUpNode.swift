@@ -44,10 +44,10 @@ class PopUpNode: SKNode {
 //        button2.titleLabel!.textAlignment = .Center
         button1.backgroundColor = Constants.darkColor
        button2.backgroundColor = Constants.darkColor
-        button1.setTitle(button1Text, for: UIControlState())
-        button2.setTitle(button2Text, for: UIControlState())
-        button1.setTitleColor(Constants.lightColor, for: UIControlState())
-        button2.setTitleColor(Constants.lightColor, for: UIControlState())
+        button1.setTitle(button1Text, for: UIControl.State.normal)
+        button2.setTitle(button2Text, for: UIControl.State.normal)
+        button1.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
+        button2.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
 //        button1.backgroundColor = UIColor.redColor()
 //        button2.backgroundColor = UIColor.redColor()
         label.textAlignment = .center
@@ -104,7 +104,7 @@ class PopUpNode: SKNode {
         
     }
     
-    func play(_ sender: UIButton!) {
+    @objc func play(_ sender: UIButton!) {
         remove()
         gameScene.isPaused = false
         gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
@@ -112,26 +112,26 @@ class PopUpNode: SKNode {
         
     }
     
-    func quit(_ sender: UIButton!) {
+    @objc func quit(_ sender: UIButton!) {
         remove()
         
         gameScene.addChild(PopUpNode(scene: gameScene, text: "Are You Sure?", button1Text: "Yes", button2Text: "No"))
         
     }
-    func reset(_ sender: UIButton!) {
+    @objc func reset(_ sender: UIButton!) {
         remove()
         
         gameScene.addChild(PopUpNode(scene: gameScene, text: "Are You Sure?", button1Text: "Yes", button2Text: "No"))
         
     }
-    func no(_ sender: UIButton!) {
+    @objc func no(_ sender: UIButton!) {
         remove()
         
         gameScene.addChild(PopUpNode(scene: gameScene, text: "Paused", button1Text: "Play", button2Text: "Quit"))
         
     }
     
-    func yes(_ sender: UIButton!) {
+    @objc func yes(_ sender: UIButton!) {
         remove()
         if (gameScene.isKind(of: HomeScene.self))
         {
@@ -186,7 +186,7 @@ class PopUpNode: SKNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func retry(_ sender: UIButton!) {
+    @objc func retry(_ sender: UIButton!) {
         remove()
         (scene as! RoomScene).viewController.max = (scene as! RoomScene).viewController.max
         (scene as! RoomScene).viewController.min = (scene as! RoomScene).viewController.min
@@ -197,7 +197,7 @@ class PopUpNode: SKNode {
            
     }
     
-    func leave(_ sender: UIButton!) {
+    @objc func leave(_ sender: UIButton!) {
         remove()
         if (gameScene.isKind(of: HomeScene.self))
         {
