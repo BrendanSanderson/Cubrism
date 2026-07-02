@@ -26,6 +26,7 @@
 		27FC7A301F16994A00F7CE89 /* HealthBarComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FC7A2A1F16994A00F7CE89 /* HealthBarComponent.swift */; };
 		27FC7A311F16994A00F7CE89 /* PlayerComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FC7A2B1F16994A00F7CE89 /* PlayerComponents.swift */; };
 		27FC7A321F16994A00F7CE89 /* VisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FC7A2C1F16994A00F7CE89 /* VisualComponent.swift */; };
+		C0DE00012A00000000000002 /* KeyboardControlState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00012A00000000000001 /* KeyboardControlState.swift */; };
 		BA0B06081CA3759A003CE50D /* LevelSelectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */; };
 		BA20C8CE1C889E0800EE234D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA20C8CD1C889E0800EE234D /* AppDelegate.swift */; };
 		BA20C8D21C889E0800EE234D /* HomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA20C8D11C889E0800EE234D /* HomeScene.swift */; };
@@ -91,6 +92,7 @@
 		27FC7A2A1F16994A00F7CE89 /* HealthBarComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HealthBarComponent.swift; path = Components/HealthBarComponent.swift; sourceTree = "<group>"; };
 		27FC7A2B1F16994A00F7CE89 /* PlayerComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PlayerComponents.swift; path = Components/PlayerComponents.swift; sourceTree = "<group>"; };
 		27FC7A2C1F16994A00F7CE89 /* VisualComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisualComponent.swift; path = Components/VisualComponent.swift; sourceTree = "<group>"; };
+		C0DE00012A00000000000001 /* KeyboardControlState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyboardControlState.swift; path = Components/KeyboardControlState.swift; sourceTree = "<group>"; };
 		BA0B06071CA3759A003CE50D /* LevelSelectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectNode.swift; sourceTree = "<group>"; };
 		BA20C8CA1C889E0800EE234D /* Cubrism.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cubrism.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA20C8CD1C889E0800EE234D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				27FC7A291F16994A00F7CE89 /* EnemyComponents.swift */,
 				27FC7A2A1F16994A00F7CE89 /* HealthBarComponent.swift */,
 				27FC7A2B1F16994A00F7CE89 /* PlayerComponents.swift */,
+				C0DE00012A00000000000001 /* KeyboardControlState.swift */,
 				27FC7A2C1F16994A00F7CE89 /* VisualComponent.swift */,
 			);
 			name = Components;
@@ -433,6 +436,7 @@
 				BADF2B861C97AE6100D573AC /* Player.swift in Sources */,
 				BAC28FE61CA65AD5003E07ED /* LevelCell.swift in Sources */,
 				27FC7A311F16994A00F7CE89 /* PlayerComponents.swift in Sources */,
+				C0DE00012A00000000000002 /* KeyboardControlState.swift in Sources */,
 				BAACCDF41CD55CCF001FEB25 /* Item.swift in Sources */,
 				27FC7A2E1F16994A00F7CE89 /* BossComponents.swift in Sources */,
 				27FC7A301F16994A00F7CE89 /* HealthBarComponent.swift in Sources */,

@@ -1,5 +1,8 @@
 
 import SpriteKit
+#if targetEnvironment(macCatalyst)
+import UIKit
+#endif
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var time = TimeInterval()
@@ -9,6 +12,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var doorAccessed = String()
     var world = Player.level/10 + 1
     let button = SKSpriteNode(imageNamed: "pauseButton")
+    #if targetEnvironment(macCatalyst)
+    var keyboardControls = KeyboardControlState()
+    #endif
     override func didMove(to view: SKView) {
         self.scaleMode = .resizeFill
         view.isMultipleTouchEnabled = true
@@ -25,6 +31,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     override func update(_ currentTime: TimeInterval) {
         time = currentTime
+        #if targetEnvironment(macCatalyst)
+        applyKeyboardControls()
+        #endif
     }
     func createGrid()
     {
@@ -306,3 +315,79 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
 }
+
+#if targetEnvironment(macCatalyst)
+extension GameScene {
+    func keyboardPressesBegan(_ presses: Set<UIPress>) {
+        for press in presses {
+            if let key = keyboardKey(for: press) {
+                keyboardControls.press(key)
+                started = true
+            }
+        }
+    }
+
+    func keyboardPressesEnded(_ presses: Set<UIPress>) {
+        for press in presses {
+            if let key = keyboardKey(for: press) {
+                keyboardControls.release(key)
+            }
+        }
+    }
+
+    func keyboardPressesCancelled() {
+        keyboardControls.reset()
+        Player.entity.component(ofType: PlayerMovementComponent.self)?.stopMoving()
+        Player.entity.component(ofType: PlayerShootComponent.self)?.stopShooting()
+    }
+
+    private func applyKeyboardControls() {
+        let movement = Player.entity.component(ofType: PlayerMovementComponent.self)
+        let shooting = Player.entity.component(ofType: PlayerShootComponent.self)
+
+        if keyboardControls.isMoving {
+            started = true
+            movement?.startMoving()
+            movement?.move(with: keyboardControls.movementVelocity)
+        }
+        else {
+            movement?.stopMoving()
+        }
+
+        if keyboardControls.isShooting {
+            started = true
+            shooting?.shoot(with: keyboardControls.shootingVelocity, currentTime: time)
+        }
+        else {
+            shooting?.stopShooting()
+        }
+    }
+
+    private func keyboardKey(for press: UIPress) -> KeyboardControlState.Key? {
+        guard let key = press.key else {
+            return nil
+        }
+
+        switch key.keyCode {
+        case .keyboardW:
+            return .w
+        case .keyboardA:
+            return .a
+        case .keyboardS:
+            return .s
+        case .keyboardD:
+            return .d
+        case .keyboardUpArrow:
+            return .up
+        case .keyboardDownArrow:
+            return .down
+        case .keyboardLeftArrow:
+            return .left
+        case .keyboardRightArrow:
+            return .right
+        default:
+            return nil
+        }
+    }
+}
+#endif

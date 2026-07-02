@@ -10,27 +10,70 @@ import XCTest
 @testable import Cubrism
 
 class CubrismTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+    func testWASDKeysDriveMovementVelocityOnly() {
+        var controls = KeyboardControlState()
+
+        controls.press(.w)
+        controls.press(.d)
+
+        XCTAssertTrue(controls.isMoving)
+        XCTAssertFalse(controls.isShooting)
+        XCTAssertEqual(controls.movementVelocity.x, KeyboardControlState.velocity / sqrt(2), accuracy: 0.001)
+        XCTAssertEqual(controls.movementVelocity.y, KeyboardControlState.velocity / sqrt(2), accuracy: 0.001)
+        XCTAssertEqual(controls.shootingVelocity, .zero)
     }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
+
+    func testArrowKeysDriveShootingVelocityOnly() {
+        var controls = KeyboardControlState()
+
+        controls.press(.up)
+        controls.press(.left)
+
+        XCTAssertFalse(controls.isMoving)
+        XCTAssertTrue(controls.isShooting)
+        XCTAssertEqual(controls.shootingVelocity.x, -KeyboardControlState.velocity / sqrt(2), accuracy: 0.001)
+        XCTAssertEqual(controls.shootingVelocity.y, KeyboardControlState.velocity / sqrt(2), accuracy: 0.001)
+        XCTAssertEqual(controls.movementVelocity, .zero)
     }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+
+    func testReleasedKeysStopDrivingVelocity() {
+        var controls = KeyboardControlState()
+
+        controls.press(.s)
+        controls.press(.right)
+        controls.release(.s)
+        controls.release(.right)
+
+        XCTAssertFalse(controls.isMoving)
+        XCTAssertFalse(controls.isShooting)
+        XCTAssertEqual(controls.movementVelocity, .zero)
+        XCTAssertEqual(controls.shootingVelocity, .zero)
     }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+
+    func testOppositeKeysCancelEachOther() {
+        var controls = KeyboardControlState()
+
+        controls.press(.a)
+        controls.press(.d)
+        controls.press(.up)
+        controls.press(.down)
+
+        XCTAssertEqual(controls.movementVelocity, .zero)
+        XCTAssertEqual(controls.shootingVelocity, .zero)
     }
-    
+
+    func testResetClearsHeldKeys() {
+        var controls = KeyboardControlState()
+
+        controls.press(.w)
+        controls.press(.right)
+        controls.reset()
+
+        XCTAssertFalse(controls.isMoving)
+        XCTAssertFalse(controls.isShooting)
+        XCTAssertEqual(controls.movementVelocity, .zero)
+        XCTAssertEqual(controls.shootingVelocity, .zero)
+    }
+
 }

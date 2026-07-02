@@ -32,9 +32,11 @@ class HomeViewController: UIViewController {
         
         floorView = FloorViewController()
         floorView.homeView = self
+        floorView.modalPresentationStyle = .fullScreen
         
         levelSelectView = LevelSelectCollectionViewController()
         levelSelectView.homeView = self
+        levelSelectView.modalPresentationStyle = .fullScreen
         
         self.view.isMultipleTouchEnabled = true
             // Configure the view.
@@ -83,6 +85,9 @@ class HomeViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         skView.presentScene(scene)
         Player.updateInventory()
+        #if targetEnvironment(macCatalyst)
+        becomeFirstResponder()
+        #endif
         //self.pause
     }
 
@@ -138,5 +143,38 @@ class HomeViewController: UIViewController {
         
         self.present(floorView, animated: false, completion: nil)
     }
+
+    #if targetEnvironment(macCatalyst)
+    override var canBecomeFirstResponder : Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesBegan(presses)
+        }
+        else {
+            super.pressesBegan(presses, with: event)
+        }
+    }
+
+    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesEnded(presses)
+        }
+        else {
+            super.pressesEnded(presses, with: event)
+        }
+    }
+
+    override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesCancelled()
+        }
+        else {
+            super.pressesCancelled(presses, with: event)
+        }
+    }
+    #endif
     
 }

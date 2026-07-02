@@ -75,6 +75,9 @@ class FloorViewController: UIViewController {
         scene.scaleMode = .resizeFill
         scene.startPosition = CGPoint (x: self.view.frame.width/2, y: self.view.frame.height/2)
         skView.presentScene(scene)
+        #if targetEnvironment(macCatalyst)
+        becomeFirstResponder()
+        #endif
         
     }
     
@@ -275,6 +278,7 @@ class FloorViewController: UIViewController {
         let completeViewController = CompletedViewController()
         completeViewController.expGained = levelExp
         completeViewController.drops = drops
+        completeViewController.modalPresentationStyle = .fullScreen
         
         if ((UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) < level)
         {
@@ -287,6 +291,39 @@ class FloorViewController: UIViewController {
         
         self.present(completeViewController, animated: false, completion: nil)
     }
+
+    #if targetEnvironment(macCatalyst)
+    override var canBecomeFirstResponder : Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesBegan(presses)
+        }
+        else {
+            super.pressesBegan(presses, with: event)
+        }
+    }
+
+    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesEnded(presses)
+        }
+        else {
+            super.pressesEnded(presses, with: event)
+        }
+    }
+
+    override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if let gameScene = skView.scene as? GameScene {
+            gameScene.keyboardPressesCancelled()
+        }
+        else {
+            super.pressesCancelled(presses, with: event)
+        }
+    }
+    #endif
     
     func getDrops() -> [Item]
     {

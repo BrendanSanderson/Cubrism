@@ -28,38 +28,18 @@ class PlayerShootComponent: GKComponent {
 
         
         joystick.position = CGPoint(x: scene.size.width - joystick.radius -  30, y: joystick.radius + 30)
+        #if !targetEnvironment(macCatalyst)
         scene.addChild(joystick)
+        #endif
         joystick.startHandler = { //[unowned self] in
             scene.started = true
         
         }
         joystick.stopHandler = { //[unowned self] in
-            Player.entity.shooting = false
+            self.stopShooting()
         }
-        joystick.trackingHandler = { [unowned scene] data in
-            self.velocity = data.velocity
-            if (scene.isPaused == false)
-            {
-                if (data.velocity.x > 10.0 || data.velocity.x < -10.0 || data.velocity.y > 10.0 || data.velocity.y < -10.0)
-                {
-                    self.velocity = data.velocity
-                    let angle = Double(atan(Double(self.velocity.y)/Double(self.velocity.x)))
-                    self.velocity.x = CGFloat(cos(angle) * 50.0)
-                    self.velocity.y = CGFloat(sin(angle) * 50.0)
-                    if (data.velocity.x < 0.0)
-                    {
-                        Player.entity.cannonSprite.zRotation = CGFloat(Double.pi+angle)
-                        self.velocity.x = -self.velocity.x
-                        self.velocity.y = -self.velocity.y
-                    }
-                    else
-                    {
-                        Player.entity.cannonSprite.zRotation = CGFloat(angle)
-                    }
-                    Player.entity.shooting = true
-                    self.ShotIfNeeded(scene.time)
-                }
-            }
+        joystick.trackingHandler = { [unowned self, unowned scene] data in
+            self.shoot(with: data.velocity, currentTime: scene.time)
         }
         
     }
@@ -73,6 +53,35 @@ class PlayerShootComponent: GKComponent {
             lastShotTime = currentTime
             self.fire(self.velocity)
         }
+    }
+
+    func shoot(with velocity: CGPoint, currentTime: TimeInterval) {
+        self.velocity = velocity
+        if (scene.isPaused == false)
+        {
+            if (velocity.x > 10.0 || velocity.x < -10.0 || velocity.y > 10.0 || velocity.y < -10.0)
+            {
+                let angle = Double(atan(Double(self.velocity.y)/Double(self.velocity.x)))
+                self.velocity.x = CGFloat(cos(angle) * 50.0)
+                self.velocity.y = CGFloat(sin(angle) * 50.0)
+                if (velocity.x < 0.0)
+                {
+                    Player.entity.cannonSprite.zRotation = CGFloat(Double.pi+angle)
+                    self.velocity.x = -self.velocity.x
+                    self.velocity.y = -self.velocity.y
+                }
+                else
+                {
+                    Player.entity.cannonSprite.zRotation = CGFloat(angle)
+                }
+                Player.entity.shooting = true
+                self.ShotIfNeeded(currentTime)
+            }
+        }
+    }
+
+    func stopShooting() {
+        Player.entity.shooting = false
     }
     
     
@@ -130,58 +139,75 @@ class PlayerMovementComponent: GKComponent {
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.3), UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8)))
         
         joystick.position = CGPoint(x: joystick.radius + 30, y: joystick.radius + 30)
+        #if !targetEnvironment(macCatalyst)
         scene.addChild(joystick)
+        #endif
         joystick.startHandler = { [unowned self] in
-            self.scene.started = true
-            Player.entity.moving = true
+            self.startMoving()
             
         }
-        joystick.stopHandler = {
-            Player.entity.moving = false
+        joystick.stopHandler = { [unowned self] in
+            self.stopMoving()
             
         }
-        joystick.trackingHandler = { [unowned scene] data in
-            
-            if (scene.isPaused == false && Player.entity.moving == true)
-            {
-                self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (data.velocity.x * 0.15), y: self.playerSprite.position.y + (data.velocity.y * 0.15))
-                if (Player.entity.shooting == false)
-                {
-                    if (data.velocity.y != 0.0 && data.velocity.x != 0.0)
-                        {
-                        var angle = CGFloat(atan(Double(data.velocity.y)/Double(data.velocity.x)))
-                        if (data.velocity.x < 0.0)
-                        {
-                            angle += CGFloat.pi
-                        }
-                        else if (data.velocity.y < 0.0)
-                        {
-                            angle += CGFloat.pi * 2.0
-                            }
-                        if Player.entity.cannonSprite.zRotation < 0
-                        {
-                                Player.entity.cannonSprite.zRotation += CGFloat.pi * 2.0
-                        }
-                        let cAngle = Player.entity.cannonSprite.zRotation.truncatingRemainder(dividingBy: 360)
-                        let diff = Swift.abs(cAngle - angle).truncatingRemainder(dividingBy: 360)
-                        let r = diff > 180 ? 360 - diff : diff
-                        let sign = (cAngle - angle >= 180) ? 1.0 : -1.0
-                        if(r <= CGFloat.pi/10)
-                        {
-                            Player.entity.cannonSprite.zRotation = angle
-                        }
-                        else
-                        {
-                            Player.entity.cannonSprite.zRotation += CGFloat(sign) * CGFloat.pi/10
-                        }
-                    }
-                }
-            }
+        joystick.trackingHandler = { [unowned self] data in
+            self.move(with: data.velocity)
         }
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func startMoving() {
+        self.scene.started = true
+        Player.entity.moving = true
+    }
+
+    func stopMoving() {
+        Player.entity.moving = false
+    }
+
+    func move(with velocity: CGPoint) {
+        if (scene.isPaused == false && Player.entity.moving == true)
+        {
+            self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (velocity.x * 0.15), y: self.playerSprite.position.y + (velocity.y * 0.15))
+            if (Player.entity.shooting == false)
+            {
+                rotateCannon(with: velocity)
+            }
+        }
+    }
+
+    private func rotateCannon(with velocity: CGPoint) {
+        if (velocity.y != 0.0 && velocity.x != 0.0)
+            {
+            var angle = CGFloat(atan(Double(velocity.y)/Double(velocity.x)))
+            if (velocity.x < 0.0)
+            {
+                angle += CGFloat.pi
+            }
+            else if (velocity.y < 0.0)
+            {
+                angle += CGFloat.pi * 2.0
+                }
+            if Player.entity.cannonSprite.zRotation < 0
+            {
+                    Player.entity.cannonSprite.zRotation += CGFloat.pi * 2.0
+            }
+            let cAngle = Player.entity.cannonSprite.zRotation.truncatingRemainder(dividingBy: 360)
+            let diff = Swift.abs(cAngle - angle).truncatingRemainder(dividingBy: 360)
+            let r = diff > 180 ? 360 - diff : diff
+            let sign = (cAngle - angle >= 180) ? 1.0 : -1.0
+            if(r <= CGFloat.pi/10)
+            {
+                Player.entity.cannonSprite.zRotation = angle
+            }
+            else
+            {
+                Player.entity.cannonSprite.zRotation += CGFloat(sign) * CGFloat.pi/10
+            }
+        }
     }
     
 }
