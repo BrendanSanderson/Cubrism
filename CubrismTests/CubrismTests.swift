@@ -23,6 +23,13 @@ class CubrismTests: XCTestCase {
         XCTAssertNotNil(EnemyEntity.enemyDict?["component"] as? [String: Any])
     }
 
+    func testNewPlayerEntityStartsStationary() {
+        let player = PlayerEntity()
+
+        XCTAssertFalse(player.moving)
+        XCTAssertFalse(player.shooting)
+    }
+
     func testLevelSelectUsesOneFullWidthPagePerWorld() {
         let controller = LevelSelectCollectionViewController()
         controller.loadViewIfNeeded()

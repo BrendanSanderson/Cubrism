@@ -16,7 +16,7 @@ class PlayerEntity: DynamicEntity {
     var lastHit = TimeInterval(0)
     var cannonSprite = SKSpriteNode()
     var shooting = false
-    var moving = true
+    var moving = false
     convenience init(scene: GameScene)
     {
         

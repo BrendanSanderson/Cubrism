@@ -28,6 +28,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         {
             world = Player.currentViewController.world
         }
+        #if targetEnvironment(macCatalyst)
+        resetKeyboardControls()
+        #endif
+    }
+
+    override func willMove(from view: SKView) {
+        #if targetEnvironment(macCatalyst)
+        resetKeyboardControls()
+        #endif
+        super.willMove(from: view)
     }
     override func update(_ currentTime: TimeInterval) {
         time = currentTime
@@ -336,7 +346,13 @@ extension GameScene {
     }
 
     func keyboardPressesCancelled() {
+        resetKeyboardControls()
+    }
+
+    func resetKeyboardControls() {
         keyboardControls.reset()
+        Player.entity.moving = false
+        Player.entity.shooting = false
         Player.entity.component(ofType: PlayerMovementComponent.self)?.stopMoving()
         Player.entity.component(ofType: PlayerShootComponent.self)?.stopShooting()
     }
