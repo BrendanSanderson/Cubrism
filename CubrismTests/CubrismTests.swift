@@ -44,6 +44,14 @@ class CubrismTests: XCTestCase {
         XCTAssertEqual(controller.collectionView.collectionViewLayout.collectionViewContentSize.width, expectedWidth, accuracy: 1.0)
     }
 
+    func testLevelSelectUnlocksUsingGlobalLevelNumber() {
+        let controller = LevelSelectCollectionViewController()
+
+        XCTAssertEqual(controller.levelNumber(for: IndexPath(item: 0, section: 1)), 10)
+        XCTAssertFalse(controller.isLevelUnlocked(at: IndexPath(item: 0, section: 1), completedLevel: 0))
+        XCTAssertTrue(controller.isLevelUnlocked(at: IndexPath(item: 0, section: 1), completedLevel: 10))
+    }
+
     func testWASDKeysDriveMovementVelocityOnly() {
         var controls = KeyboardControlState()
 

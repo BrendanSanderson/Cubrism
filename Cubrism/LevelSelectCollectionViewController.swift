@@ -111,7 +111,7 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         cell.cellLabel.textAlignment = .center
         cell.cellLabel.text = "\((indexPath.row + 1))"
         
-        if (indexPath.section * 10) + indexPath.item > (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
+        if !isLevelUnlocked(at: indexPath, completedLevel: UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) {
             let bottomImage = UIImage(named: "background\((indexPath.section + 1))Cell")
             let topImage = UIImage(named: "lockedCell")
             
@@ -146,7 +146,7 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
 //            self.dismiss(animated: false, completion: nil)
 //            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
 //        }
-        if indexPath.item <= (UserDefaults.standard.object(forKey: "LevelCompleted") as! Int){
+        if isLevelUnlocked(at: indexPath, completedLevel: UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) {
             
         if let path = Bundle.main.path(forResource: "levels", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
             let level = dict[indexPath.item] as? NSDictionary
@@ -190,6 +190,14 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         let pageWidth = self.collectionView!.frame.size.width
         self.pageControl.currentPage = Int(self.collectionView!.contentOffset.x / pageWidth)
 //        }
+    }
+
+    func levelNumber(for indexPath: IndexPath) -> Int {
+        return (indexPath.section * 10) + indexPath.item
+    }
+
+    func isLevelUnlocked(at indexPath: IndexPath, completedLevel: Int) -> Bool {
+        return levelNumber(for: indexPath) <= completedLevel
     }
 
     func addBackgrounds()
