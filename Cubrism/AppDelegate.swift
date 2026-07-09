@@ -72,24 +72,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                "TotalExperience")
 //            UserDefaults.standard.synchronize()
 //        }
-        if UserDefaults.standard.object(forKey: "jsonConstants") == nil
-        {
-            do {
-                let file = Bundle.main.url(forResource: "constants", withExtension: "json")
-                let data = try Data(contentsOf: file!)
-                let json = try JSONSerialization.jsonObject(with: data, options: [])
-                let jsonDict = json as? [String: Any]
-                Constants.jsonDict = jsonDict
-                UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
-                UserDefaults.standard.synchronize()
-            
-            }
-            catch {
-                print(error.localizedDescription)
-            }
+        if let cachedConstants = UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any] {
+            Constants.jsonDict = cachedConstants
         }
-        else {
-            Constants.jsonDict = UserDefaults.standard.object(forKey: "jsonConstants") as! [String : Any]
+        else if let bundledConstants = loadBundledConstants() {
+            Constants.jsonDict = bundledConstants
+            UserDefaults.standard.set(bundledConstants, forKey: "jsonConstants")
+            UserDefaults.standard.synchronize()
         }
         EnemyEntity.refreshEnemyDictionary()
         let session = URLSession.shared
@@ -98,12 +87,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if let data = data {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    let jsonDict = json as? [String: Any]
-                    Constants.jsonDict = jsonDict
-                    EnemyEntity.refreshEnemyDictionary()
-                    Player.readConstants()
-                    UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
-                    UserDefaults.standard.synchronize()
+                    if let jsonDict = json as? [String: Any] {
+                        Constants.jsonDict = jsonDict
+                        EnemyEntity.refreshEnemyDictionary()
+                        Player.readConstants()
+                        UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
+                        UserDefaults.standard.synchronize()
+                    }
                 }
                 catch {
                     print(error.localizedDescription)
@@ -139,6 +129,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.makeKeyAndVisible()
         Constants.updateMerchantInventory()
         return true
+    }
+
+    private func loadBundledConstants() -> [String: Any]? {
+        do {
+            let file = Bundle.main.url(forResource: "constants", withExtension: "json")
+            let data = try Data(contentsOf: file!)
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
+            return json as? [String: Any]
+        }
+        catch {
+            print(error.localizedDescription)
+            return nil
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
