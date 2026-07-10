@@ -77,6 +77,7 @@ class FloorViewController: UIViewController {
         skView.presentScene(scene)
         #if targetEnvironment(macCatalyst)
         becomeFirstResponder()
+        scene.resetKeyboardControls()
         #endif
         
     }
@@ -204,6 +205,9 @@ class FloorViewController: UIViewController {
         newScene.scaleMode = .resizeFill
         newScene.maze = maze
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }
@@ -225,6 +229,9 @@ class FloorViewController: UIViewController {
         newScene.scaleMode = .resizeFill
         newScene.maze = maze
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }

@@ -140,6 +140,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             NSLog("teleporting")
             if (self.isKind(of: HomeScene.self) == true)
             {
+                #if targetEnvironment(macCatalyst)
+                resetKeyboardControls()
+                #endif
                 while (((self.view?.presentScene(nil)) == nil))
                 {
                 
@@ -154,6 +157,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             else if (self.isKind(of: RoomScene.self) == true)
             {
+                #if targetEnvironment(macCatalyst)
+                resetKeyboardControls()
+                #endif
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
                 Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.disabled = true
@@ -166,6 +172,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         else if (mask1 == Constants.playerCategory && mask2 == Constants.doorCategory)
         {
+            #if targetEnvironment(macCatalyst)
+            resetKeyboardControls()
+            #endif
             self.physicsWorld.contactDelegate = nil
             Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
             Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
@@ -351,10 +360,7 @@ extension GameScene {
 
     func resetKeyboardControls() {
         keyboardControls.reset()
-        Player.entity.moving = false
-        Player.entity.shooting = false
-        Player.entity.component(ofType: PlayerMovementComponent.self)?.stopMoving()
-        Player.entity.component(ofType: PlayerShootComponent.self)?.stopShooting()
+        Player.entity.stopControls()
     }
 
     private func applyKeyboardControls() {
