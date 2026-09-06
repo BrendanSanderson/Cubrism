@@ -10,13 +10,14 @@ import SpriteKit
 import GameplayKit
 
 class HomeScene: GameScene {
-    var viewController = HomeViewController()
+    weak var viewController: HomeViewController?
     var first = true
     var bank: VendorEntity!
     var shop: VendorEntity!
     override func didMove(to view: SKView) {
         
         /* Setup your scene here */
+        Player.currentViewController = nil
         addTeleporter()
         addVendors()
         addPlayer()

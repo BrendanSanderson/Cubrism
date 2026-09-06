@@ -21,6 +21,7 @@ class VendorEntity: GKEntity {
         scene = s
         type = t
         sprite = VendorNode(t: t)
+        sprite.position = CGPoint(x: scene.size.width * (t == "bank" ? 0.33 : 0.67), y: scene.size.height * 0.8)
         sprite.entity = self
         node.addChild(sprite)
         self.addComponent(VisualComponent(scene: scene, sprite: sprite))

@@ -22,6 +22,7 @@ struct KeyboardControlState {
     static let velocity: CGFloat = 50.0
 
     private var pressedKeys = Set<Key>()
+    private var pendingKeys = Set<Key>()
 
     var movementVelocity: CGPoint {
         return velocityFor(left: .a, right: .d, up: .w, down: .s)
@@ -41,14 +42,21 @@ struct KeyboardControlState {
 
     mutating func press(_ key: Key) {
         pressedKeys.insert(key)
+        pendingKeys.insert(key)
     }
 
     mutating func release(_ key: Key) {
         pressedKeys.remove(key)
     }
 
+    /// Keep very short taps until one game frame has consumed them.
+    mutating func finishFrame() {
+        pendingKeys.removeAll()
+    }
+
     mutating func reset() {
         pressedKeys.removeAll()
+        pendingKeys.removeAll()
     }
 
     private func velocityFor(left: Key, right: Key, up: Key, down: Key) -> CGPoint {
@@ -68,10 +76,10 @@ struct KeyboardControlState {
 
     private func axis(negative: Key, positive: Key) -> Double {
         var value = 0.0
-        if pressedKeys.contains(negative) {
+        if pressedKeys.contains(negative) || pendingKeys.contains(negative) {
             value -= 1.0
         }
-        if pressedKeys.contains(positive) {
+        if pressedKeys.contains(positive) || pendingKeys.contains(positive) {
             value += 1.0
         }
         return value

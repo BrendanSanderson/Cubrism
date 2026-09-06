@@ -34,6 +34,23 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 
+
+/// Prefer a distant attack point, with a bounded fallback for compact arenas.
+func bossAttackPosition(in size: CGSize, awayFrom origin: CGPoint, padding: CGSize) -> CGPoint {
+    let width = max(0, size.width * 0.9 - padding.width * 2)
+    let height = max(0, size.height * 0.8 - padding.height * 2)
+    var best = CGPoint(x: size.width / 2, y: size.height / 2)
+    var bestDistance: CGFloat = -1
+    for _ in 0..<64 {
+        let candidate = CGPoint(x: size.width / 2 + CGFloat.random(in: -width/2...width/2),
+                                y: size.height / 2 + CGFloat.random(in: -height/2...height/2))
+        let distance = hypot(candidate.x - origin.x, candidate.y - origin.y)
+        if distance > 100 { return candidate }
+        if distance > bestDistance { best = candidate; bestDistance = distance }
+    }
+    return best
+}
+
 class BossSprayComponent: ActionComponent {
     var scene: GameScene!
     var bossSprite: SKSpriteNode!
@@ -140,18 +157,7 @@ class BossElectricFieldComponent: ActionComponent {
             exploded = false
             for _ in 0 ..< 36
             {
-                var finding = false
-                while (finding == false)
-                {
-                    let x = Int(arc4random_uniform(UInt32(scene.frame.width*0.9 - Player.entity.sprite.size.width))) + Int(scene.frame.width*0.05 + Player.entity.sprite.size.width)
-                    let y = Int(arc4random_uniform(UInt32(scene.frame.height*0.8 - Player.entity.sprite.size.height))) + Int(scene.frame.height*0.1 + Player.entity.sprite.size.height)
-                    let distance = hypotf(abs(Float(bossSprite.position.x) - Float(x)), abs(Float(bossSprite.position.y) - Float(y)))
-                    if (distance > 100)
-                    {
-                        points.append(CGPoint(x: x, y: y))
-                        finding = true
-                    }
-                }
+                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size))
 
             }
             lastShot = currentTime
@@ -506,7 +512,7 @@ class BossDragonFireballComponent: ActionComponent {
     }
     func fire()
     {
-        let shot = EnemyEntity(scene: scene, eType: "DragonFireball", lev: shooter.level, elite: false)
+        let shot = EnemyEntity(scene: scene, eType: "DragonFireball", lev: 1, elite: false)
         shot.node.zPosition = shooter.node.zPosition - 1
         (scene as! RoomScene).entites.append(shot)
         
@@ -799,14 +805,14 @@ class BossGolemRockShoot: ActionComponent {
     
     func followPath(_ sprite: SKSpriteNode, shotNum: Int)
     {
-        if (sprite.position.x + sprite.size.width/2 >= (0.95) * Constants.w || sprite.position.x - sprite.size.width/2 <= (0.05) * Constants.w)
+        if (sprite.position.x + sprite.size.width/2 >= (0.95) * scene.size.width || sprite.position.x - sprite.size.width/2 <= (0.05) * scene.size.width)
         {
-            if (cos(angle[shotNum]) >= 0 && sprite.position.x + sprite.size.width/2 >= (0.95)*Constants.w)
+            if (cos(angle[shotNum]) >= 0 && sprite.position.x + sprite.size.width/2 >= (0.95)*scene.size.width)
             {
                 let temp = angle[shotNum]
                 angle[shotNum] = CGFloat(Double.pi)-temp
             }
-            else if (cos(angle[shotNum]) <= 0 &&  sprite.position.x - sprite.size.width/2 <= (0.05)*Constants.w)
+            else if (cos(angle[shotNum]) <= 0 &&  sprite.position.x - sprite.size.width/2 <= (0.05)*scene.size.width)
             {
                 let temp = angle[shotNum]
                 angle[shotNum] = CGFloat(Double.pi)-temp
@@ -815,14 +821,14 @@ class BossGolemRockShoot: ActionComponent {
         }
 
         
-        if (sprite.position.y + sprite.size.height/2 >= (0.90) * Constants.h || sprite.position.y - sprite.size.height/2 <= (0.1) * Constants.h)
+        if (sprite.position.y + sprite.size.height/2 >= (0.90) * scene.size.height || sprite.position.y - sprite.size.height/2 <= (0.1) * scene.size.height)
         {
-            if (sin(angle[shotNum]) >= 0 && sprite.position.y + sprite.size.height/2 >= (0.90) * Constants.h)
+            if (sin(angle[shotNum]) >= 0 && sprite.position.y + sprite.size.height/2 >= (0.90) * scene.size.height)
             {
                 let temp = angle[shotNum]
                 angle[shotNum] = 0 - temp
             }
-            else if (sin(angle[shotNum]) <= 0 && sprite.position.y - sprite.size.height/2 <= (0.1) * Constants.h)
+            else if (sin(angle[shotNum]) <= 0 && sprite.position.y - sprite.size.height/2 <= (0.1) * scene.size.height)
             {
                 let temp = angle[shotNum]
                 angle[shotNum] = 0 - temp
@@ -945,18 +951,7 @@ class GolemDropComponent: ActionComponent {
             landed = false
             for _ in 0 ..< 36
             {
-                var finding = false
-                while (finding == false)
-                {
-                    let x = Int(arc4random_uniform(UInt32(scene.frame.width*0.9 - Player.entity.sprite.size.width))) + Int(scene.frame.width*0.05 + Player.entity.sprite.size.width)
-                    let y = Int(arc4random_uniform(UInt32(scene.frame.height*0.8 - Player.entity.sprite.size.height))) + Int(scene.frame.height*0.1 + Player.entity.sprite.size.height)
-                    let distance = hypotf(abs(Float(bossSprite.position.x) - Float(x)), abs(Float(bossSprite.position.y) - Float(y)))
-                    if (distance > 100)
-                    {
-                        points.append(CGPoint(x: x, y: y))
-                        finding = true
-                    }
-                }
+                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size))
                 
             }
             lastShot = currentTime

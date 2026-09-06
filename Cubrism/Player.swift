@@ -25,17 +25,17 @@ class Player: NSObject {
     static var shieldRegen = 0.3
     static var shieldRegenExp = 1.0
     static var shieldRegenBase = 0.3
-    static var level = UserDefaults.standard.object(forKey: "Level") as! Int
+    static var level = max(1, UserDefaults.standard.integer(forKey: "Level"))
     static var entity = PlayerEntity()
     static var defence = 0.0
-    static var exp = UserDefaults.standard.object(forKey: "Experience") as! Int
-    static var totalExp = UserDefaults.standard.object(forKey: "TotalExperience") as! Int
+    static var exp = UserDefaults.standard.integer(forKey: "Experience")
+    static var totalExp = UserDefaults.standard.integer(forKey: "TotalExperience")
     static var currentScene: GameScene!
     static var currentViewController: FloorViewController!
     static var gearDict : [String:[String : AnyObject]]!
     static var gear : [String : Equipment]!
-    static var inventoryDict = UserDefaults.standard.object(forKey: "Inventory") as! [[String : AnyObject]]
-    static var inventory = UserDefaults.standard.object(forKey: "Inventory") as! [Item]
+    static var inventoryDict = UserDefaults.standard.object(forKey: "Inventory") as? [[String : AnyObject]] ?? []
+    static var inventory = [Item]()
     static var attackPowerBoost = 0.0
     static var attackPowerBoostMult = 1.0
     static var attackSpeedBoost = 0.0
@@ -47,11 +47,33 @@ class Player: NSObject {
     static var healthBoostMult = 1.0
     static var shieldRegenBoost = 0.0
     static var shieldRegenBoostMult = 1.0
+    static var shotCoolDownBase = 0.5
     static var shotCoolDownSeconds = 0.5
     static var defenceBoostMult = 0.25
     static var alive = true
     static var expGained = 0
     
+    static func resetProgress() {
+        level = 1
+        exp = 0
+        totalExp = 0
+        let defaults = UserDefaults.standard
+        defaults.set(level, forKey: "Level")
+        defaults.set(0, forKey: "Experience")
+        defaults.set(0, forKey: "TotalExperience")
+        defaults.set(0, forKey: "LevelCompleted")
+        inventory = []
+        gear = [:]
+        for slot in ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment 1", "Attachment 2"] {
+            gear[slot] = Equipment(t: slot.hasPrefix("Attachment") ? "Attachment" : slot)
+        }
+        saveItems()
+        updateInventory()
+        updateEquipment()
+        updatePlayer()
+        Constants.updateMerchantInventory()
+    }
+
     static func updatePlayer()
     
     {
@@ -68,7 +90,8 @@ class Player: NSObject {
 //            attackPower = 21000000.0
 //            defence = 10000000000.0
 //        }
-        shotCoolDownSeconds = shotCoolDownSeconds - (attackSpeedBoost*attackSpeedBoostMult)
+        // The bundled speed boost multiplier is negative: a bonus reduces the delay.
+        shotCoolDownSeconds = max(0.05, shotCoolDownBase + attackSpeedBoost * attackSpeedBoostMult)
         currentHealth = health
         currentShield = shield
         if totalExp < totalExpToLevel(Player.level)
@@ -85,7 +108,7 @@ class Player: NSObject {
     {
         attackPowerBoost = (gear["Power Core"]?.attackPower)! + (gear["Pulsar"]?.attackPower)! + (gear["Attachment 1"]?.attackPower)! + (gear["Attachment 2"]?.attackPower)!
         
-        attackSpeedBoost = (gear["Power Core"]?.attackSpeed)! + (gear["Pulsar"]?.attackSpeed)! + (gear["Attachment 1"]?.attackSpeed)! + (gear["Attachment 2"]?.attackSpeed)!
+        attackSpeedBoost = (gear["Special Pulsar"]?.attackSpeed)! + (gear["Power Core"]?.attackSpeed)! + (gear["Pulsar"]?.attackSpeed)! + (gear["Attachment 1"]?.attackSpeed)! + (gear["Attachment 2"]?.attackSpeed)!
         
         defenceBoost = (gear["Power Core"]?.defence)! + (gear["Armor Core"]?.defence)! + (gear["Shield"]?.defence)! + (gear["Attachment 1"]?.defence)! + (gear["Attachment 2"]?.defence)!
         
@@ -93,7 +116,7 @@ class Player: NSObject {
         
         shieldRegenBoost = (gear["Power Core"]?.shieldRegen)! + (gear["Shield"]?.shieldRegen)! + (gear["Attachment 1"]?.shieldRegen)! + (gear["Attachment 2"]?.shieldRegen)!
         
-        healthBoost = (gear["Power Core"]?.shield)! + (gear["Armor Core"]?.shield)! + (gear["Attachment 1"]?.shield)! + (gear["Attachment 2"]?.shield)!
+        healthBoost = (gear["Power Core"]?.health)! + (gear["Armor Core"]?.health)! + (gear["Attachment 1"]?.health)! + (gear["Attachment 2"]?.health)!
         
 
     }
@@ -120,6 +143,7 @@ class Player: NSObject {
     }
     static func damagePlayer(_ damage: Double)
     {
+        guard alive else { return }
         var dam = damage - defence/10.0
         if (dam < 0)
         {
@@ -158,7 +182,6 @@ class Player: NSObject {
 //            
             expGained = currentViewController.levelExp
             
-            Player.augmentExperience(currentViewController.levelExp)
             augmentExperience(currentViewController.levelExp)
             currentScene.addChild(PopUpNode(scene: currentScene, text: "You are Dead.", button1Text: "Retry", button2Text: "Leave"))
             alive = false
@@ -174,7 +197,7 @@ class Player: NSObject {
     {
         if (entity.lastHit + 2 <= currentScene.time && currentShield < shield)
         {
-            currentShield += shieldRegen
+            currentShield = min(shield, currentShield + shieldRegen * currentScene.frameDuration * 60)
             entity.component(ofType: HealthBarComponent.self)!.updateBars(currentShield, health: currentHealth)
         }
         if (entity.sprite.position.x > currentScene.size.width * 0.95 - entity.sprite.size.width/2)
@@ -189,7 +212,7 @@ class Player: NSObject {
         {
             entity.sprite.position.y = currentScene.size.height * 0.9 - entity.sprite.size.height/2
         }
-        else if (entity.sprite.position.y < currentScene.size.height * 0.1 + entity.sprite.size.height/213)
+        else if (entity.sprite.position.y < currentScene.size.height * 0.1 + entity.sprite.size.height/2)
         {
             entity.sprite.position.y = currentScene.size.height * 0.1 + entity.sprite.size.height/2
         }
@@ -223,14 +246,10 @@ class Player: NSObject {
     }
     static func totalExpToLevel(_ level: Int) -> Int
     {
-    var total = 0.0
-    for i in 1 ... level
-    {
-        total += floor(Double(i) + 300.0 * pow(2.0, Double(i) / 4.0))
+        guard level > 1 else { return 0 }
+        return (1..<level).reduce(0) { $0 + expToLevel($1) }
     }
-    return  Int((floor(total / 4)))
-    
-    }
+
     static func playerMultiplier(_ level: Int, mult: Double) -> Double{
         return pow((Double(level) + 4)/5, mult)
     }
@@ -281,6 +300,29 @@ class Player: NSObject {
         self.updateEquipment()
     }
     
+    static func buy(_ equipment: Equipment) -> Bool {
+        guard let stockIndex = Constants.merchantInventory.firstIndex(of: equipment),
+              let coins = inventory.firstIndex(where: { $0.type == "Cubrixel" }),
+              inventory[coins].quantity >= equipment.price * 2 else { return false }
+        inventory[coins].quantity -= equipment.price * 2
+        inventory.append(equipment)
+        Constants.merchantInventory.remove(at: stockIndex)
+        saveItems()
+        return true
+    }
+
+    static func sell(_ equipment: Equipment) -> Bool {
+        guard let index = inventory.firstIndex(of: equipment) else { return false }
+        inventory.remove(at: index)
+        if let coins = inventory.firstIndex(where: { $0.type == "Cubrixel" }) {
+            inventory[coins].quantity += equipment.price
+        } else {
+            inventory.append(Item(t: "Cubrixel", q: equipment.price, s: true))
+        }
+        saveItems()
+        return true
+    }
+
     static func saveItems()
     {
         Player.inventoryDict.removeAll()
@@ -306,7 +348,7 @@ class Player: NSObject {
             attackPowerBase = (attackDict?["base"] as? Double)!
             let attackSpeedDict = attackDict?["speed"] as? [String: Any]
             attackSpeedBoostMult = (attackSpeedDict?["boostMult"] as? Double)!
-            shotCoolDownSeconds = (attackSpeedDict?["base"] as? Double)!
+            shotCoolDownBase = (attackSpeedDict?["base"] as? Double)!
             
             let shieldDict = playerDict["shield"] as? [String: Any]
             shieldBase = (shieldDict?["base"] as? Double)!

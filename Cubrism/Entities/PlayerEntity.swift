@@ -65,6 +65,13 @@ class PlayerEntity: DynamicEntity {
         super.init()
     }
 
+    func stopControls() {
+        moving = false
+        shooting = false
+        component(ofType: PlayerMovementComponent.self)?.stopMoving()
+        component(ofType: PlayerShootComponent.self)?.stopShooting()
+    }
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

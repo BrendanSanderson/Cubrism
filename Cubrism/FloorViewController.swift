@@ -16,24 +16,29 @@ class FloorViewController: UIViewController {
     var start = CGPoint()
     var skView = SKView()
     var scene: RoomScene!
-    var level = 0
-    var world = 0
+    var level = 1
+    var world = 1
     var levelExp = 0
+    var rewardsGranted = false
+    var needsNewRun = true
+    var globalLevel: Int { return (world - 1) * 10 + level }
     var max = UInt32(6)
     var min = UInt32(4)
     var homeView: HomeViewController!
     var enemyPoints = 4
+    let arenaSize = GameScene.arenaSize
     
     convenience init(min: UInt32, max: UInt32, level:Int, world:Int)
     {
         self.init()
         self.level = level
+        self.world = world
         self.max = max
         self.min = min
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "loadingScreen")!)
+        self.view.backgroundColor = .black
         self.view.isMultipleTouchEnabled = true
         // Configure the view.
         
@@ -53,9 +58,9 @@ class FloorViewController: UIViewController {
             name: NSNotification.Name(rawValue: "GoToCompletedViewController"),
             object: nil)
         
-        skView = SKView(frame: self.view.frame)
+        skView = SKView(frame: self.view.bounds)
         self.view.addSubview(skView)
-        self.level = (world-1) * 10 + level
+
         skView.showsFPS = false
         skView.showsNodeCount = false
         /* Sprite Kit applies additional optimizations to improve rendering performance */
@@ -67,20 +72,49 @@ class FloorViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        guard needsNewRun else { return }
+        startNewRun()
+    }
+
+    func startNewRun() {
+        skView.presentScene(nil)
+        needsNewRun = false
+        levelExp = 0
+        rewardsGranted = false
         Player.currentViewController = self
         Player.updatePlayer()
         
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        skView.bounds = CGRect(origin: .zero, size: arenaSize)
         buildMaze()
         scene = maze[Int(start.x)][Int(start.y)]
-        scene.scaleMode = .resizeFill
-        scene.startPosition = CGPoint (x: self.view.frame.width/2, y: self.view.frame.height/2)
+        scene.scaleMode = .aspectFit
+        scene.startPosition = CGPoint (x: arenaSize.width/2, y: arenaSize.height/2)
         skView.presentScene(scene)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
         #if targetEnvironment(macCatalyst)
         becomeFirstResponder()
+        scene.resetKeyboardControls()
         #endif
         
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let available = view.safeAreaLayoutGuide.layoutFrame
+        skView.transform = .identity
+        if let scene = skView.scene, scene.size.width > 0, scene.size.height > 0 {
+            skView.bounds = CGRect(origin: .zero, size: scene.size)
+            skView.center = CGPoint(x: available.midX, y: available.midY)
+            let scale = Swift.min(available.width / scene.size.width, available.height / scene.size.height)
+            skView.transform = CGAffineTransform(scaleX: scale, y: scale)
+        } else {
+            skView.frame = available
+        }
+    }
+
     override var shouldAutorotate : Bool {
         return true
     }
@@ -105,13 +139,13 @@ class FloorViewController: UIViewController {
     
     func buildMaze (){
         
-        length = Int(arc4random_uniform(max-min) + min)
+        length = Int(max > min ? arc4random_uniform(max - min) + min : min)
         start = CGPoint(x: length + 1, y: length + 1)
         var pointer = start
-        var scene = RoomScene()
+        var scene = RoomScene(size: arenaSize)
         scene.viewController = self
         scene.name = "startRoom"
-        maze = Array(repeating: Array(repeating: RoomScene(), count: (length * 2) + 2), count: length * 2 + 2)
+        maze = Array(repeating: Array(repeating: RoomScene(size: arenaSize), count: (length * 2) + 2), count: length * 2 + 2)
         maze[Int(start.x)][Int(start.y)] = scene
         var oldPointer = pointer
         var direction = 1
@@ -148,7 +182,7 @@ class FloorViewController: UIViewController {
                 door.pointer = pointer
                 scene.doors.append(door)
                 let oppDirection = oppositeDirection(direction)
-                scene = RoomScene()
+                scene = RoomScene(size: arenaSize)
                 scene.viewController = self
                 scene.name = "room"
                 let newDoor = DoorEntity(scene: scene, direction: oppDirection, type: "challenge")
@@ -201,9 +235,11 @@ class FloorViewController: UIViewController {
             }
         }
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
-        newScene.scaleMode = .resizeFill
-        newScene.maze = maze
+        newScene.scaleMode = .aspectFit
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }
@@ -222,9 +258,11 @@ class FloorViewController: UIViewController {
             }
         }
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
-        newScene.scaleMode = .resizeFill
-        newScene.maze = maze
+        newScene.scaleMode = .aspectFit
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }
@@ -234,28 +272,33 @@ class FloorViewController: UIViewController {
     {
         if direction == 0
         {
-            return CGPoint(x: position.x, y: self.view.frame.height * 0.05 + 48)
+            return CGPoint(x: position.x, y: arenaSize.height * 0.05 + 48)
         }
         else if direction == 2
         {
-            return CGPoint(x: position.x, y: self.view.frame.height*0.95 - 48)
+            return CGPoint(x: position.x, y: arenaSize.height*0.95 - 48)
         }
         else if direction == 1
         {
-            return CGPoint(x: self.view.frame.width * 0.1 + 32, y: position.y)
+            return CGPoint(x: arenaSize.width * 0.1 + 32, y: position.y)
         }
         else
         {
-            return CGPoint(x: self.view.frame.width * 0.9 - 32, y: position.y)
+            return CGPoint(x: arenaSize.width * 0.9 - 32, y: position.y)
         }
     }
     @objc func goToHomeViewController(_ notification: Notification)
     {
+        guard Player.currentViewController === self else { return }
         self.skView.presentScene(nil)
         self.dismiss(animated: false, completion: nil)
     }
     @objc func goToCompletedViewController(_ notification: Notification)
     {
+        guard Player.currentViewController === self,
+              let room = notification.object as? RoomScene, room === scene,
+              !rewardsGranted, Player.alive else { return }
+        rewardsGranted = true
         self.skView.presentScene(nil)
 //        var levelGap = Player.level - self.level
 //        var augExp = levelExp
@@ -280,9 +323,9 @@ class FloorViewController: UIViewController {
         completeViewController.drops = drops
         completeViewController.modalPresentationStyle = .fullScreen
         
-        if ((UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) < level)
+        if ((UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) < globalLevel)
         {
-            UserDefaults.standard.set(Int(level), forKey:
+            UserDefaults.standard.set(globalLevel, forKey:
                 "LevelCompleted")
             UserDefaults.standard.synchronize()
 
@@ -328,14 +371,14 @@ class FloorViewController: UIViewController {
     func getDrops() -> [Item]
     {
         var d = [Item]()
-        let l = level + 10*(world-1)
-        let cubrixels = Int(arc4random_uniform(UInt32((l * 10))))
+        let l = globalLevel
+        let cubrixels = Int(arc4random_uniform(UInt32((l * 10)))) + 1
         d.append(Item(t: "Cubrixel", q: cubrixels, s: true))
         
         let pt1 = 50 - l
         let pt2 = 50 + l
         let pt3 = l
-        let pt4 = Int(Double(level) / 2.0)
+        let pt4 = Int(Double(l) / 2.0)
         let num = Int(arc4random_uniform(UInt32(100)))
         if num <= (pt1)
         {

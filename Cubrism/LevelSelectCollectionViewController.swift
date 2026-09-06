@@ -70,6 +70,14 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         layoutLevelSelectViews()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        #if targetEnvironment(macCatalyst)
+        becomeFirstResponder()
+        Player.entity.stopControls()
+        #endif
+    }
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -149,6 +157,9 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         if isLevelUnlocked(at: indexPath, completedLevel: UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) {
             
         if let path = Bundle.main.path(forResource: "levels", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
+            #if targetEnvironment(macCatalyst)
+            Player.entity.stopControls()
+            #endif
             let level = dict[indexPath.item] as? NSDictionary
             
             homeView.floorView.min = UInt32(((level?.value(forKey: "min")) as? Int)!)
@@ -161,8 +172,9 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
 //            }
             homeView.floorView.world = indexPath.section + 1
             
-            self.dismiss(animated: false, completion: nil)
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
+            self.dismiss(animated: false) {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"), object: nil)
+            }
         }
         }
         
@@ -199,6 +211,24 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
     func isLevelUnlocked(at indexPath: IndexPath, completedLevel: Int) -> Bool {
         return levelNumber(for: indexPath) <= completedLevel
     }
+
+    #if targetEnvironment(macCatalyst)
+    override var canBecomeFirstResponder : Bool {
+        return true
+    }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        Player.entity.stopControls()
+    }
+
+    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        Player.entity.stopControls()
+    }
+
+    override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        Player.entity.stopControls()
+    }
+    #endif
 
     func addBackgrounds()
     {

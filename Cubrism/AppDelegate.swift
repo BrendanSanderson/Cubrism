@@ -72,35 +72,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                "TotalExperience")
 //            UserDefaults.standard.synchronize()
 //        }
-        if let cachedConstants = UserDefaults.standard.object(forKey: "jsonConstants") as? [String: Any] {
-            Constants.jsonDict = cachedConstants
-        }
-        else if let bundledConstants = loadBundledConstants() {
-            Constants.jsonDict = bundledConstants
-            UserDefaults.standard.set(bundledConstants, forKey: "jsonConstants")
-            UserDefaults.standard.synchronize()
-        }
+        // Keep a run's balance data stable and usable offline. The old remote
+        // endpoint could replace these values and reset health during gameplay.
+        Constants.jsonDict = loadBundledConstants()
         EnemyEntity.refreshEnemyDictionary()
-        let session = URLSession.shared
-        let url = URL(string: "https://quarkbackend.com/getfile/brendansanderson/constants-json")!
-        let task = session.dataTask(with: url) { (data, _, _) -> Void in
-            if let data = data {
-                do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    if let jsonDict = json as? [String: Any] {
-                        Constants.jsonDict = jsonDict
-                        EnemyEntity.refreshEnemyDictionary()
-                        Player.readConstants()
-                        UserDefaults.standard.set(jsonDict, forKey: "jsonConstants")
-                        UserDefaults.standard.synchronize()
-                    }
-                }
-                catch {
-                    print(error.localizedDescription)
-                }
-            }
-        }
-        task.resume()
         if UserDefaults.standard.object(forKey: "Gear") == nil
         {
             let gear : [String : [String : AnyObject]] = ["Power Core": Equipment(t: "Power Core").toDictionary(), "Armor Core": Equipment(t: "Armor Core").toDictionary(), "Pulsar": Equipment(t:"Pulsar").toDictionary(), "Special Pulsar": Equipment(t: "Special Pulsar").toDictionary(), "Shield": Equipment(t: "Shield").toDictionary(), "Attachment 1": Equipment(t: "Attachment").toDictionary(), "Attachment 2": Equipment(t: "Attachment").toDictionary()]
@@ -145,6 +120,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
+        Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.resetInput()
+        Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.resetInput()
+        #if targetEnvironment(macCatalyst)
+        Player.currentScene?.resetKeyboardControls()
+        #endif
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     }

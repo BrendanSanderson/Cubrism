@@ -26,6 +26,7 @@ class PopUpNode: SKNode {
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
         //mainFrame = SKSpriteNode(texture: SKTexture(imageNamed: "popUp"), size: CGSize(width: scene.frame.width * 0.8, height: scene.frame.height * 0.7))
         mainFrame = SKSpriteNode(imageNamed: "popUp")
+        mainFrame.size = CGSize(width: scene.size.width * 0.8, height: scene.size.height * 0.75)
         mainFrame.zPosition = 1000
         label = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.33 - 25, width: mainFrame.size.width, height: 50))
         button1 = UIButton(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/3), y: scene.size.height * 0.66, width: mainFrame.size.width/6, height: scene.size.height * 0.1))
@@ -38,6 +39,11 @@ class PopUpNode: SKNode {
 //        button2.layer.borderColor = UIColor.blackColor().CGColor
         addChild(mainFrame)
         gameScene = scene
+        Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.resetInput()
+        Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.resetInput()
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         scene.isPaused = true
         scene.button.texture = nil
 //        button1.titleLabel!.textAlignment = .Center
@@ -74,7 +80,7 @@ class PopUpNode: SKNode {
         expLeftLabel.textAlignment = .center
         if (text == "You are Dead.")
         {
-            expLabel.text = String(format: "Experence Gained: %i", Player.expGained)
+            expLabel.text = String(format: "Experience Gained: %i", Player.expGained)
         }
         else
         {
@@ -127,7 +133,7 @@ class PopUpNode: SKNode {
     @objc func no(_ sender: UIButton!) {
         remove()
         
-        gameScene.addChild(PopUpNode(scene: gameScene, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+        gameScene.addChild(PopUpNode(scene: gameScene, text: "Paused", button1Text: "Play", button2Text: gameScene is HomeScene ? "Reset" : "Quit"))
         
     }
     
@@ -138,19 +144,7 @@ class PopUpNode: SKNode {
             gameScene.isPaused = false
             gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "ResetHomeViewController"), object: self)
-            let level = 1
-            UserDefaults.standard.set(level, forKey: "Level")
-            let experience = 0
-            UserDefaults.standard.set(experience, forKey: "Experience")
-            let totaExperience = 0
-            UserDefaults.standard.set(totaExperience, forKey:
-                    "TotalExperience")
-            UserDefaults.standard.set(0, forKey:
-                "LevelCompleted")
-            UserDefaults.standard.removeObject(forKey: "Gear")
-            UserDefaults.standard.removeObject(forKey: "Inventory")
-            UserDefaults.standard.synchronize()
-        
+
         }
         else
         {
@@ -162,7 +156,8 @@ class PopUpNode: SKNode {
     func remove()
     {
 
-        for i in (0...((gameScene.view?.subviews.count)!-1)).reversed() {
+        guard let view = gameScene.view else { return }
+        for i in view.subviews.indices.reversed() {
             if ((gameScene.view?.subviews[i].isKind(of: UIButton.self)) == true)
             {
                 gameScene.view!.subviews[i].removeFromSuperview()
@@ -179,7 +174,7 @@ class PopUpNode: SKNode {
                 gameScene.view!.subviews[i].removeFromSuperview()
             }
         }
-        self.mainFrame.removeFromParent()
+        self.removeFromParent()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -188,13 +183,8 @@ class PopUpNode: SKNode {
     
     @objc func retry(_ sender: UIButton!) {
         remove()
-        (scene as! RoomScene).viewController.max = (scene as! RoomScene).viewController.max
-        (scene as! RoomScene).viewController.min = (scene as! RoomScene).viewController.min
-        (scene as! RoomScene).viewController.level = (scene as! RoomScene).viewController.level
-        
-        (scene as! RoomScene).viewController.dismiss(animated: false, completion: nil)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "RestartFloorViewController"), object: nil)
-           
+        (gameScene as? RoomScene)?.viewController.startNewRun()
+
     }
     
     @objc func leave(_ sender: UIButton!) {

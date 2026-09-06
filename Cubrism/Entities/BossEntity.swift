@@ -38,7 +38,7 @@ class BossEntity: DynamicEntity {
         super.init()
         self.scene = scene
         node.entity = self
-        level = (scene as! RoomScene).viewController.level
+        level = (scene as! RoomScene).viewController.globalLevel
         type = properties.value(forKey: "name") as? String
         setUpBoss(properties)
         node.addChild(sprite)
@@ -175,6 +175,7 @@ class BossEntity: DynamicEntity {
     
     func damageBoss (_ damage: Double)
     {
+        guard currentHealth > 0 else { return }
         node.Entity.currentHealth -= damage
         
         self.component(ofType: BossBarComponent.self)?.updateBars(currentHealth, totalHealth: health)
@@ -210,7 +211,7 @@ class BossEntity: DynamicEntity {
             actions.append(EnemyDyingComponent(scene: scene, sprite: sprite))
             attack = actions[0]
             self.addComponent(actions[0])
-            scene.killEnemy(50.0)
+            scene.killEnemy(exp)
             alive = false
             for i in scene.children
             {

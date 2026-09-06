@@ -5,18 +5,38 @@ import UIKit
 #endif
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    // A shared phone-sized world keeps sprite sizes, speeds and difficulty identical
+    // on iPhone and Mac. Controllers scale this world into the available safe area.
+    static let arenaSize = CGSize(width: 750, height: 375)
+
+    func launchWallBoundShot(_ sprite: SKSpriteNode, angle: CGFloat, speed: CGFloat) {
+        // A full scene diagonal always crosses a wall, even from the opposite corner.
+        // Keep speed constant as range changes; wall contacts remove the shot sooner.
+        let distance = hypot(size.width, size.height)
+        let wrapper = sprite.parent
+        sprite.run(.sequence([
+            .moveBy(x: cos(angle) * distance, y: sin(angle) * distance,
+                    duration: TimeInterval(distance / speed)),
+            .removeFromParent()
+        ]))
+        // Some patterns share a wrapper. Remove it only after every shot has expired.
+        wrapper?.run(.sequence([.wait(forDuration: TimeInterval(distance / speed) + 0.1),
+                                .removeFromParent()]))
+    }
+
     var time = TimeInterval()
+    var frameDuration: TimeInterval = 1.0 / 60.0
     var started = false
     var vending = false
     var vender: VendorPopUpNode!
     var doorAccessed = String()
-    var world = Player.level/10 + 1
+    var world = 1
     let button = SKSpriteNode(imageNamed: "pauseButton")
     #if targetEnvironment(macCatalyst)
     var keyboardControls = KeyboardControlState()
     #endif
     override func didMove(to view: SKView) {
-        self.scaleMode = .resizeFill
+        self.scaleMode = .aspectFit
         view.isMultipleTouchEnabled = true
         self.view!.isMultipleTouchEnabled = true
         self.scene!.backgroundColor = UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 1)
@@ -40,9 +60,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         super.willMove(from: view)
     }
     override func update(_ currentTime: TimeInterval) {
+        frameDuration = time > 0 ? min(currentTime - time, 1.0 / 15.0) : 1.0 / 60.0
         time = currentTime
         #if targetEnvironment(macCatalyst)
         applyKeyboardControls()
+        #else
+        Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.listen()
+        Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.listen()
         #endif
     }
     func createGrid()
@@ -57,7 +81,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let gameFrame = CGRect(x: offsetX, y: offsetY, width: usableWidth, height: usableHeight)
         let frame = SKShapeNode(rect: gameFrame)
         frame.zPosition = -15
-        let sn = SKSpriteNode(imageNamed:"border")
+        let sn = SKSpriteNode()
         sn.zPosition = -25
         if world >= 1
         {
@@ -140,10 +164,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             NSLog("teleporting")
             if (self.isKind(of: HomeScene.self) == true)
             {
-                while (((self.view?.presentScene(nil)) == nil))
-                {
-                
-                }
+                #if targetEnvironment(macCatalyst)
+                resetKeyboardControls()
+                #endif
+                self.physicsWorld.contactDelegate = nil
+                self.view?.presentScene(nil)
                 //NSNotificationCenter.defaultCenter().postNotificationName("GoToFloorViewController", object: self)
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
@@ -154,6 +179,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             else if (self.isKind(of: RoomScene.self) == true)
             {
+                #if targetEnvironment(macCatalyst)
+                resetKeyboardControls()
+                #endif
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
                 Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
                 Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.disabled = true
@@ -166,6 +194,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         else if (mask1 == Constants.playerCategory && mask2 == Constants.doorCategory)
         {
+            #if targetEnvironment(macCatalyst)
+            resetKeyboardControls()
+            #endif
             self.physicsWorld.contactDelegate = nil
             Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.disabled = true
             Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.removeFromParent()
@@ -329,6 +360,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 #if targetEnvironment(macCatalyst)
 extension GameScene {
     func keyboardPressesBegan(_ presses: Set<UIPress>) {
+        guard !isPaused, !vending else { return }
         for press in presses {
             if let key = keyboardKey(for: press) {
                 keyboardControls.press(key)
@@ -351,13 +383,11 @@ extension GameScene {
 
     func resetKeyboardControls() {
         keyboardControls.reset()
-        Player.entity.moving = false
-        Player.entity.shooting = false
-        Player.entity.component(ofType: PlayerMovementComponent.self)?.stopMoving()
-        Player.entity.component(ofType: PlayerShootComponent.self)?.stopShooting()
+        Player.entity.stopControls()
     }
 
     private func applyKeyboardControls() {
+        defer { keyboardControls.finishFrame() }
         let movement = Player.entity.component(ofType: PlayerMovementComponent.self)
         let shooting = Player.entity.component(ofType: PlayerShootComponent.self)
 

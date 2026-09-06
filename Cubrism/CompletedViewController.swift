@@ -1,185 +1,112 @@
-//
-//  CompletedViewController.swift
-//  Cubrism
-//
-//  Created by Brendan Sanderson on 3/21/16.
-//  Copyright © 2016 Brendan. All rights reserved.
-//
-
 import UIKit
 
 class CompletedViewController: UIViewController {
     var expGained = 10
     var level = 0
     var drops = [Item]()
-    let font = Constants.font
+
     override func viewDidLoad() {
-        createGUI()
-        
-        
+        super.viewDidLoad()
+        view.backgroundColor = Constants.darkColor
+        let scroll = UIScrollView()
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 18
+        stack.alignment = .fill
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        let content = UIView()
+        content.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(content)
+        content.addSubview(scroll)
+        scroll.addSubview(stack)
+        NSLayoutConstraint.activate([
+            scroll.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            scroll.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            scroll.topAnchor.constraint(equalTo: content.topAnchor),
+            content.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            content.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            content.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            content.widthAnchor.constraint(lessThanOrEqualToConstant: 720),
+            content.widthAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.widthAnchor),
+            stack.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 24),
+            stack.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -24),
+            stack.centerXAnchor.constraint(equalTo: scroll.frameLayoutGuide.centerXAnchor),
+            stack.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -48)
+        ])
+        let preferredWidth = content.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
+        preferredWidth.priority = .defaultHigh
+        preferredWidth.isActive = true
+        func addLabel(_ text: String, size: CGFloat = 20) {
+            let label = UILabel()
+            label.text = text
+            label.textColor = Constants.lightColor
+            label.font = UIFont(name: Constants.font, size: size)
+            label.numberOfLines = 0
+            label.textAlignment = .center
+            stack.addArrangedSubview(label)
+        }
+        addLabel("Floor Complete!", size: 36)
+        addLabel("Experience Gained: \(expGained)")
+        addLabel("Total Experience: \(Player.totalExp)")
+        addLabel("Level \(Player.level) · \(Player.expToLevel(Player.level) - Player.exp) XP to next level")
+        let progress = UIProgressView(progressViewStyle: .default)
+        progress.progress = Float(Player.exp) / Float(Player.expToLevel(Player.level))
+        progress.progressTintColor = Constants.lightColor
+        progress.accessibilityLabel = "Experience progress"
+        stack.addArrangedSubview(progress)
+        addLabel("Loot", size: 24)
+        for item in drops {
+            let row = UIStackView()
+            row.axis = .horizontal
+            row.alignment = .center
+            row.spacing = 16
+            let icon = UIImageView(image: UIImage(named: item.type))
+            icon.contentMode = .scaleAspectFit
+            icon.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                icon.widthAnchor.constraint(equalToConstant: 48),
+                icon.heightAnchor.constraint(equalToConstant: 48)
+            ])
+            let label = UILabel()
+            if let equipment = item as? Equipment {
+                label.text = "\(equipment.type!) · Level \(equipment.level) · Tier \(equipment.tier)"
+            } else {
+                label.text = "\(item.type!) × \(item.quantity)"
+            }
+            label.font = UIFont(name: Constants.font, size: 18)
+            label.textColor = Constants.lightColor
+            label.numberOfLines = 0
+            row.addArrangedSubview(icon)
+            row.addArrangedSubview(label)
+            stack.addArrangedSubview(row)
+        }
+        let button = UIButton(type: .system)
+        button.setTitle("Continue", for: .normal)
+        button.titleLabel?.font = UIFont(name: Constants.fontB, size: 24)
+        button.setTitleColor(Constants.darkColor, for: .normal)
+        button.backgroundColor = Constants.lightColor
+        button.layer.cornerRadius = 8
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+        button.addTarget(self, action: #selector(goToHome(_:)), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.accessibilityIdentifier = "completion.continue"
+        scroll.accessibilityIdentifier = "completion.rewards"
+        content.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 24),
+            button.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -24),
+            button.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -12),
+            scroll.bottomAnchor.constraint(equalTo: button.topAnchor, constant: -12)
+        ])
     }
-    func createGUI()
-    {
-        let frame = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-        frame.image = UIImage(named: "popUp")
-        
-        view.addSubview(frame)
-        
-        let completeLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.1), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.20)))
-        completeLabel.text = "Floor Complete!"
-        completeLabel.font = UIFont(name: font, size: 48)
-        completeLabel.textAlignment = .center
-        completeLabel.textColor = Constants.lightColor
-        view.addSubview(completeLabel)
-        
-        let expGainedLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.3), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel.font = UIFont(name: font, size: 18)
-        expGainedLabel.text = String(format: "Experience Gained: %i", expGained)
-        expGainedLabel.textAlignment = .center
-        expGainedLabel.textColor = Constants.darkColor
-        view.addSubview(expGainedLabel)
-        
-        let expGainedLabel2 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.4), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel2.font = UIFont(name: font, size: 18)
-        expGainedLabel2.text = String(format: "Experience: %i", Player.totalExp)
-        expGainedLabel2.textAlignment = .center
-        expGainedLabel2.textColor = Constants.darkColor
-        view.addSubview(expGainedLabel2)
 
-        
-        let expGainedLabel3 = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.1, y: view.frame.height * 0.5), size: CGSize(width: view.frame.width * 0.8, height: view.frame.height * 0.05)))
-        expGainedLabel3.font = UIFont(name: font, size: 18)
-        expGainedLabel3.text = String(format: "Experience To Next: %i", (Player.expToLevel(Player.level)) - Player.exp)
-        expGainedLabel3.textAlignment = .center
-        expGainedLabel3.textColor = Constants.darkColor
-        view.addSubview(expGainedLabel3)
-        
-        let expBar = UIProgressView(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.3, y: view.frame.height * 0.625), size: CGSize(width: view.frame.width * 0.4, height: view.frame.height * 0.05)))
-        expBar.progress = Float(Player.exp)/Float(Player.expToLevel(Player.level))
-        expBar.progressTintColor = Constants.lightColor
-        expBar.trackTintColor = Constants.darkColor
-        view.addSubview(expBar)
-        
-        let levelLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.6), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
-        levelLabel.font = UIFont(name: font, size: 18)
-        levelLabel.text = String(format: "Level: %i", Player.level)
-        levelLabel.textAlignment = .center
-        levelLabel.textColor = Constants.darkColor
-        view.addSubview(levelLabel)
-        
-        
-        
-        let equipmentLabel = UILabel(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.15, y: view.frame.height * 0.725), size: CGSize(width: view.frame.width * 0.15, height: view.frame.height * 0.05)))
-        equipmentLabel.font = UIFont(name: font, size: 18)
-        equipmentLabel.text = String(format: "Loot:")
-        equipmentLabel.textColor = Constants.darkColor
-        equipmentLabel.textAlignment = .center
-        view.addSubview(equipmentLabel)
-        
-        let equipment1tier = UIImageView(frame: CGRect(x: view.frame.width * 0.5 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment1tier.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment1tier)
-        
-        let equipment2tier = UIImageView(frame: CGRect(x: view.frame.width * 0.4 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment2tier.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment2tier)
-        
-        let equipment3tier = UIImageView(frame: CGRect(x: view.frame.width * 0.6 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment3tier.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment3tier)
-        
-        let equipment1 = UIImageView(frame: CGRect(x: view.frame.width * 0.5 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment1.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment1)
-        
-        let equipment2 = UIImageView(frame: CGRect(x: view.frame.width * 0.4 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment2.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment2)
-        
-        let equipment3 = UIImageView(frame: CGRect(x: view.frame.width * 0.6 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-        equipment3.image = UIImage(named: "noEquipment")
-        view.addSubview(equipment3)
-        
-        
-        
-        let numDrops = drops.count
-        if (numDrops > 0)
-        {
-            if drops[0].isKind(of: Equipment.self)
-            {
-                equipment1tier.image = UIImage (named: "tier\((drops[0] as! Equipment).tier)")
-                if (drops[0] as! Equipment).tier == 0
-                {
-                    equipment1tier.image = UIImage (named: "tier1")
-                }
-            }
-            equipment1.image = UIImage(named: drops[0].type)
-        }
-        if (numDrops > 1)
-        {
-            if drops[1].isKind(of: Equipment.self)
-            {
-                equipment2tier.image = UIImage (named: "tier\((drops[1] as! Equipment).tier)")
-            }
-            equipment2.image = UIImage(named: drops[1].type)
-        }
-        if (numDrops > 2)
-        {
-            if drops[2].isKind(of: Equipment.self)
-            {
-                equipment3tier.image = UIImage (named: "tier\((drops[2] as! Equipment).tier)")
-            }
-            equipment3.image = UIImage(named: drops[2].type)
-        }
-        
-//        let equipment4 = UIImageView(frame: CGRect(x: view.frame.width * 0.3 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-//        equipment4.image = UIImage(named: "noEquipment")
-//        view.addSubview(equipment4)
-//        
-//        let equipment5 = UIImageView(frame: CGRect(x: view.frame.width * 0.7 - view.frame.height * 0.05, y: view.frame.height * 0.7, width: view.frame.height * 0.1, height: view.frame.height * 0.1))
-//        equipment5.image = UIImage(named: "noEquipment")
-//        view.addSubview(equipment5)
-        
-        
-        
-        let button = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width * 0.32, y: view.frame.height * 0.825), size: CGSize(width: view.frame.width * 0.38, height: view.frame.height * 0.1)))
-        button.setTitle("Continue", for: UIControl.State.normal)
-        button.layer.cornerRadius = 5
-        button.backgroundColor = Constants.darkColor
-        button.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
-        button.titleLabel!.font = UIFont(name: font, size: 32)
-        view.addSubview(button)
-        
-        let contineMethod: Selector = NSSelectorFromString("goToHome:")
-        button.addTarget(self, action: contineMethod, for: .touchUpInside)
-
-    }
-    
     @objc func goToHome(_ sender: UIButton!) {
-        self.dismiss(animated: false, completion: nil)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToHomeViewController"), object: self)
-    }
-    
-    
-    
-    
-    
-    
-    override var shouldAutorotate : Bool {
-        return true
-    }
-    
-    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
+        dismiss(animated: false) {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToHomeViewController"), object: self)
         }
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
-    }
-    
+
+    override var prefersStatusBarHidden: Bool { true }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .landscape }
 }

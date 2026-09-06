@@ -231,22 +231,9 @@ class EnemyShotTargetingComponent: ActionComponent {
     func followPath(_ sprite: SKSpriteNode)
     {
         playerSprite = Player.entity.sprite
-        var sequence = [SKAction]()
-        let angle = Double(atan((playerSprite.position.y - enemySprite.position.y)/(playerSprite.position.x - enemySprite.position.x)))
-        var moveTo = CGPoint()
-        moveTo.x = CGFloat(cos(angle) * 500.0)
-        moveTo.y = CGFloat(sin(angle) * 500.0)
-        if (playerSprite.position.x - enemySprite.position.x < 0)
-        {
-            moveTo.x = 0 - CGFloat(cos(angle) * 500.0)
-            moveTo.y = 0 - CGFloat(sin(angle) * 500.0)
-        }
-        //let distance = Double(hypotf(abs(Float(playerSprite.position.x) - Float(enemySprite.position.x)), abs(Float(playerSprite.position.y) - Float(enemySprite.position.y))))
-        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        
-        sequence += [action]
-        
-        sprite.run(SKAction.sequence(sequence))
+        let angle = atan2(playerSprite.position.y - sprite.position.y,
+                          playerSprite.position.x - sprite.position.x)
+        scene.launchWallBoundShot(sprite, angle: angle, speed: 250)
     }
     
 }
@@ -553,31 +540,8 @@ class EnemyShotTrippleComponent: ActionComponent {
     
     func followPath(_ sprite: SKSpriteNode)
     {
-        var sequence = [SKAction]()
-        moveTo.x = 0
-        moveTo.y = 0
-        if (direction == 0)
-        {
-            moveTo.y = 500
-        }
-        else if (direction == 1)
-        {
-            moveTo.x = 500
-        }
-        else if (direction == 2)
-        {
-            moveTo.y = -500
-        }
-        else
-        {
-            moveTo.x = -500
-        }
-        
-        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: shotLength), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        
-        sequence += [action]
-        
-        sprite.run(SKAction.sequence(sequence))
+        let angles: [CGFloat] = [.pi / 2, 0, -.pi / 2, .pi]
+        scene.launchWallBoundShot(sprite, angle: angles[direction], speed: 500 / CGFloat(shotLength))
     }
     
 }
