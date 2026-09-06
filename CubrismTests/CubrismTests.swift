@@ -124,6 +124,17 @@ class CubrismTests: XCTestCase {
         XCTAssertFalse(player.shooting)
     }
 
+    func testPlayerEntityStopControlsClearsInputFlags() {
+        let player = PlayerEntity()
+        player.moving = true
+        player.shooting = true
+
+        player.stopControls()
+
+        XCTAssertFalse(player.moving)
+        XCTAssertFalse(player.shooting)
+    }
+
     func testLevelSelectUsesOneFullWidthPagePerWorld() {
         let controller = LevelSelectCollectionViewController()
         controller.loadViewIfNeeded()

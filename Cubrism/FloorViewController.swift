@@ -96,6 +96,7 @@ class FloorViewController: UIViewController {
         view.layoutIfNeeded()
         #if targetEnvironment(macCatalyst)
         becomeFirstResponder()
+        scene.resetKeyboardControls()
         #endif
         
     }
@@ -236,6 +237,9 @@ class FloorViewController: UIViewController {
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
         newScene.scaleMode = .aspectFit
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }
@@ -256,6 +260,9 @@ class FloorViewController: UIViewController {
         let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
         newScene.scaleMode = .aspectFit
         newScene.startPosition = start
+        #if targetEnvironment(macCatalyst)
+        scene.resetKeyboardControls()
+        #endif
         skView.presentScene(newScene)
         scene = newScene
     }

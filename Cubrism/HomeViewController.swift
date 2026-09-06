@@ -156,6 +156,10 @@ class HomeViewController: UIViewController {
     }
     
     @objc func goToLevelSelectCollectionViewController(_ notification: Notification){
+        #if targetEnvironment(macCatalyst)
+        (skView.scene as? GameScene)?.resetKeyboardControls()
+        Player.entity.stopControls()
+        #endif
         self.present(levelSelectView, animated: false, completion: nil)
     }
     
@@ -165,6 +169,10 @@ class HomeViewController: UIViewController {
     }
     
     @objc func goToLevelFloorViewController(_ notification: Notification){
+        #if targetEnvironment(macCatalyst)
+        (skView.scene as? GameScene)?.resetKeyboardControls()
+        Player.entity.stopControls()
+        #endif
         
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)
