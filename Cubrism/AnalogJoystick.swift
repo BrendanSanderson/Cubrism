@@ -122,6 +122,7 @@ open class AnalogJoystick: SKNode {
     var substrate: AnalogJoystickSubstrate!
     var stick: AnalogJoystickStick!
     fileprivate var tracking = false
+    private var pendingData: AnalogJoystickData?
     fileprivate(set) var data = AnalogJoystickData()
     
     var disabled: Bool {
@@ -130,7 +131,7 @@ open class AnalogJoystick: SKNode {
         set {
             isUserInteractionEnabled = !newValue
             if newValue {
-                resetStick()
+                resetInput()
             }
         }
     }
@@ -164,8 +165,6 @@ open class AnalogJoystick: SKNode {
         addChild(stick)
         
         disabled = false
-        let velocityLoop = CADisplayLink(target: self, selector: #selector(AnalogJoystick.listen))
-        velocityLoop.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
     }
     
     convenience init(diameters: (substrate: CGFloat, stick: CGFloat?), colors: (substrate: UIColor?, stick: UIColor?)? = nil, images: (substrate: UIImage?, stick: UIImage?)? = nil) {
@@ -192,7 +191,16 @@ open class AnalogJoystick: SKNode {
     
     @objc func listen() {
         
-        if tracking { trackingHandler?(data) }
+        if tracking {
+            trackingHandler?(data)
+            pendingData = nil
+        } else if let pending = pendingData {
+            // Consume a gesture that began and ended between rendered frames.
+            pendingData = nil
+            startHandler?()
+            trackingHandler?(pending)
+            stopHandler?()
+        }
     }
     
     //MARK: - Overrides
@@ -200,6 +208,7 @@ open class AnalogJoystick: SKNode {
         
         if let touch = touches.first, stick == atPoint(touch.location(in: self)) {
             
+            pendingData = nil
             tracking = true
             startHandler?()
         }
@@ -219,17 +228,26 @@ open class AnalogJoystick: SKNode {
             
             stick.position = needPosition
             data = AnalogJoystickData(velocity: needPosition, angular: -atan2(needPosition.x, needPosition.y))
+            pendingData = data
         }
     }
     
     open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
+        // Very short gestures may be coalesced directly into an ended event.
+        if tracking, data.velocity == .zero, let touch = touches.first {
+            let location = touch.location(in: self)
+            let distance = hypot(location.x, location.y)
+            if distance > 0 {
+                let scale = min(1, radius / distance)
+                pendingData = AnalogJoystickData(velocity: CGPoint(x: location.x * scale, y: location.y * scale),
+                                                 angular: -atan2(location.x, location.y))
+            }
+        }
         resetStick()
     }
     
     open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        resetStick()
+        resetInput()
     }
     
     // CustomStringConvertible protocol
@@ -238,6 +256,8 @@ open class AnalogJoystick: SKNode {
         return "AnalogJoystick(data: \(data), position: \(position))"
     }
     
+    func resetInput() { pendingData = nil; resetStick() }
+
     // private methods
     fileprivate func resetStick() {
         

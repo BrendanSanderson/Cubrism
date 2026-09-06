@@ -161,8 +161,9 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
 //            }
             homeView.floorView.world = indexPath.section + 1
             
-            self.dismiss(animated: false, completion: nil)
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"),  object: nil)
+            self.dismiss(animated: false) {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "GoToLevelFloorViewController"), object: nil)
+            }
         }
         }
         

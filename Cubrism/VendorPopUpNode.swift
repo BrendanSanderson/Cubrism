@@ -14,6 +14,44 @@ class VendorPopUpNode: SKNode
     var selectedNode: ItemNode!
     var labels = [SKLabelNode(), SKLabelNode(), SKLabelNode(), SKLabelNode(), SKLabelNode(), SKLabelNode(), SKLabelNode()]
     
+    var inventoryPage = 0
+    var pageItems: [Item] { Array(Player.inventory.dropFirst(inventoryPage * 30).prefix(30)) }
+
+    func addPageControls() {
+        let total = max(1, (Player.inventory.count + 29) / 30)
+        for (text, name, x) in [("‹", "previous-page", CGFloat(0.09)),
+                                ("\(inventoryPage + 1) / \(total)", "page-number", CGFloat(0.245)),
+                                ("›", "next-page", CGFloat(0.40))] {
+            let label = SKLabelNode(fontNamed: Constants.fontB)
+            label.text = text
+            label.name = name
+            label.fontSize = 20
+            label.fontColor = Constants.lightColor
+            label.position = CGPoint(x: mainFrame.size.width * x, y: -mainFrame.size.height * 0.48)
+            label.zPosition = 1005
+            addChild(label)
+        }
+    }
+
+    func handlePageTouch(_ location: CGPoint) -> Bool {
+        let name = atPoint(location).name
+        guard name == "previous-page" || name == "next-page" else { return false }
+        let lastPage = max(0, (Player.inventory.count - 1) / 30)
+        let nextPage = min(lastPage, max(0, inventoryPage + (name == "next-page" ? 1 : -1)))
+        rebuild(page: nextPage)
+        return true
+    }
+
+    func rebuild(page: Int) {
+        guard let gameScene = scene as? GameScene else { return }
+        let replacement: VendorPopUpNode = self is BankPopUpNode
+            ? BankPopUpNode(scene: gameScene, page: page)
+            : ShopPopUpNode(scene: gameScene, page: page)
+        removeFromParent()
+        gameScene.vender = replacement
+        gameScene.addChild(replacement)
+    }
+
     func updateLabels()
     {
         if (selectedNode != nil)
@@ -60,7 +98,7 @@ class VendorPopUpNode: SKNode
             }
             else
             {
-                if let q = selectedNode.quantity.text {labels[1].text = "x \(q)"}
+                labels[1].text = "x \(selectedNode.item.quantity)"
                 labels[2].text = ""
                 labels[3].text = ""
                 labels[4].text = ""
@@ -130,15 +168,16 @@ class BankPopUpNode: VendorPopUpNode {
         super.init()
     }
     
-    init (scene: GameScene)
+    init (scene: GameScene, page: Int = 0)
     {
         super.init()
+        inventoryPage = min(max(0, page), max(0, (Player.inventory.count - 1) / 30))
         self.isUserInteractionEnabled = true
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
         mainFrame = SKSpriteNode(imageNamed: "popUp")
-        mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
+        mainFrame.size = CGSize(width: scene.size.width * 0.9, height: scene.size.height * 0.8)
         mainFrame.zPosition = 999
-        let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
+        let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: scene.size.width * 0.03, height: scene.size.height * 0.8))
         let leftDividerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
         leftDividerLine.position = CGPoint(x: mainFrame.size.width * -0.25, y: mainFrame.size.height * -0.175)
         centerLine.zPosition = 1001
@@ -167,12 +206,12 @@ class BankPopUpNode: VendorPopUpNode {
                 addChild(square)
             }
         }
-        for i in 0 ..< Player.inventory.count
+        for i in 0 ..< pageItems.count
         {
             let col = i % 5
             let row = 5 - (i / 5)
             let temp = inv[col][row]
-            inv[col][row] = ItemNode(i: Player.inventory[i])
+            inv[col][row] = ItemNode(i: pageItems[i])
             inv[col][row].position = temp.position
             inv[col][row].zPosition = temp.zPosition
             temp.removeFromParent()
@@ -225,6 +264,7 @@ class BankPopUpNode: VendorPopUpNode {
         addChild(mainFrame)
         addChild(leftDividerLine)
         
+        addPageControls()
         gameScene = scene
         
     }
@@ -236,7 +276,9 @@ class BankPopUpNode: VendorPopUpNode {
 
     internal override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        let selNode = atPoint(touches.first!.location(in: self))
+        let location = touches.first!.location(in: self)
+        if handlePageTouch(location) { return }
+        let selNode = atPoint(location)
         if selNode.isKind(of: ItemNode.self)
         {
             if selectedNode == nil || selNode.position == selectedNode.position
@@ -278,6 +320,10 @@ class BankPopUpNode: VendorPopUpNode {
                         }
                         let i = Player.inventory.index(of: selectedNode.item)!
                         Player.inventory[i] = (selNode as? ItemNode)!.item
+                        Player.saveItems()
+                        Player.updateEquipment()
+                        rebuild(page: inventoryPage)
+                        return
                         
                         
                     }
@@ -337,15 +383,16 @@ class ShopPopUpNode: VendorPopUpNode {
             super.init()
         }
         
-        init (scene: GameScene)
+        init (scene: GameScene, page: Int = 0)
         {
             super.init()
-            self.isUserInteractionEnabled = true
+            inventoryPage = min(max(0, page), max(0, (Player.inventory.count - 1) / 30))
+        self.isUserInteractionEnabled = true
             self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
             mainFrame = SKSpriteNode(imageNamed: "popUp")
-            mainFrame.size = CGSize(width: Constants.uW, height: Constants.uH)
+            mainFrame.size = CGSize(width: scene.size.width * 0.9, height: scene.size.height * 0.8)
             mainFrame.zPosition = 999
-            let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: Constants.w * 0.03, height: Constants.uH))
+            let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: scene.size.width * 0.03, height: scene.size.height * 0.8))
             let leftDividerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: mainFrame.size.width * 0.5, height: mainFrame.size.height * 0.05))
             leftDividerLine.position = CGPoint(x: mainFrame.size.width * -0.25, y: mainFrame.size.height * -0.175)
             centerLine.zPosition = 1001
@@ -374,12 +421,12 @@ class ShopPopUpNode: VendorPopUpNode {
                     addChild(square)
                 }
             }
-            for i in 0 ..< Player.inventory.count
+            for i in 0 ..< pageItems.count
             {
                 let col = i % 5
                 let row = 5 - (i / 5)
                 let temp = inv[col][row]
-                inv[col][row] = ItemNode(i: Player.inventory[i])
+                inv[col][row] = ItemNode(i: pageItems[i])
                 inv[col][row].position = temp.position
                 inv[col][row].zPosition = temp.zPosition
                 temp.removeFromParent()
@@ -421,7 +468,8 @@ class ShopPopUpNode: VendorPopUpNode {
             addChild(mainFrame)
             addChild(leftDividerLine)
             
-            gameScene = scene
+            addPageControls()
+        gameScene = scene
             
         }
         
@@ -432,7 +480,9 @@ class ShopPopUpNode: VendorPopUpNode {
         
         internal override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             
-            let selNode = atPoint(touches.first!.location(in: self))
+            let location = touches.first!.location(in: self)
+        if handlePageTouch(location) { return }
+        let selNode = atPoint(location)
             if selNode.isKind(of: ItemNode.self)
             {
                 selectedNode = selNode as? ItemNode
@@ -460,14 +510,11 @@ class ShopPopUpNode: VendorPopUpNode {
                     vendorButton.text.text = "N/A"
                 }
             }
-            else if selNode.isKind(of: SellNode.self) || (selNode.parent?.isKind(of: SellNode.self))!
+            else if selNode.isKind(of: SellNode.self) || (selNode.parent?.isKind(of: SellNode.self) == true)
             {
                 if selectedNode.position.x > 0
                 {
-                    let cubrixels = Item(t: "Cubrixel", q: (selectedNode.item as! Equipment).price, s: true)
-                    Player.addDrop(cubrixels)
-                    let i = Player.inventory.index(of: selectedNode.item as! Equipment)
-                    Player.inventory.remove(at: i!)
+                    guard Player.sell(selectedNode.item as! Equipment) else { return }
                     selectedSquare.removeFromParent()
                     vendorButton.back()
                     self.updateLabels()
@@ -494,14 +541,11 @@ class ShopPopUpNode: VendorPopUpNode {
                         labels[4].text = ""
                         labels[5].text = ""
                         labels[6].text = ""
+                        return
                     }
                     else if Player.inventory[index].quantity >= num
                     {
-                        Player.addDrop(selectedNode.item as! Equipment)
-                        Player.inventory[index].quantity -= num
-                        
-                        let mIndex = Constants.merchantInventory.index(of: selectedNode.item as! Equipment)
-                        Constants.merchantInventory.remove(at: mIndex!)
+                        guard Player.buy(selectedNode.item as! Equipment) else { return }
                         selectedSquare.removeFromParent()
                         vendorButton.back()
                         self.updateLabels()
@@ -516,10 +560,11 @@ class ShopPopUpNode: VendorPopUpNode {
                         labels[4].text = ""
                         labels[5].text = ""
                         labels[6].text = ""
+                        return
 
                     }
                 }
-                self.reloadTables()
+                rebuild(page: inventoryPage)
                 
             }
             else
@@ -535,19 +580,19 @@ class ShopPopUpNode: VendorPopUpNode {
     }
     func reloadTables()
     {
-        for i in 0 ..< Player.inventory.count
+        for i in 0 ..< pageItems.count
         {
             let col = i % 5
             let row = 5 - (i / 5)
             let temp = inv[col][row]
-            inv[col][row] = ItemNode(i: Player.inventory[i])
+            inv[col][row] = ItemNode(i: pageItems[i])
             inv[col][row].position = temp.position
             inv[col][row].zPosition = temp.zPosition
             temp.removeFromParent()
             addChild(inv[col][row])
         }
         
-        for i in Player.inventory.count ..< 30
+        for i in pageItems.count ..< 30
         {
             let col = i % 5
             let row = 5 - (i / 5)

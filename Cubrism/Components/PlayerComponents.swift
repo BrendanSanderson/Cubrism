@@ -31,12 +31,12 @@ class PlayerShootComponent: GKComponent {
         #if !targetEnvironment(macCatalyst)
         scene.addChild(joystick)
         #endif
-        joystick.startHandler = { //[unowned self] in
-            scene.started = true
+        joystick.startHandler = { [weak scene] in
+            scene?.started = true
         
         }
-        joystick.stopHandler = { //[unowned self] in
-            self.stopShooting()
+        joystick.stopHandler = { [weak self] in
+            self?.stopShooting()
         }
         joystick.trackingHandler = { [unowned self, unowned scene] data in
             self.shoot(with: data.velocity, currentTime: scene.time)
@@ -56,28 +56,16 @@ class PlayerShootComponent: GKComponent {
     }
 
     func shoot(with velocity: CGPoint, currentTime: TimeInterval) {
-        self.velocity = velocity
-        if (scene.isPaused == false)
-        {
-            if (velocity.x > 10.0 || velocity.x < -10.0 || velocity.y > 10.0 || velocity.y < -10.0)
-            {
-                let angle = Double(atan(Double(self.velocity.y)/Double(self.velocity.x)))
-                self.velocity.x = CGFloat(cos(angle) * 50.0)
-                self.velocity.y = CGFloat(sin(angle) * 50.0)
-                if (velocity.x < 0.0)
-                {
-                    Player.entity.cannonSprite.zRotation = CGFloat(Double.pi+angle)
-                    self.velocity.x = -self.velocity.x
-                    self.velocity.y = -self.velocity.y
-                }
-                else
-                {
-                    Player.entity.cannonSprite.zRotation = CGFloat(angle)
-                }
-                Player.entity.shooting = true
-                self.ShotIfNeeded(currentTime)
-            }
+        guard !scene.isPaused, !scene.vending,
+              abs(velocity.x) > 10 || abs(velocity.y) > 10 else {
+            stopShooting()
+            return
         }
+        let angle = atan2(velocity.y, velocity.x)
+        self.velocity = CGPoint(x: cos(angle) * 50, y: sin(angle) * 50)
+        Player.entity.cannonSprite.zRotation = angle
+        Player.entity.shooting = true
+        ShotIfNeeded(currentTime)
     }
 
     func stopShooting() {
@@ -115,11 +103,11 @@ class PlayerShootComponent: GKComponent {
     func followPath(_ velocity: CGPoint) {
         var sequence = [SKAction]()
         let destination = CGPoint(x:Int(20.0*velocity.x), y:Int(20.0*velocity.y))
-        let action = SKAction.sequence([SKAction.move(to: destination, duration: 1.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.moveBy(x: destination.x, y: destination.y, duration: 1.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
         
         sequence += [action]
         
-        self.sprite.run(SKAction.sequence(sequence))
+        self.node.run(SKAction.sequence(sequence))
     }
     
 }
@@ -169,9 +157,9 @@ class PlayerMovementComponent: GKComponent {
     }
 
     func move(with velocity: CGPoint) {
-        if (scene.isPaused == false && Player.entity.moving == true)
+        if (scene.isPaused == false && !scene.vending && Player.entity.moving == true)
         {
-            self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (velocity.x * 0.15), y: self.playerSprite.position.y + (velocity.y * 0.15))
+            self.playerSprite.position = CGPoint(x: self.playerSprite.position.x + (velocity.x * 9 * CGFloat(scene.frameDuration)), y: self.playerSprite.position.y + (velocity.y * 9 * CGFloat(scene.frameDuration)))
             if (Player.entity.shooting == false)
             {
                 rotateCannon(with: velocity)
@@ -180,34 +168,8 @@ class PlayerMovementComponent: GKComponent {
     }
 
     private func rotateCannon(with velocity: CGPoint) {
-        if (velocity.y != 0.0 && velocity.x != 0.0)
-            {
-            var angle = CGFloat(atan(Double(velocity.y)/Double(velocity.x)))
-            if (velocity.x < 0.0)
-            {
-                angle += CGFloat.pi
-            }
-            else if (velocity.y < 0.0)
-            {
-                angle += CGFloat.pi * 2.0
-                }
-            if Player.entity.cannonSprite.zRotation < 0
-            {
-                    Player.entity.cannonSprite.zRotation += CGFloat.pi * 2.0
-            }
-            let cAngle = Player.entity.cannonSprite.zRotation.truncatingRemainder(dividingBy: 360)
-            let diff = Swift.abs(cAngle - angle).truncatingRemainder(dividingBy: 360)
-            let r = diff > 180 ? 360 - diff : diff
-            let sign = (cAngle - angle >= 180) ? 1.0 : -1.0
-            if(r <= CGFloat.pi/10)
-            {
-                Player.entity.cannonSprite.zRotation = angle
-            }
-            else
-            {
-                Player.entity.cannonSprite.zRotation += CGFloat(sign) * CGFloat.pi/10
-            }
-        }
+        guard velocity != .zero else { return }
+        Player.entity.cannonSprite.zRotation = atan2(velocity.y, velocity.x)
     }
     
 }

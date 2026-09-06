@@ -115,7 +115,7 @@ class Equipment: Item {
             
         else if type == "Special Pulsar"
         {
-            self.attackSpeed = Double(tier * level/25)
+            self.attackSpeed = Double(tier * level) / 25.0
         }
             
         else if type == "Armor Core"

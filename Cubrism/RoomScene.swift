@@ -28,7 +28,6 @@ fileprivate func <= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 
 class RoomScene: GameScene {
     var doors = [DoorEntity]()      
-    var maze = [[RoomScene]]()
     var entites = [DynamicEntity]()
     var startPosition = CGPoint()
     var killedEnemies = 0
@@ -36,11 +35,12 @@ class RoomScene: GameScene {
     var playerEntity = PlayerEntity()
     var completed = false
     var startTime: TimeInterval!
-    var viewController: FloorViewController!
+    weak var viewController: FloorViewController!
     var enemyPoints = 4
     override func didMove(to view: SKView) {
         /* Setup your scene here */
         killedEnemies = 0
+        entites.removeAll()
         addEntities()
         addDoors()
         world = viewController.world
@@ -71,9 +71,9 @@ class RoomScene: GameScene {
 //        }
 //        else if (startTime + 0.5 <= currentTime)
 //        {
+        super.update(currentTime)
         if (started == true)
         {
-            super.update(currentTime)
             for i in 0 ..< entites.count
             {
                 entites[i].act(currentTime)
@@ -121,46 +121,31 @@ class RoomScene: GameScene {
     
     func addEnemies()
     {
-//        var mobs: NSArray?
-//        if let path = NSBundle.mainBundle().pathForResource("rooms", ofType: "plist"), dict = NSArray(contentsOfFile: path){
-//            let room = dict[Int(arc4random_uniform(UInt32(dict.count)))] as? NSDictionary
-//            mobs = room?.valueForKey("mobs") as? NSArray
-//            for i in 0 ..< mobs!.count
-//            {
-//                entites.append(EnemyEntity(scene: self, eType: (mobs![i].valueForKey("type") as? String)!, lev: (mobs![i].valueForKey("level") as? Int)!, elite: (mobs![i].valueForKey("elite") as? Bool)!))
-//            }
-//            enemies = mobs!.count
-//            
-//        }
-
-        if let path = Bundle.main.path(forResource: "Enemies", ofType: "plist"), let enemiesArray = NSArray(contentsOfFile: path){
-                var remainPoints = enemyPoints
-                var totalEnemies = 0
-                while remainPoints >= 1
-                {
-                    let en = enemiesArray[Int(arc4random_uniform(UInt32(enemiesArray.count)))] as? NSDictionary
-                    if (en!.value(forKey: "points") as? Int) <= remainPoints && (en!.value(forKey: "minLevel") as? Int) <= viewController.level
-                    {
-                        var num = 0
-                        for i in 0 ..< entites.count
-                        {
-                            if (entites[i] as? EnemyEntity)!.type == (en!.value(forKey: "name") as? String)
-                            {
-                                num += 1
-                            }
-                        }
-                        if num < (en!.value(forKey: "max") as? Int)
-                        {
-                            entites.append(EnemyEntity(scene: self, eType: (en!.value(forKey: "name") as? String)!, lev: (en!.value(forKey: "level") as? Int)!, elite: (en!.value(forKey: "elite") as? Bool)!))
-                            remainPoints -= (en!.value(forKey: "points") as? Int)!
-                            totalEnemies += 1
-                        }
-                    }
-                }
-                enemies = totalEnemies
-                
+        guard let path = Bundle.main.path(forResource: "Enemies", ofType: "plist"),
+              let definitions = NSArray(contentsOfFile: path) as? [[String: Any]] else {
+            return
+        }
+        var remaining = Double(enemyPoints)
+        var counts = [String: Int]()
+        while remaining > 0 {
+            let eligible = definitions.filter { definition in
+                guard let cost = definition["points"] as? NSNumber,
+                      let minLevel = definition["minLevel"] as? Int,
+                      let limit = definition["max"] as? Int,
+                      let name = definition["name"] as? String else { return false }
+                return cost.doubleValue > 0 && cost.doubleValue <= remaining
+                    && minLevel <= viewController.globalLevel && counts[name, default: 0] < limit
             }
-        
+            guard let definition = eligible.randomElement(),
+                  let name = definition["name"] as? String,
+                  let level = definition["level"] as? Int,
+                  let elite = definition["elite"] as? Bool,
+                  let cost = definition["points"] as? NSNumber else { break }
+            entites.append(EnemyEntity(scene: self, eType: name, lev: level, elite: elite))
+            counts[name, default: 0] += 1
+            remaining -= cost.doubleValue
+        }
+        enemies = entites.count
     }
     func addBoss()
     {
@@ -182,12 +167,13 @@ class RoomScene: GameScene {
         self.addChild(door.node)
     }
     override func killEnemy(_ exp: Double) {
+        guard !completed else { return }
         killedEnemies += 1
-        Player.currentViewController.levelExp += Int(exp)
+        viewController.levelExp += Int(exp)
         if (killedEnemies == enemies)
         {
-            let roomExp = 10 * Constants.expMultiplier(viewController.level)
-            Player.currentViewController.levelExp += Int(roomExp)
+            let roomExp = 10 * Constants.expMultiplier(viewController.globalLevel)
+            viewController.levelExp += Int(roomExp)
             unlockDoors()
         }
     }

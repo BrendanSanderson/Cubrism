@@ -68,9 +68,9 @@ class HomeViewController: UIViewController {
             object: nil)
         
         
-        scene = HomeScene()
-        skView = SKView(frame: self.view.frame)
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "loadingScreen")!)
+        scene = HomeScene(size: GameScene.arenaSize)
+        skView = SKView(frame: self.view.bounds)
+        self.view.backgroundColor = .black
         self.view.addSubview(skView)
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)
@@ -78,17 +78,37 @@ class HomeViewController: UIViewController {
         skView.showsNodeCount = false
         scene.viewController = self
         skView.ignoresSiblingOrder = true
-        scene.scaleMode = .resizeFill
+        scene.scaleMode = .aspectFit
             
         
     }
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        skView.bounds = CGRect(origin: .zero, size: GameScene.arenaSize)
         skView.presentScene(scene)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
         Player.updateInventory()
         #if targetEnvironment(macCatalyst)
         becomeFirstResponder()
         #endif
         //self.pause
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let available = view.safeAreaLayoutGuide.layoutFrame
+        skView.transform = .identity
+        if let scene = skView.scene, scene.size.width > 0, scene.size.height > 0 {
+            skView.bounds = CGRect(origin: .zero, size: scene.size)
+            skView.center = CGPoint(x: available.midX, y: available.midY)
+            let scale = min(available.width / scene.size.width, available.height / scene.size.height)
+            skView.transform = CGAffineTransform(scaleX: scale, y: scale)
+        } else {
+            skView.frame = available
+        }
     }
 
     override var shouldAutorotate : Bool {
@@ -114,7 +134,13 @@ class HomeViewController: UIViewController {
     @objc func resetHomeViewController(_ notification: Notification){
     
         self.skView.presentScene(nil)
-        self.viewDidLoad()
+        Player.resetProgress()
+        scene = HomeScene(size: GameScene.arenaSize)
+        scene.viewController = self
+        scene.scaleMode = .aspectFit
+        skView.presentScene(scene)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
     }
     
     @objc func goToFloorViewController(_ notification: Notification){
@@ -125,6 +151,7 @@ class HomeViewController: UIViewController {
     floorView.max = UInt32(6)
     floorView.max = UInt32(4)
     floorView.level = 1
+    floorView.needsNewRun = true
     self.present(floorView, animated: false, completion: nil)
     }
     
@@ -133,7 +160,8 @@ class HomeViewController: UIViewController {
     }
     
     @objc func restartFloorViewController(_ notification: Notification){
-        self.present(floorView, animated: false, completion: nil)
+        floorView.needsNewRun = true
+    self.present(floorView, animated: false, completion: nil)
     }
     
     @objc func goToLevelFloorViewController(_ notification: Notification){
@@ -141,7 +169,8 @@ class HomeViewController: UIViewController {
         let loadingView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         self.view.addSubview(loadingView)
         
-        self.present(floorView, animated: false, completion: nil)
+        floorView.needsNewRun = true
+    self.present(floorView, animated: false, completion: nil)
     }
 
     #if targetEnvironment(macCatalyst)

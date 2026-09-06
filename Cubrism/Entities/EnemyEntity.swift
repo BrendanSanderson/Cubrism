@@ -44,7 +44,7 @@ class EnemyEntity: DynamicEntity {
         self.scene = scene
         self.type = eType
         node.entity = self
-        level = Player.currentViewController.level + lev - 1
+        level = (scene as! RoomScene).viewController.globalLevel + lev - 1
         setUpType(eType, elite:elite)
         if (self.sprite.position == CGPoint())
         {
@@ -195,44 +195,33 @@ class EnemyEntity: DynamicEntity {
     
     
     
-    func getNewPosition (_ position: CGPoint) -> CGPoint
-    {
-        var x = Int()
-        var y = Int()
-        var distance = Float()
-        var newPosition = CGPoint()
-        while (true)
-        {
-            x = Int(arc4random_uniform(UInt32(scene.frame.width*0.9 - 2*sprite.size.width))) + Int(scene.frame.width*0.05 + sprite.size.width)
-            y = Int(arc4random_uniform(UInt32(scene.frame.height*0.8 - 2*sprite.size.height))) + Int(scene.frame.height*0.1 + sprite.size.height)
-            newPosition = CGPoint(x: x, y: y)
-            distance = hypotf(abs(Float(position.x) - Float(x)), abs(Float(position.y) - Float(y)))
-            if (distance > 200)
-            {
-                return newPosition
-            }
-        }
+    func getNewPosition (_ position: CGPoint) -> CGPoint {
+        return spawnPosition(awayFrom: position, fraction: 0.9, minimumDistance: 200)
     }
-    
-    func getNewCenterPosition (_ position: CGPoint) -> CGPoint
-    {
-        var x = Int()
-        var y = Int()
-        var distance = CGFloat()
-        var newPosition = CGPoint()
-        while (true)
-        {
-            x = Int(arc4random_uniform(UInt32(scene.frame.width*0.3 - 2*sprite.size.width))) + Int(scene.frame.width*0.35 + sprite.size.width)
-            y = Int(arc4random_uniform(UInt32(scene.frame.height*0.3 - 2*sprite.size.height))) + Int(scene.frame.height*0.35 + sprite.size.height)
-            newPosition = CGPoint(x: x, y: y)
-            distance = CGFloat(hypotf(abs(Float(position.x) - Float(x)), abs(Float(position.y) - Float(y))))
-            if (distance > Player.entity.sprite.size.height * 4.0)
-            {
-                return newPosition
-            }
-        }
+
+    func getNewCenterPosition (_ position: CGPoint) -> CGPoint {
+        return spawnPosition(awayFrom: position, fraction: 0.3,
+                             minimumDistance: Player.entity.sprite.size.height * 4)
     }
-    
+
+    private func spawnPosition(awayFrom position: CGPoint, fraction: CGFloat,
+                               minimumDistance: CGFloat) -> CGPoint {
+        let width = max(0, scene.size.width * fraction - sprite.size.width * 2)
+        let heightFraction: CGFloat = fraction == 0.9 ? 0.8 : fraction
+        let height = max(0, scene.size.height * heightFraction - sprite.size.height * 2)
+        let center = CGPoint(x: scene.size.width / 2, y: scene.size.height / 2)
+        var best = center
+        var bestDistance: CGFloat = -1
+        for _ in 0..<64 {
+            let candidate = CGPoint(x: center.x + CGFloat.random(in: -width/2...width/2),
+                                    y: center.y + CGFloat.random(in: -height/2...height/2))
+            let distance = hypot(candidate.x - position.x, candidate.y - position.y)
+            if distance > minimumDistance { return candidate }
+            if distance > bestDistance { best = candidate; bestDistance = distance }
+        }
+        return best
+    }
+
     override func act(_ currentTime: TimeInterval)
     {
         if (alive == true)
@@ -262,6 +251,7 @@ class EnemyEntity: DynamicEntity {
     
     func damageEnemy (_ damage: Int)
     {
+        guard currentHealth > 0 else { return }
         node.Entity.currentHealth -= damage
         if (node.Entity.currentHealth > 0)
         {
