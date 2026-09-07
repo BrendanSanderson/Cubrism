@@ -180,7 +180,7 @@ class RoomScene: GameScene {
     func addTeleporter(_ point: CGPoint)
     {
         //  let teleporterSprite = SKSpriteNode(color: UIColor.whiteColor(), size: CGSize(width: 64, height: 32))
-        let teleporterSprite = SKSpriteNode(imageNamed: "horizontalDoor")
+        let teleporterSprite = GameArt.sprite("horizontalDoor")
         let teleporterNode = SKNode();
         teleporterNode.addChild(teleporterSprite)
         teleporterSprite.position = point
@@ -205,11 +205,11 @@ class RoomScene: GameScene {
                 if (doors[i].direction == 0 || doors[i].direction == 2)
                 {
                     doors[i].type = "completed"
-                    doors[i].sprite.texture = SKTexture(imageNamed: "horizontalDoorUnlock")}
+                    doors[i].sprite.texture = GameArt.texture( "horizontalDoorUnlock")}
                 else
                 {
                     doors[i].type = "completed"
-                    doors[i].sprite.texture = SKTexture(imageNamed: "verticalDoorUnlock")
+                    doors[i].sprite.texture = GameArt.texture( "verticalDoorUnlock")
                 }
                 doors[i].sprite.physicsBody?.categoryBitMask = Constants.doorCategory
             }
@@ -218,11 +218,11 @@ class RoomScene: GameScene {
                 if (doors[i].direction == 0 || doors[i].direction == 2)
                 {
                     doors[i].type = "bossCompleted"
-                    doors[i].sprite.texture = SKTexture(imageNamed: "horizontalDoorBossUnlock")}
+                    doors[i].sprite.texture = GameArt.texture( "horizontalDoorBossUnlock")}
                 else
                 {
                     doors[i].type = "bossCompleted"
-                    doors[i].sprite.texture = SKTexture(imageNamed: "verticalDoorBossUnlock")
+                    doors[i].sprite.texture = GameArt.texture( "verticalDoorBossUnlock")
                 }
                 doors[i].sprite.physicsBody?.categoryBitMask = Constants.doorCategory
             }

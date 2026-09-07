@@ -91,7 +91,7 @@ class BossSprayComponent: ActionComponent {
     {
         let node = ShotNode()
         node.bossShooter = shooter
-        let sprite = SKSpriteNode(imageNamed: "bossGeneratorShot")
+        let sprite = GameArt.sprite("bossGeneratorShot")
         node.addChild(sprite)
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
@@ -202,7 +202,7 @@ class BossElectricFieldComponent: ActionComponent {
         node.bossShooter = shooter
         for i in 0 ..< points.count
         {
-            let sprite = SKSpriteNode(imageNamed: "bossEnergyShot")
+            let sprite = GameArt.sprite("bossEnergyShot")
             node.addChild(sprite)
 //            sprite.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
 //            sprite.physicsBody?.allowsRotation = false
@@ -233,7 +233,7 @@ class BossElectricFieldComponent: ActionComponent {
         node.bossShooter = nil
         for i in 0 ..< points.count
         {
-            let sprite = SKSpriteNode(imageNamed: "bossEnergy")
+            let sprite = GameArt.sprite("bossEnergy")
             sprite.position = points[i]
             node.addChild(sprite)
             
@@ -298,7 +298,7 @@ class BossShotTargetingComponent: ActionComponent {
         node.bossShooter = shooter
         node.zPosition = shooter.node.zPosition - 1
         //let sprite = SKSpriteNode(color: UIColor(red: 77.0/255.0, green: 135.0/255.0, blue: 14.0/255.0, alpha: 1), size: CGSize(width: 5, height: 5))
-        let sprite = SKSpriteNode(imageNamed: self.image)
+        let sprite = GameArt.sprite(self.image)
         node.addChild(sprite)
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
@@ -360,8 +360,8 @@ class BossDragonBreatheComponent: ActionComponent {
         shooter = entity
         for i in 0 ..< 4
         {
-            dragonMouthOpen.append(SKTexture(imageNamed: "dragonMouth\(i+1)"))
-            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), at: 0)
+            dragonMouthOpen.append(GameArt.texture( "dragonMouth\(i+1)"))
+            dragonMouthClose.insert(GameArt.texture( "dragonMouth\(i+1)"), at: 0)
         }
         
     }
@@ -407,7 +407,7 @@ class BossDragonBreatheComponent: ActionComponent {
         let node = ShotNode()
         node.bossShooter = shooter
         node.type = "DragonBreathe"
-        let sprite = SKSpriteNode(imageNamed: String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         node.zPosition = shooter.node.zPosition - 1
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
@@ -483,8 +483,8 @@ class BossDragonFireballComponent: ActionComponent {
         shooter = entity
         for i in 0 ..< 4
         {
-            dragonMouthOpen.append(SKTexture(imageNamed: "dragonMouth\(i+1)"))
-            dragonMouthClose.insert(SKTexture(imageNamed: "dragonMouth\(i+1)"), at: 0)
+            dragonMouthOpen.append(GameArt.texture( "dragonMouth\(i+1)"))
+            dragonMouthClose.insert(GameArt.texture( "dragonMouth\(i+1)"), at: 0)
         }
         super.init()
         let action1 = (SKAction.animate(with: dragonMouthOpen, timePerFrame: 0.125))
@@ -589,11 +589,11 @@ class BossGolemJumpComponent: ActionComponent {
         {
             if (i != 0)
             {
-                golemJumpUp.append(SKTexture(imageNamed: "golemJump\(i)"))
+                golemJumpUp.append(GameArt.texture( "golemJump\(i)"))
             }
             if (i != 8)
             {
-                golemJumpDown.insert(SKTexture(imageNamed: "golemJump\(i)"), at: 0)
+                golemJumpDown.insert(GameArt.texture( "golemJump\(i)"), at: 0)
             }
         }
         //let action1 = (SKAction.animateWithTextures(golemJumpUp, timePerFrame: 0.09))
@@ -784,7 +784,7 @@ class BossGolemRockShoot: ActionComponent {
     {
         let node = ShotNode()
         node.bossShooter = shooter
-        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossGolemRock"), size: Player.entity.sprite.size)
+        let sprite = SKSpriteNode(texture: GameArt.texture( "bossGolemRock"), size: Player.entity.sprite.size)
         node.addChild(sprite)
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
@@ -1025,7 +1025,7 @@ class GolemDropComponent: ActionComponent {
         node.bossShooter = nil
         for i in 0 ..< points.count
         {
-            let sprite = SKSpriteNode(imageNamed: "golemBlock")
+            let sprite = GameArt.sprite("golemBlock")
             sprite.position = points[i]
             sprite.zPosition = bossSprite.zPosition - 1
             node.addChild(sprite)
@@ -1067,11 +1067,11 @@ class BossBarComponent: GKComponent {
     var healthBackgroundSprite: SKSpriteNode!
     init(scene: GameScene) {
         let totalHeight = scene.size.height * 0.04
-        healthBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
-        healthCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
+        healthBackgroundSprite = SKSpriteNode(texture: GameArt.texture( "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
+        healthCropSprite = SKSpriteNode(texture: GameArt.texture( "bossBarTop"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
         healthCropSprite.zPosition = (healthBackgroundSprite.zPosition + 1)
         healthNode.addChild(healthBackgroundSprite)
-        healthNode.addChild(healthCropSprite)
+        addBarFill(healthCropSprite, to: healthNode)
         healthNode.position = CGPoint(x: scene.size.width * 0.7, y: scene.size.height - scene.size.height * 0.07)
         healthBackgroundSprite.anchorPoint = CGPoint(x:0,y:0)
         healthCropSprite.anchorPoint = CGPoint(x:0,y:0)
@@ -1088,10 +1088,10 @@ class BossBarComponent: GKComponent {
     
     func updateBars(_ health: Double, totalHealth: Double)
     {
-        healthCropSprite.size.width = CGFloat(scene.size.width * 0.25 * CGFloat(Double(health)/Double(totalHealth)))
+        updateBarFill(healthCropSprite, value: health, maximum: totalHealth)
         if (health <= 0)
         {
-            healthCropSprite.removeFromParent()
+            healthCropSprite.parent?.removeFromParent()
             healthBackgroundSprite.removeFromParent()
         }
     }

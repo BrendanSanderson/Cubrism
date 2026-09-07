@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+ AA0000000000000000000001 = {isa = PBXBuildFile; fileRef = AA0000000000000000000002; };
 		2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */; };
 		27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27562A571F05AC5D00915990 /* Launch Screen.storyboard */; };
 		276704781F16959100A85D8B /* LevelSelectCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */; };
@@ -73,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+ AA0000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameArt.swift; sourceTree = "<group>"; };
 		2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		27562A571F05AC5D00915990 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		276704771F16959100A85D8B /* LevelSelectCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectCollectionViewController.swift; sourceTree = "<group>"; };
@@ -240,7 +242,8 @@
 			isa = PBXGroup;
 			children = (
 				27562A571F05AC5D00915990 /* Launch Screen.storyboard */,
-				BA20C8CD1C889E0800EE234D /* AppDelegate.swift */,
+				AA0000000000000000000002 /* GameArt.swift */,
+ BA20C8CD1C889E0800EE234D /* AppDelegate.swift */,
 				BAD62F7F1C95F26800B9A5AD /* Constants.swift */,
 				27FC7A341F1699A200F7CE89 /* ViewControllers */,
 				27FC7A331F16999800F7CE89 /* Scenes */,
@@ -464,7 +467,8 @@
 				BA22A8FC1C8E15BB00D52174 /* FloorViewController.swift in Sources */,
 				BAD884541C94D7F30018BDDE /* ProgressBar.swift in Sources */,
 				BA20C8D41C889E0800EE234D /* HomeViewController.swift in Sources */,
-				BA20C8CE1C889E0800EE234D /* AppDelegate.swift in Sources */,
+				AA0000000000000000000001 /* GameArt.swift in Sources */,
+ BA20C8CE1C889E0800EE234D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,6 +24,7 @@ class PlayerShootComponent: GKComponent {
         self.scene = scene
         self.playerNode = pNode
         self.playerSprite = self.playerNode.childNode(withName: "playerSprite")!
+        GameArt.styleJoystick(joystick, aiming: true)
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8), UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.8)))
 
         
@@ -78,7 +79,7 @@ class PlayerShootComponent: GKComponent {
     
     func fire(_ velocity: CGPoint)
     {
-        self.sprite = SKSpriteNode(imageNamed: "playerShot")
+        self.sprite = GameArt.sprite("playerShot")
         self.node = SKNode()
         self.node.position = self.playerSprite.position
         self.node.addChild(self.sprite)
@@ -123,6 +124,7 @@ class PlayerMovementComponent: GKComponent {
         self.scene = scene
         self.node = node
         playerSprite = sprite
+        GameArt.styleJoystick(joystick, aiming: false)
         self.coordinate = self.node.position
         //let joystick = AnalogJoystick(diameter: 100, colors: (UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 0.3), UIColor(red: 255.0/255.0, green: 249.0/255.0, blue: 58.0/255.0, alpha: 0.8)))
         
@@ -185,11 +187,11 @@ class ExpBarComponent: GKComponent {
     var levelLabel: SKLabelNode!
     init(scene: GameScene) {
         let totalHeight = scene.size.height * 0.04
-        expBackgroundSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
-        expCropSprite = SKSpriteNode(texture: SKTexture(imageNamed: "bossBarTop"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
+        expBackgroundSprite = SKSpriteNode(texture: GameArt.texture( "bossBarBottom"), size: CGSize(width: CGFloat(scene.size.width * 0.25), height: totalHeight))
+        expCropSprite = SKSpriteNode(texture: GameArt.texture("experienceFill"), size: CGSize(width: CGFloat(scene.size.width * 0.25),height: totalHeight ))
         expCropSprite.zPosition = (expBackgroundSprite.zPosition + 1)
         expNode.addChild(expBackgroundSprite)
-        expNode.addChild(expCropSprite)
+        addBarFill(expCropSprite, to: expNode)
         expNode.position = CGPoint(x: scene.size.width * 0.05, y: scene.size.height - scene.size.height * 0.07)
         expBackgroundSprite.anchorPoint = CGPoint(x:0,y:0)
         expCropSprite.anchorPoint = CGPoint(x:0,y:0)
@@ -215,7 +217,7 @@ class ExpBarComponent: GKComponent {
     
     func updateBars(_ exp: Int)
     {
-        expCropSprite.size.width = CGFloat(scene.size.width * 0.25 * CGFloat(Double(exp)/Double(Player.expToLevel(Player.level))))
+        updateBarFill(expCropSprite, value: Double(exp), maximum: Double(Player.expToLevel(Player.level)))
         levelLabel.text = String(format: "%i", Player.level)
     }
 }

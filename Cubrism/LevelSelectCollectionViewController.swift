@@ -37,7 +37,7 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         
         self.view.addSubview(self.collectionView!)
         
-        //self.collectionView!.backgroundColor = UIColor(patternImage: UIImage(named:  String(format: "background%i", 1))!)
+        //self.collectionView!.backgroundColor = UIColor(patternImage: GameArt.image(  String(format: "background%i", 1))!)
         self.collectionView!.backgroundColor = UIColor.clear
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -56,7 +56,7 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
         self.view.addSubview(self.pageControl)
         
         
-        backImageView.image = UIImage(named: "backButton")
+        backImageView.image = GameArt.image( "backButton")
         let tapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(LevelSelectCollectionViewController.back(_:)))
         backImageView.isUserInteractionEnabled = true
         backImageView.addGestureRecognizer(tapGestureRecognizer)
@@ -111,17 +111,17 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! LevelCell
-        cell.backgroundColor = UIColor.blue
+        cell.backgroundColor = GameArt.ink
         cell.imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.frame.width, height: cell.frame.height))
         
-        cell.imageView.image = UIImage(named: "background\((indexPath.section + 1))Cell")
+        cell.imageView.image = GameArt.image( "background\((indexPath.section + 1))Cell")
         cell.cellLabel = UILabel(frame: CGRect(x: 0, y: 0, width: cell.frame.width, height: cell.frame.height))
         cell.cellLabel.textAlignment = .center
         cell.cellLabel.text = "\((indexPath.row + 1))"
         
         if !isLevelUnlocked(at: indexPath, completedLevel: UserDefaults.standard.object(forKey: "LevelCompleted") as! Int) {
-            let bottomImage = UIImage(named: "background\((indexPath.section + 1))Cell")
-            let topImage = UIImage(named: "lockedCell")
+            let bottomImage = GameArt.image( "background\((indexPath.section + 1))Cell")
+            let topImage = GameArt.image( "lockedCell")
             
             let size = CGSize(width: topImage!.size.width, height: topImage!.size.height)
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
@@ -234,7 +234,7 @@ class LevelSelectCollectionViewController: UICollectionViewController, UICollect
     {
         for world in 1...numberOfWorlds {
             let imageView = UIImageView()
-            imageView.image = UIImage(named: "background\(world)")
+            imageView.image = GameArt.image( "background\(world)")
             backgroundViews.append(imageView)
             self.collectionView?.addSubview(imageView)
         }

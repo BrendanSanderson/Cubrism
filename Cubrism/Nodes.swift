@@ -57,21 +57,21 @@ class VendorNode: SKSpriteNode {
     {
         if t == "bank"
         {
-            let texture = SKTexture(imageNamed: "bank")
+            let texture = GameArt.texture( "bank")
             super.init(texture: texture, color: UIColor.clear, size: texture.size())
             self.position = CGPoint(x: Constants.w * 0.33, y: Constants.h * 0.8)
             self.type = t
         }
         else if t == "shop"
         {
-            let texture = SKTexture(imageNamed: "merchant")
+            let texture = GameArt.texture( "merchant")
             super.init(texture: texture, color: UIColor.clear, size: texture.size())
             self.position = CGPoint(x: Constants.w * 0.67, y: Constants.h * 0.8)
             self.type = t
         }
         else
         {
-            let texture = SKTexture(imageNamed: "playerIcon")
+            let texture = GameArt.texture( "playerIcon")
             super.init(texture: texture, color: UIColor.clear, size: texture.size())
         }
     }
@@ -104,18 +104,18 @@ class ItemNode: SelectNode {
         {
             let e = i as! Equipment
             let imgName = e.type + String(e.variant)
-            super.init(texture: SKTexture(imageNamed: imgName), size: CGSize(width: 32, height: 32))
+            super.init(texture: GameArt.texture( imgName), size: CGSize(width: 32, height: 32))
         }
         else
         {
-            super.init(texture: SKTexture(imageNamed: i.type), size: CGSize(width: 32, height: 32))
+            super.init(texture: GameArt.texture( i.type), size: CGSize(width: 32, height: 32))
         }
         if i.quantity > 1
         {
             quantity = SKLabelNode(text: String(i.quantity))
             quantity.fontSize = 8
             quantity.fontName = "Arial"
-            quantity.fontColor = UIColor.black
+            quantity.fontColor = GameArt.ivory
             quantity.horizontalAlignmentMode = .right
             
             quantity.position = CGPoint(x: 14, y: -14)
@@ -124,10 +124,10 @@ class ItemNode: SelectNode {
         }
         if item.isKind(of: Equipment.self)
         {
-            tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier\((i as! Equipment).tier)"), color: UIColor.clear, size: self.size)
+            tier = SKSpriteNode(texture: GameArt.texture( "tier\((i as! Equipment).tier)"), color: UIColor.clear, size: self.size)
             if ((i as! Equipment).tier == 0)
             {
-                tier = SKSpriteNode(texture: SKTexture(imageNamed: "tier1"), color: UIColor.clear, size: self.size)
+                tier = SKSpriteNode(texture: GameArt.texture( "tier1"), color: UIColor.clear, size: self.size)
             }
             tier.zPosition = self.zPosition - 1
             self.addChild(tier)
@@ -164,7 +164,7 @@ class SellNode: SKSpriteNode
         cost.zPosition = 1005
         cost.position = CGPoint(x: self.size.width * 0.5, y: 0)
         
-        cubrixel = SKSpriteNode(texture: SKTexture(imageNamed: "Cubrixel"), color: UIColor.clear, size: CGSize(width: self.size.width * 0.2, height: self.size.width * 0.2))
+        cubrixel = SKSpriteNode(texture: GameArt.texture( "Cubrixel"), color: UIColor.clear, size: CGSize(width: self.size.width * 0.2, height: self.size.width * 0.2))
         cubrixel.zPosition = 1005
         cubrixel.position = CGPoint(x: self.size.width * 0.4, y: 0 - (self.size.width * 0.1))
         addChild(cubrixel)

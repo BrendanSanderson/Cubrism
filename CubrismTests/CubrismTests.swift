@@ -13,6 +13,101 @@ import SpriteKit
 
 class CubrismTests: XCTestCase {
 
+    func testStyleCatalogPreservesLogicalSizesAndHasTransparentSprites() throws {
+        let animationNames = (1...4).map { "dragonMouth\($0)" } + (0...8).map { "golemJump\($0)" }
+        let names = GameArt.enemies + GameArt.items + GameArt.bosses + ["playerIcon", "playerCannon"] + animationNames
+        for name in names {
+            let image = try XCTUnwrap(GameArt.image(name), name)
+            XCTAssertEqual(image.size, try XCTUnwrap(UIImage(named: name)).size, name)
+            XCTAssertTrue(GameArt.texture(name) === GameArt.texture(name), "Textures should be cached")
+        }
+        for name in animationNames {
+            XCTAssertNotEqual(GameArt.image(name)?.pngData(), UIImage(named: name)?.pngData(),
+                              "Animation frames must not fall back to the old artwork: \(name)")
+        }
+        for name in ["StyleGun", "StyleEnemies", "StyleItems", "StyleBosses"] {
+            let cg = try XCTUnwrap(UIImage(named: name)?.cgImage)
+            XCTAssertNotEqual(cg.alphaInfo, .none, name)
+            XCTAssertNotEqual(cg.alphaInfo, .noneSkipLast, name)
+        }
+    }
+
+    func testStyleCatalogVisualGallery() throws {
+        let names = ["playerIcon", "playerCannon"] + GameArt.enemies + GameArt.bosses + GameArt.items
+        let image = GameArt.render(CGSize(width: 720, height: 320)) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            for (index, name) in names.enumerated() {
+                let box = CGRect(x: 12 + (index % 8) * 88, y: 12 + (index / 8) * 100, width: 64, height: 64)
+                GameArt.image(name)?.draw(in: box)
+                (name as NSString).draw(at: CGPoint(x: box.minX, y: box.maxY + 2), withAttributes: [.font: UIFont.systemFont(ofSize: 8), .foregroundColor: UIColor.white])
+            }
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "StyleA-catalog"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testBarsKeepTheirTexturesAndLeftCapsWhileDepleting() throws {
+        let scene = GameScene(size: GameScene.arenaSize)
+        let bars = HealthBarComponent(scene: scene, playerNode: SKNode(), sprite: SKSpriteNode())
+        let xp = ExpBarComponent(scene: scene)
+        let boss = BossBarComponent(scene: scene)
+        let sprites = [bars.healthCropSprite, bars.shieldCropSprite, xp.expCropSprite!, boss.healthCropSprite!]
+        let sizes = sprites.map { $0.size }
+        let textures = sprites.map { $0.texture }
+        for fraction in [1.0, 0.75, 0.5, 0.25, 0.05, 0, -0.2, 1.2] {
+            bars.updateBars(Player.shield * fraction, health: Player.health * fraction)
+            xp.updateBars(Int(Double(Player.expToLevel(Player.level)) * fraction))
+            // The boss removes its HUD on death, so exercise zero via the fill helper.
+            updateBarFill(boss.healthCropSprite, value: fraction * 100, maximum: 100)
+            for (index, sprite) in sprites.enumerated() {
+                XCTAssertEqual(sprite.size, sizes[index], "Do not rescale cap or border pixels")
+                XCTAssertTrue(sprite.texture === textures[index])
+                XCTAssertEqual(sprite.anchorPoint, .zero)
+                let crop = try XCTUnwrap(sprite.parent as? SKCropNode)
+                let mask = try XCTUnwrap(crop.maskNode as? SKSpriteNode)
+                XCTAssertEqual(mask.anchorPoint, .zero)
+                XCTAssertEqual(mask.position, .zero)
+                XCTAssertEqual(mask.size.height, sizes[index].height)
+                XCTAssertGreaterThanOrEqual(mask.size.width, 0)
+                XCTAssertLessThanOrEqual(mask.size.width, sizes[index].width)
+                if index != 2 {
+                    XCTAssertEqual(mask.size.width, sizes[index].width * CGFloat(min(1, max(0, fraction))), accuracy: 0.001)
+                }
+                XCTAssertEqual(crop.isHidden, fraction <= 0)
+            }
+        }
+        updateBarFill(bars.shieldCropSprite, value: 1, maximum: 0)
+        XCTAssertTrue(bars.shieldCropSprite.parent!.isHidden)
+        boss.updateBars(0, totalHealth: 100)
+        XCTAssertNil(boss.healthCropSprite.parent?.parent)
+    }
+
+    func testBarFillVisualStates() throws {
+        let scene = GameScene(size: GameScene.arenaSize)
+        let gallery = SKNode()
+        scene.addChild(gallery)
+        for (row, fraction) in [1.0, 0.75, 0.5, 0.25, 0.05, 0].enumerated() {
+            let bars = HealthBarComponent(scene: scene, playerNode: SKNode(), sprite: SKSpriteNode())
+            bars.healthNode.removeFromParent()
+            bars.shieldNode.removeFromParent()
+            gallery.addChild(bars.healthNode)
+            gallery.addChild(bars.shieldNode)
+            let y = CGFloat(5 - row) * 45
+            bars.healthNode.position = CGPoint(x: 70, y: y)
+            bars.shieldNode.position = CGPoint(x: 70, y: y)
+            bars.updateBars(Player.shield * fraction, health: Player.health * fraction)
+
+        }
+        let view = SKView(frame: CGRect(origin: .zero, size: scene.size))
+        let texture = try XCTUnwrap(view.texture(from: gallery))
+        let attachment = XCTAttachment(image: UIImage(cgImage: texture.cgImage()))
+        attachment.name = "Health-and-shield-100-75-50-25-5-0-percent"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testArenaScaleIsIndependentOfWindowSize() {
         let floor = FloorViewController(min: 4, max: 5, level: 1, world: 1)
         floor.loadViewIfNeeded()

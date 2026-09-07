@@ -31,12 +31,14 @@ class PlayerEntity: DynamicEntity {
     {
         super.init()
         
-        sprite = SKSpriteNode (imageNamed: "playerIcon")
-        cannonSprite = SKSpriteNode (imageNamed: "playerCannon")
+        sprite = GameArt.sprite("playerIcon")
+        cannonSprite = GameArt.sprite("playerCannon")
         sprite.name = "playerSprite"
         sprite.position = position
         sprite.zPosition = 100
         cannonSprite.zPosition = 101
+        cannonSprite.size = CGSize(width: 25, height: 20)
+        cannonSprite.anchorPoint = CGPoint(x: 0.36, y: 0.5)
         cannonSprite.zRotation = CGFloat(Double.pi/2.0)
         node.addChild(sprite)
         sprite.addChild(cannonSprite)
