@@ -16,7 +16,7 @@ Production source images live in `Cubrism/Assets.xcassets/StyleA`:
 
 Sprite cells require genuine alpha, equal grid cells and transparent gutters. The catalog trims those gutters once. For a replacement, preserve the sheet ordering; for a new family, add its mapping and an original logical size. Legacy images remain as fallbacks and dimensional references. Generated-source provenance is in `art-sources.json`.
 
-Dragon mouth and golem jump frames derive from the new boss art, so attack/movement animations stay in the selected style. Panels, buttons, doors, tier rims, projectiles, player chassis and HUD are drawn at runtime for crisp scaling. SF Symbols provide interface icons. Health and shield artwork remains at full width while crop masks reveal the current fill. A separate outline preserves the capsule shape at low or zero health.
+Dragon mouth and golem jump frames derive from the new boss art, so attack/movement animations stay in the selected style. Panels, buttons, doors, tier rims, player chassis and HUD are drawn at runtime for crisp scaling. SF Symbols provide interface icons. Health and shield artwork remains at full width while crop masks reveal the current fill. A separate outline preserves the capsule shape at low or zero health.
 
 ## Verification
 
@@ -35,3 +35,9 @@ Run with Xcode 16.4 and the `CubrismAcceptance` scheme, selecting only `CubrismP
 - Structured code review: no actionable findings in the final review.
 
 The video uses an automated pilot through the game's input handling. It retains failed attempts; only simulator footage after the final result is trimmed. It does not substitute a completion-screen fixture for a combat victory. Physical device input testing is not claimed.
+
+## Follow-up on 2026-09-07
+
+Restored the original bundled ammunition and projectile effect artwork, including the tracking bullet. Replaced the level picker with an explicit two-row page layout, reusable readable tiles, lock/cleared labels and Previous/Next world controls. Pages retain their position through layout updates; unlocking still uses global progress while labels remain 1–10 within each world. Catalyst consumes gameplay keys while the menu is open and clears them on return.
+
+Validation: 34 checks passed on Mac Catalyst and iPhone simulator, including exact original projectile image comparisons, page geometry, and presenting the menu, rejecting a locked choice and launching the selected unlocked world/floor. Final structured review had no actionable findings.

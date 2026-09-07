@@ -244,6 +244,44 @@ class CubrismTests: XCTestCase {
         XCTAssertEqual(controller.collectionView.collectionViewLayout.collectionViewContentSize.width, expectedWidth, accuracy: 1.0)
     }
 
+    func testOriginalProjectileArtAndMenuPaging() throws {
+        for name in ["playerShot", "enemyShot", "enemyTrackingShot", "enemyTrippleShot", "bossDragonFireball", "bombLit1"] {
+            XCTAssertEqual(try XCTUnwrap(GameArt.image(name)).pngData(), try XCTUnwrap(UIImage(named: name)).pngData(), name)
+        }
+        for size in [CGSize(width: 844, height: 390), CGSize(width: 1440, height: 900)] {
+            let controller = LevelSelectCollectionViewController()
+            controller.loadViewIfNeeded()
+            controller.view.frame = CGRect(origin: .zero, size: size)
+            controller.viewDidLayoutSubviews()
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            controller.collectionView.layoutIfNeeded()
+            controller.pageControl.currentPage = 2
+            controller.pageControlChanged(controller.pageControl)
+            controller.collectionView.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let offset = CGPoint(x: controller.collectionView.bounds.width * 2, y: 0)
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            XCTAssertEqual(controller.collectionView.bounds.origin, offset, "Layout must not reset paging")
+            let layout = controller.collectionView.collectionViewLayout
+            for item in 0..<10 {
+                let frame = try XCTUnwrap(layout.layoutAttributesForItem(at: IndexPath(item: item, section: 2))).frame
+                XCTAssertTrue(CGRect(x: offset.x, y: 0, width: controller.collectionView.bounds.width, height: controller.collectionView.bounds.height).contains(frame), "offset=\(offset) bounds=\(controller.collectionView.bounds) frame=\(frame)")
+            }
+            controller.pageControl.currentPage = 0
+            controller.pageControlChanged(controller.pageControl)
+            controller.collectionView.layoutIfNeeded()
+            let image = UIGraphicsImageRenderer(size: size).image { context in
+                controller.view.layer.render(in: context.cgContext)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "Level selection \(Int(size.width))x\(Int(size.height))"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
     func testLevelSelectUnlocksUsingGlobalLevelNumber() {
         let controller = LevelSelectCollectionViewController()
 
@@ -552,6 +590,31 @@ class CubrismPlaythroughTests: XCTestCase {
         XCTAssertNil(home.presentedViewController)
         XCTAssertTrue(home.skView.scene is HomeScene)
         XCTAssertNil(Player.currentViewController)
+    }
+
+    func testLevelSelectionStartsChosenFloor() throws {
+        guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else { throw XCTSkip("Acceptance scheme required") }
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let home = try XCTUnwrap(window.rootViewController as? HomeViewController)
+        let defaults = UserDefaults.standard
+        let saved = defaults.object(forKey: "LevelCompleted")
+        defer {
+            home.dismiss(animated: false)
+            if let saved = saved { defaults.set(saved, forKey: "LevelCompleted") }
+            else { defaults.removeObject(forKey: "LevelCompleted") }
+        }
+        defaults.set(10, forKey: "LevelCompleted")
+        let menu = try XCTUnwrap(home.levelSelectView)
+        home.present(menu, animated: false)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        menu.collectionView(menu.collectionView, didSelectItemAt: IndexPath(item: 1, section: 1))
+        XCTAssertTrue(home.presentedViewController === menu, "Locked floor must not start")
+        menu.collectionView(menu.collectionView, didSelectItemAt: IndexPath(item: 0, section: 1))
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
+        XCTAssertTrue(home.presentedViewController === home.floorView)
+        XCTAssertEqual(home.floorView.world, 2)
+        XCTAssertEqual(home.floorView.level, 1)
+        XCTAssertNotNil(home.floorView.scene)
     }
 
     func testFirstTwoFloorsThroughCombatAndDoors() throws {

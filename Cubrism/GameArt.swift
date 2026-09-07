@@ -29,6 +29,11 @@ enum GameArt {
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }
         let original = UIImage(named: name)
+        // Keep the original projectile silhouettes, especially the tracking bullet.
+        if name.lowercased().contains("shot") || name.hasPrefix("bombLit") ||
+            ["bossDragonFireball", "bossGolemRock", "enemySludge"].contains(name) {
+            return original
+        }
         let size = original?.size ?? CGSize(width: 32, height: 32)
         // Attack and movement frames must use the same art as the idle boss.
         if name.hasPrefix("dragonMouth"), let frame = Int(name.dropFirst("dragonMouth".count)),
@@ -173,17 +178,8 @@ enum GameArt {
                 }
             }
         }
-        if name == "golemBlock" || name == "bossGolemRock" {
+        if name == "golemBlock" {
             return render(size) { rect in panel(rect, fill: gold, radius: 2) }
-        }
-        if name.hasPrefix("bombLit") || name == "enemySludge" {
-            return render(size) { rect in
-                let frame = Int(name.last.map(String.init) ?? "") ?? 1
-                let color: UIColor = name == "enemySludge" ? .systemPurple : frame == 2 ? .systemOrange : .systemRed
-                color.withAlphaComponent(0.7).setFill()
-                UIBezierPath(ovalIn: rect.insetBy(dx: 1, dy: 1)).fill()
-                symbol(name == "enemySludge" ? "drop.fill" : "exclamationmark", in: rect.insetBy(dx: rect.width * 0.25, dy: rect.height * 0.25))
-            }
         }
         if name == "experienceFill" { return bar(size:CGSize(width:188,height:15),color:gold) }
         if name.contains("Bar") {
@@ -217,13 +213,6 @@ enum GameArt {
             let s = text.size(withAttributes:attrs)
             text.draw(at:CGPoint(x:(rect.width-s.width)/2,y:(rect.height-s.height)/2),withAttributes:attrs)
         } }
-        if name.lowercased().contains("shot") || name == "bossDragonFireball" {
-            return render(size) { rect in
-                let color: UIColor = name == "playerShot" ? emerald : name.contains("Dragon") ? .systemOrange : .systemPink
-                color.setFill(); UIBezierPath(roundedRect:rect.insetBy(dx:0.5,dy:0.5),cornerRadius:min(rect.width,rect.height)/3).fill()
-                ivory.setFill(); UIBezierPath(ovalIn:rect.insetBy(dx:rect.width*0.3,dy:rect.height*0.3)).fill()
-            }
-        }
         return nil
     }
 }
