@@ -16,6 +16,13 @@ enum GameArt {
     static let items = ["Pulsar", "Special Pulsar", "Shield", "Armor Core", "Power Core", "Attachment"]
     static let bosses = ["generatorBoss", "dragonBoss", "golemBoss", "bossEnergy"]
 
+    /// Common equipment uses the white family icon. Saved cosmetic variants are
+    /// independent of rarity and retain their original 0...3 identifiers.
+    static func imageName(for item: Item) -> String {
+        guard let equipment = item as? Equipment, equipment.tier > 1 else { return item.type }
+        return equipment.type + String(equipment.variant)
+    }
+
     static func texture(_ name: String) -> SKTexture {
         if let cached = textures[name] { return cached }
         let result = SKTexture(image: image(name) ?? UIImage())
@@ -73,15 +80,29 @@ enum GameArt {
         }
         if name == "playerCannon" { source = cell("StyleGun", 0, columns: 1, rows: 1) }
         let family = items.first { name == $0 || (name.hasPrefix($0) && Int(name.dropFirst($0.count)) != nil) }
-        if let family = family, let index = items.firstIndex(of: family) { source = cell("StyleItems", index, columns: 3, rows: 2) }
+        if let family = family {
+            let suffix = String(name.dropFirst(family.count))
+            let variant = Int(suffix)
+            if suffix.isEmpty || (variant.map { (0...3).contains($0) } ?? false) {
+                let sheet = "Style" + family.replacingOccurrences(of: " ", with: "")
+                // Atlas order: white, green, blue, purple, orange, empty.
+                source = cell(sheet, variant.map { $0 + 1 } ?? 0, columns: 3, rows: 2)
+            }
+        }
         if let source = source {
-            let result = render(size) { rect in
-                source.draw(in: rect)
-                if let family = family, let variant = Int(name.dropFirst(family.count)) {
-                    // Variant is distinct from rarity: a small inset marker, never a new save key.
-                    let c = tiers[max(0, min(3, variant))]
-                    c.setFill()
-                    UIBezierPath(roundedRect: CGRect(x: rect.width * 0.70, y: rect.height * 0.72, width: rect.width * 0.22, height: rect.height * 0.14), cornerRadius: 2).fill()
+            // Keep the same point size but enough pixels for enlarged item details.
+            let scale: CGFloat = family == nil ? 3 : max(3, 288 / max(size.width, size.height))
+            let result = render(size, scale: scale) { rect in
+                if family != nil {
+                    // Preserve gun/shield proportions within the existing square slot.
+                    // A small gutter keeps the silhouette clear of the rarity frame.
+                    let bounds = rect.insetBy(dx: rect.width * 0.04, dy: rect.height * 0.04)
+                    let scale = min(bounds.width / source.size.width, bounds.height / source.size.height)
+                    let fitted = CGSize(width: source.size.width * scale, height: source.size.height * scale)
+                    source.draw(in: CGRect(x: rect.midX - fitted.width / 2, y: rect.midY - fitted.height / 2,
+                                           width: fitted.width, height: fitted.height))
+                } else {
+                    source.draw(in: rect)
                 }
             }
             images[name] = result
@@ -90,9 +111,9 @@ enum GameArt {
         if let result = interface(name, size: size) { images[name] = result; return result }
         return original
     }
-    static func render(_ size: CGSize, draw: (CGRect) -> Void) -> UIImage {
+    static func render(_ size: CGSize, scale: CGFloat = 3, draw: (CGRect) -> Void) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
-        format.scale = 3
+        format.scale = scale
         return UIGraphicsImageRenderer(size: size, format: format).image { _ in draw(CGRect(origin: .zero, size: size)) }
     }
     private static func cell(_ sheet: String, _ index: Int, columns: Int, rows: Int) -> UIImage? {

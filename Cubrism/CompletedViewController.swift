@@ -62,7 +62,7 @@ class CompletedViewController: UIViewController {
             row.axis = .horizontal
             row.alignment = .center
             row.spacing = 16
-            let icon = UIImageView(image: GameArt.image( item.type))
+            let icon = UIImageView(image: GameArt.image(GameArt.imageName(for: item)))
             icon.contentMode = .scaleAspectFit
             icon.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([

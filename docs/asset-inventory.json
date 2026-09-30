@@ -1,0 +1,4665 @@
+{
+  "catalog": "Cubrism/Assets.xcassets",
+  "imageSets": [
+    {
+      "name": "horizontalDoor",
+      "directory": "Cubrism/Assets.xcassets/Doors/horizontalDoor.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoor.imageset/horiz1.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 6347
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoor.imageset/horiz2.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7285
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoor.imageset/horiz3.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20015
+        }
+      ]
+    },
+    {
+      "name": "horizontalDoorBossLock",
+      "directory": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossLock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossLock.imageset/bossLockHorizX1.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5985
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossLock.imageset/bossLockHorizX2.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7285
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossLock.imageset/bossLockHorizX3.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20015
+        }
+      ]
+    },
+    {
+      "name": "horizontalDoorBossUnlock",
+      "directory": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossUnlock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossUnlock.imageset/bossUnlockHorizX1.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5929
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossUnlock.imageset/bossUnlockHorizX2.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7689
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorBossUnlock.imageset/bossUnlockHorizX3.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20017
+        }
+      ]
+    },
+    {
+      "name": "horizontalDoorLock",
+      "directory": "Cubrism/Assets.xcassets/Doors/horizontalDoorLock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorLock.imageset/horiz1Lock.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 6150
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorLock.imageset/horiz2Lock.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7122
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorLock.imageset/horiz3Lock.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20018
+        }
+      ]
+    },
+    {
+      "name": "horizontalDoorUnlock",
+      "directory": "Cubrism/Assets.xcassets/Doors/horizontalDoorUnlock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorUnlock.imageset/horiz1Unlock.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5910
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorUnlock.imageset/horiz2Unlock.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7411
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/horizontalDoorUnlock.imageset/horiz3Unlock.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20019
+        }
+      ]
+    },
+    {
+      "name": "verticalDoor",
+      "directory": "Cubrism/Assets.xcassets/Doors/verticalDoor.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoor.imageset/vert1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6514
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoor.imageset/vert2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            128
+          ],
+          "mode": "RGBA",
+          "bytes": 7569
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoor.imageset/vert3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            192
+          ],
+          "mode": "RGBA",
+          "bytes": 5963
+        }
+      ]
+    },
+    {
+      "name": "verticalDoorBossLock",
+      "directory": "Cubrism/Assets.xcassets/Doors/verticalDoorBossLock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossLock.imageset/bossLockVertX1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6013
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossLock.imageset/bossLockVertX2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            128
+          ],
+          "mode": "RGBA",
+          "bytes": 7338
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossLock.imageset/bossLockVertX3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            192
+          ],
+          "mode": "RGBA",
+          "bytes": 5967
+        }
+      ]
+    },
+    {
+      "name": "verticalDoorBossUnlock",
+      "directory": "Cubrism/Assets.xcassets/Doors/verticalDoorBossUnlock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossUnlock.imageset/bossUnlockVertX1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6000
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossUnlock.imageset/bossUnlockVertX2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            128
+          ],
+          "mode": "RGBA",
+          "bytes": 7534
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorBossUnlock.imageset/bossUnlockVertX3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            192
+          ],
+          "mode": "RGBA",
+          "bytes": 5967
+        }
+      ]
+    },
+    {
+      "name": "verticalDoorLock",
+      "directory": "Cubrism/Assets.xcassets/Doors/verticalDoorLock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorLock.imageset/vert1Lock.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6291
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorLock.imageset/vert2Lock.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            128
+          ],
+          "mode": "RGBA",
+          "bytes": 7167
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorLock.imageset/vert3Lock.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            192
+          ],
+          "mode": "RGBA",
+          "bytes": 5968
+        }
+      ]
+    },
+    {
+      "name": "verticalDoorUnlock",
+      "directory": "Cubrism/Assets.xcassets/Doors/verticalDoorUnlock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorUnlock.imageset/vert1Unlock.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5999
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorUnlock.imageset/vert2Unlock.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            128
+          ],
+          "mode": "RGBA",
+          "bytes": 7547
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Doors/verticalDoorUnlock.imageset/vert3Unlock.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            192
+          ],
+          "mode": "RGBA",
+          "bytes": 5952
+        }
+      ]
+    },
+    {
+      "name": "bombLit1",
+      "directory": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit1.imageset/bomb1x1.png",
+          "scale": "1x",
+          "pixels": [
+            16,
+            16
+          ],
+          "mode": "RGBA",
+          "bytes": 5055
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit1.imageset/bomb1x2.png",
+          "scale": "2x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5842
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit1.imageset/bomb1x3.png",
+          "scale": "3x",
+          "pixels": [
+            48,
+            48
+          ],
+          "mode": "RGBA",
+          "bytes": 21251
+        }
+      ]
+    },
+    {
+      "name": "bombLit2",
+      "directory": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit2.imageset/bomb2x1.png",
+          "scale": "1x",
+          "pixels": [
+            16,
+            16
+          ],
+          "mode": "RGBA",
+          "bytes": 5087
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit2.imageset/bomb2x2.png",
+          "scale": "2x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5892
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit2.imageset/bomb2x3.png",
+          "scale": "3x",
+          "pixels": [
+            48,
+            48
+          ],
+          "mode": "RGBA",
+          "bytes": 21288
+        }
+      ]
+    },
+    {
+      "name": "bombLit3",
+      "directory": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit3.imageset/bomb3x1.png",
+          "scale": "1x",
+          "pixels": [
+            16,
+            16
+          ],
+          "mode": "RGBA",
+          "bytes": 5075
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit3.imageset/bomb3x2.png",
+          "scale": "2x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5870
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bombLit3.imageset/bomb3x3.png",
+          "scale": "3x",
+          "pixels": [
+            48,
+            48
+          ],
+          "mode": "RGBA",
+          "bytes": 21299
+        }
+      ]
+    },
+    {
+      "name": "bomberShot",
+      "directory": "Cubrism/Assets.xcassets/Enemies/bomb/bomberShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bomberShot.imageset/bombx1.png",
+          "scale": "1x",
+          "pixels": [
+            16,
+            16
+          ],
+          "mode": "RGBA",
+          "bytes": 4996
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bomberShot.imageset/bombx2.png",
+          "scale": "2x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5696
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomb/bomberShot.imageset/bombx3.png",
+          "scale": "3x",
+          "pixels": [
+            48,
+            48
+          ],
+          "mode": "RGBA",
+          "bytes": 21165
+        }
+      ]
+    },
+    {
+      "name": "bomberEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/bomberEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomberEnemy.imageset/bomberCubrismx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4882
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomberEnemy.imageset/bomberCubrismx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5259
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/bomberEnemy.imageset/bomberCubrismx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19965
+        }
+      ]
+    },
+    {
+      "name": "damaged25",
+      "directory": "Cubrism/Assets.xcassets/Enemies/damaged25.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged25.imageset/25% x 1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 344
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged25.imageset/25% x 2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5926
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged25.imageset/25% x 3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 9182
+        }
+      ]
+    },
+    {
+      "name": "damaged50",
+      "directory": "Cubrism/Assets.xcassets/Enemies/damaged50.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged50.imageset/50% x 1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 251
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged50.imageset/50% x 2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 3432
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged50.imageset/50% x 3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5350
+        }
+      ]
+    },
+    {
+      "name": "damaged75",
+      "directory": "Cubrism/Assets.xcassets/Enemies/damaged75.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged75.imageset/75% x 1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 163
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged75.imageset/75% x 2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 1779
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/damaged75.imageset/75% x 3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 2661
+        }
+      ]
+    },
+    {
+      "name": "dashEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/dashEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/dashEnemy.imageset/DashEnemyx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5327
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/dashEnemy.imageset/DashEnemyx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5451
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/dashEnemy.imageset/DashEnemyx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19829
+        }
+      ]
+    },
+    {
+      "name": "enemyRingShot",
+      "directory": "Cubrism/Assets.xcassets/Enemies/enemyRingShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyRingShot.imageset/ringShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4829
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyRingShot.imageset/ringShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5275
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyRingShot.imageset/ringShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20361
+        }
+      ]
+    },
+    {
+      "name": "enemyShot",
+      "directory": "Cubrism/Assets.xcassets/Enemies/enemyShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyShot.imageset/enemyShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4509
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyShot.imageset/enemyShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5036
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyShot.imageset/enemyShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20215
+        }
+      ]
+    },
+    {
+      "name": "enemySludge",
+      "directory": "Cubrism/Assets.xcassets/Enemies/enemySludge.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemySludge.imageset/enemySmudgex1.png",
+          "scale": "1x",
+          "pixels": [
+            16,
+            14
+          ],
+          "mode": "RGBA",
+          "bytes": 5484
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemySludge.imageset/enemySmudgex2-1.png",
+          "scale": "2x",
+          "pixels": [
+            32,
+            28
+          ],
+          "mode": "RGBA",
+          "bytes": 6903
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemySludge.imageset/enemySmudgex3.png",
+          "scale": "3x",
+          "pixels": [
+            48,
+            42
+          ],
+          "mode": "RGBA",
+          "bytes": 21808
+        }
+      ]
+    },
+    {
+      "name": "enemyTrackingShot",
+      "directory": "Cubrism/Assets.xcassets/Enemies/enemyTrackingShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrackingShot.imageset/enemyTrackingShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            25,
+            15
+          ],
+          "mode": "RGBA",
+          "bytes": 4940
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrackingShot.imageset/enemyTrackingShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            50,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 6054
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrackingShot.imageset/enemyTrackingShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            75,
+            45
+          ],
+          "mode": "RGBA",
+          "bytes": 21116
+        }
+      ]
+    },
+    {
+      "name": "enemyTrippleShot",
+      "directory": "Cubrism/Assets.xcassets/Enemies/enemyTrippleShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrippleShot.imageset/trippleShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4981
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrippleShot.imageset/trippleShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5452
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/enemyTrippleShot.imageset/trippleShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20589
+        }
+      ]
+    },
+    {
+      "name": "golemBlock",
+      "directory": "Cubrism/Assets.xcassets/Enemies/golemBlock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/golemBlock.imageset/golemBlockx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 6456
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/golemBlock.imageset/golemBlockx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 9093
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/golemBlock.imageset/golemBlockx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 24448
+        }
+      ]
+    },
+    {
+      "name": "meleeEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/meleeEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/meleeEnemy.imageset/enemyCubrism newx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4945
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/meleeEnemy.imageset/enemyCubrism newx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5207
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/meleeEnemy.imageset/enemyCubrism newx3.1.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6331
+        }
+      ]
+    },
+    {
+      "name": "rangeEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/rangeEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeEnemy.imageset/rangeCubrismx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4903
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeEnemy.imageset/rangeCubrismx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5290
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeEnemy.imageset/rangeCubrismx3.png.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19838
+        }
+      ]
+    },
+    {
+      "name": "rangeRingEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/rangeRingEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeRingEnemy.imageset/rangeRingCubrismx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4793
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeRingEnemy.imageset/rangeRingCubrismx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5246
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeRingEnemy.imageset/rangeRingCubrismx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19800
+        }
+      ]
+    },
+    {
+      "name": "rangeTrackingEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/rangeTrackingEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrackingEnemy.imageset/rangeTrackingCubrism x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5044
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrackingEnemy.imageset/rangeTrackingCubrism x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5372
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrackingEnemy.imageset/rangeTrackingCubrism x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19828
+        }
+      ]
+    },
+    {
+      "name": "rangeTrippleEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/rangeTrippleEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrippleEnemy.imageset/TrippleShootEnemyx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4935
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrippleEnemy.imageset/TrippleShootEnemyx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5235
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/rangeTrippleEnemy.imageset/TrippleShootEnemyx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19837
+        }
+      ]
+    },
+    {
+      "name": "sludgeEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/sludgeEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/sludgeEnemy.imageset/sludgeCubrismx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 4940
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/sludgeEnemy.imageset/sludgeCubrismx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5289
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/sludgeEnemy.imageset/sludgeCubrismx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19841
+        }
+      ]
+    },
+    {
+      "name": "suicideEnemy",
+      "directory": "Cubrism/Assets.xcassets/Enemies/suicideEnemy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/suicideEnemy.imageset/suicideCubrismx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5176
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/suicideEnemy.imageset/suicideCubrismx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5338
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Enemies/suicideEnemy.imageset/suicideCubrismx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 19812
+        }
+      ]
+    },
+    {
+      "name": "Armor Core",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Armor Core.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core.imageset/ArmorCore-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26296
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core.imageset/ArmorCore-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26296
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core.imageset/ArmorCore.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26296
+        }
+      ]
+    },
+    {
+      "name": "Armor Core0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Armor Core0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core0.imageset/ArmorCore4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2684
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core0.imageset/ArmorCore4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6840
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core0.imageset/ArmorCore4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 11114
+        }
+      ]
+    },
+    {
+      "name": "Armor Core1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Armor Core1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core1.imageset/ArmorCore1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2692
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core1.imageset/ArmorCore1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6893
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core1.imageset/ArmorCore1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 12013
+        }
+      ]
+    },
+    {
+      "name": "Armor Core2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Armor Core2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core2.imageset/ArmorCore2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2561
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core2.imageset/ArmorCore2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6673
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core2.imageset/ArmorCore2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 11605
+        }
+      ]
+    },
+    {
+      "name": "Armor Core3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Armor Core3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core3.imageset/ArmorCore3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2649
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core3.imageset/ArmorCore3x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6944
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Armor Core3.imageset/ArmorCore3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 11653
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Attachment.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment.imageset/Attachment-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 21973
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment.imageset/Attachment-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 21973
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment.imageset/Attachment.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 21973
+        }
+      ]
+    },
+    {
+      "name": "Attachment0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Attachment0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment0.imageset/Attachment4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2603
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment0.imageset/Attachment4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5920
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment0.imageset/Attachment4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5349
+        }
+      ]
+    },
+    {
+      "name": "Attachment1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Attachment1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment1.imageset/Attachment1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2449
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment1.imageset/Attachment1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5672
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment1.imageset/Attachment1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5465
+        }
+      ]
+    },
+    {
+      "name": "Attachment2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Attachment2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment2.imageset/Attachment2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2454
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment2.imageset/Attachment2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5631
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment2.imageset/Attachment2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5327
+        }
+      ]
+    },
+    {
+      "name": "Attachment3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Attachment3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment3.imageset/Attachment3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2669
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment3.imageset/Attachment3x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 6063
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Attachment3.imageset/Attachment3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5287
+        }
+      ]
+    },
+    {
+      "name": "Cubrixel",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Cubrixel.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Cubrixel.imageset/Cubrixels.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23518
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Cubrixel.imageset/Cubrixels-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23518
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Cubrixel.imageset/Cubrixels-2.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23518
+        }
+      ]
+    },
+    {
+      "name": "Power Core",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Power Core.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core.imageset/Energy Core-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26860
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core.imageset/Energy Core-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26860
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core.imageset/Energy Core.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26860
+        }
+      ]
+    },
+    {
+      "name": "Power Core0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Power Core0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core0.imageset/Energy Core4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 3185
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core0.imageset/Energy Core4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 8928
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core0.imageset/Energy Core4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 12175
+        }
+      ]
+    },
+    {
+      "name": "Power Core1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Power Core1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core1.imageset/Energy Core1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 3033
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core1.imageset/Energy Core1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 8046
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core1.imageset/Energy Core1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 10735
+        }
+      ]
+    },
+    {
+      "name": "Power Core2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Power Core2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core2.imageset/Energy Core2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2963
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core2.imageset/Energy Core2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 7765
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core2.imageset/Energy Core2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 9671
+        }
+      ]
+    },
+    {
+      "name": "Power Core3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Power Core3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core3.imageset/Energy Core3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 3159
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core3.imageset/Energy Core3x3 copy-1.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 8171
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Power Core3.imageset/Energy Core3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 8735
+        }
+      ]
+    },
+    {
+      "name": "Pulsar",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Pulsar.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar.imageset/puslar-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar.imageset/puslar-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar.imageset/puslar.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        }
+      ]
+    },
+    {
+      "name": "Pulsar0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Pulsar0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar0.imageset/puslar4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2095
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar0.imageset/puslar4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4717
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar0.imageset/puslar4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5565
+        }
+      ]
+    },
+    {
+      "name": "Pulsar1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Pulsar1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar1.imageset/puslar1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2085
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar1.imageset/puslar1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4841
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar1.imageset/puslar1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 7157
+        }
+      ]
+    },
+    {
+      "name": "Pulsar2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Pulsar2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar2.imageset/puslar2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2061
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar2.imageset/puslar2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4785
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar2.imageset/puslar2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6466
+        }
+      ]
+    },
+    {
+      "name": "Pulsar3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Pulsar3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar3.imageset/puslar3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2109
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar3.imageset/puslar3x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4779
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Pulsar3.imageset/puslar3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6036
+        }
+      ]
+    },
+    {
+      "name": "Shield",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Shield.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield.imageset/shield-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20086
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield.imageset/shield-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20086
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield.imageset/shield.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20086
+        }
+      ]
+    },
+    {
+      "name": "Shield0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Shield0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield0.imageset/shield4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 1860
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield0.imageset/shield4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 3632
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield0.imageset/shield4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 3345
+        }
+      ]
+    },
+    {
+      "name": "Shield1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Shield1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield1.imageset/shield1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 1863
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield1.imageset/shield1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 3605
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield1.imageset/shield1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 3377
+        }
+      ]
+    },
+    {
+      "name": "Shield2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Shield2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield2.imageset/shield2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 1875
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield2.imageset/shield2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 3541
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield2.imageset/shield2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 3352
+        }
+      ]
+    },
+    {
+      "name": "Shield3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Shield3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield3.imageset/shield3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 1946
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield3.imageset/shield3x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 3816
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Shield3.imageset/shield3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 3345
+        }
+      ]
+    },
+    {
+      "name": "Special Pulsar",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Special Pulsar.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar.imageset/puslar-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar.imageset/puslar-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar.imageset/puslar.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23646
+        }
+      ]
+    },
+    {
+      "name": "Special Pulsar0",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Special Pulsar0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar0.imageset/puslar4x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2095
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar0.imageset/puslar4x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4717
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar0.imageset/puslar4x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 5565
+        }
+      ]
+    },
+    {
+      "name": "Special Pulsar1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Special Pulsar1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar1.imageset/puslar1x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2085
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar1.imageset/puslar1x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4841
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar1.imageset/puslar1x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 7157
+        }
+      ]
+    },
+    {
+      "name": "Special Pulsar2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Special Pulsar2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar2.imageset/puslar2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2061
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar2.imageset/puslar2x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6466
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar2.imageset/puslar2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6466
+        }
+      ]
+    },
+    {
+      "name": "Special Pulsar3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/Special Pulsar3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar3.imageset/puslar3x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2109
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar3.imageset/puslar3x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 4779
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/Special Pulsar3.imageset/puslar3x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 6036
+        }
+      ]
+    },
+    {
+      "name": "noEquipment",
+      "directory": "Cubrism/Assets.xcassets/Equipment/noEquipment.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/noEquipment.imageset/nonex3-2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20076
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/noEquipment.imageset/nonex3-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20076
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/noEquipment.imageset/nonex3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20076
+        }
+      ]
+    },
+    {
+      "name": "tier1",
+      "directory": "Cubrism/Assets.xcassets/Equipment/tier1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier1.imageset/tier1.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20019
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier1.imageset/tier1-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20019
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier1.imageset/tier1-2.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20019
+        }
+      ]
+    },
+    {
+      "name": "tier2",
+      "directory": "Cubrism/Assets.xcassets/Equipment/tier2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier2.imageset/tier2.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20003
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier2.imageset/tier2-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20003
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier2.imageset/tier2-2.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20003
+        }
+      ]
+    },
+    {
+      "name": "tier3",
+      "directory": "Cubrism/Assets.xcassets/Equipment/tier3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier3.imageset/tier3.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20060
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier3.imageset/tier3-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20060
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier3.imageset/tier3-2.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20060
+        }
+      ]
+    },
+    {
+      "name": "tier4",
+      "directory": "Cubrism/Assets.xcassets/Equipment/tier4.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier4.imageset/tier4.png",
+          "scale": "1x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20149
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier4.imageset/tier4-1.png",
+          "scale": "2x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20149
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/Equipment/tier4.imageset/tier4-2.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 20149
+        }
+      ]
+    },
+    {
+      "name": "StyleArmorCore",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleArmorCore.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleArmorCore.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 2073708
+        }
+      ]
+    },
+    {
+      "name": "StyleAttachment",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleAttachment.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleAttachment.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 1914839
+        }
+      ]
+    },
+    {
+      "name": "StyleBosses",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleBosses.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleBosses.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1254,
+            1254
+          ],
+          "mode": "RGBA",
+          "bytes": 1417203
+        }
+      ]
+    },
+    {
+      "name": "StyleEnemies",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleEnemies.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleEnemies.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1254,
+            1254
+          ],
+          "mode": "RGBA",
+          "bytes": 1504727
+        }
+      ]
+    },
+    {
+      "name": "StyleFloor",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleFloor.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleFloor.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 2071118
+        }
+      ]
+    },
+    {
+      "name": "StyleGun",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleGun.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleGun.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1254,
+            1254
+          ],
+          "mode": "RGBA",
+          "bytes": 706930
+        }
+      ]
+    },
+    {
+      "name": "StylePowerCore",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StylePowerCore.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StylePowerCore.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 2145993
+        }
+      ]
+    },
+    {
+      "name": "StylePulsar",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StylePulsar.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StylePulsar.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 1648392
+        }
+      ]
+    },
+    {
+      "name": "StyleShield",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleShield.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleShield.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 1633332
+        }
+      ]
+    },
+    {
+      "name": "StyleSpecialPulsar",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleSpecialPulsar.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleSpecialPulsar.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1536,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 1759777
+        }
+      ]
+    },
+    {
+      "name": "backButton",
+      "directory": "Cubrism/Assets.xcassets/backButton.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backButton.imageset/backx1.png",
+          "scale": "1x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 2260
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backButton.imageset/backx2.png",
+          "scale": "2x",
+          "pixels": [
+            60,
+            60
+          ],
+          "mode": "RGBA",
+          "bytes": 4785
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backButton.imageset/backx3.png",
+          "scale": "3x",
+          "pixels": [
+            90,
+            90
+          ],
+          "mode": "RGBA",
+          "bytes": 6500
+        }
+      ]
+    },
+    {
+      "name": "background1",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1.imageset/backgroundx1.jpg",
+          "scale": "1x",
+          "pixels": [
+            480,
+            320
+          ],
+          "mode": "RGB",
+          "bytes": 20413
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1.imageset/backgroundx2.jpg",
+          "scale": "2x",
+          "pixels": [
+            1472,
+            828
+          ],
+          "mode": "RGB",
+          "bytes": 73496
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1.imageset/backgroundx3.jpg",
+          "scale": "3x",
+          "pixels": [
+            2208,
+            1242
+          ],
+          "mode": "RGB",
+          "bytes": 133624
+        }
+      ]
+    },
+    {
+      "name": "background1Cell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background1Cell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1Cell.imageset/background1Levelx1.png",
+          "scale": "1x",
+          "pixels": [
+            50,
+            50
+          ],
+          "mode": "RGBA",
+          "bytes": 6594
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1Cell.imageset/background1Levelx2.png",
+          "scale": "2x",
+          "pixels": [
+            100,
+            100
+          ],
+          "mode": "RGBA",
+          "bytes": 12436
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background1Cell.imageset/background1Levelx3.png",
+          "scale": "3x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 30664
+        }
+      ]
+    },
+    {
+      "name": "background2",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2.imageset/background2x3.png",
+          "scale": "1x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 208388
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2.imageset/background2x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 208388
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2.imageset/background2x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 208388
+        }
+      ]
+    },
+    {
+      "name": "background2Cell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background2Cell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2Cell.imageset/background2Level-1.png",
+          "scale": "1x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 29561
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2Cell.imageset/background2Level.png",
+          "scale": "2x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 29561
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background2Cell.imageset/background2Level-2.png",
+          "scale": "3x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 29561
+        }
+      ]
+    },
+    {
+      "name": "background3",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3.imageset/background3.png",
+          "scale": "1x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 178661
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3.imageset/background3-1.png",
+          "scale": "2x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 178661
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3.imageset/background3-2.png",
+          "scale": "3x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 178661
+        }
+      ]
+    },
+    {
+      "name": "background3Cell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background3Cell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3Cell.imageset/background3Level-2.png",
+          "scale": "1x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 28746
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3Cell.imageset/background3Level-1.png",
+          "scale": "2x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 28746
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background3Cell.imageset/background3Level.png",
+          "scale": "3x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 28746
+        }
+      ]
+    },
+    {
+      "name": "background4",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background4.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4.imageset/background4.png",
+          "scale": "1x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGB",
+          "bytes": 196329
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4.imageset/background4@2x.png",
+          "scale": "2x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGB",
+          "bytes": 196350
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4.imageset/background4@3x.png",
+          "scale": "3x",
+          "pixels": [
+            1104,
+            621
+          ],
+          "mode": "RGBA",
+          "bytes": 460570
+        }
+      ]
+    },
+    {
+      "name": "background4Cell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background4Cell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4Cell.imageset/background4Cell.png",
+          "scale": "1x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 10780
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4Cell.imageset/background4Cell@2x.png",
+          "scale": "2x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 10801
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background4Cell.imageset/background4Cell@3.png",
+          "scale": "3x",
+          "pixels": [
+            225,
+            225
+          ],
+          "mode": "RGBA",
+          "bytes": 23176
+        }
+      ]
+    },
+    {
+      "name": "background5",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background5.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5.imageset/background5.png",
+          "scale": "1x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 253034
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5.imageset/background5@2x.png",
+          "scale": "2x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 253055
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5.imageset/background5@3x.png",
+          "scale": "3x",
+          "pixels": [
+            1104,
+            621
+          ],
+          "mode": "RGBA",
+          "bytes": 494125
+        }
+      ]
+    },
+    {
+      "name": "background5Cell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/background5Cell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5Cell.imageset/background5Cell.png",
+          "scale": "1x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 11723
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5Cell.imageset/background5Cell@2x.png",
+          "scale": "2x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 11744
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/background5Cell.imageset/background5Cell@3x.png",
+          "scale": "3x",
+          "pixels": [
+            225,
+            225
+          ],
+          "mode": "RGBA",
+          "bytes": 25178
+        }
+      ]
+    },
+    {
+      "name": "backgroundInner1",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/backgroundInner1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner1.imageset/background1Innerx1.jpg",
+          "scale": "1x",
+          "pixels": [
+            662,
+            331
+          ],
+          "mode": "RGB",
+          "bytes": 16081
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner1.imageset/background1Innerx2.jpg",
+          "scale": "2x",
+          "pixels": [
+            1325,
+            662
+          ],
+          "mode": "RGB",
+          "bytes": 40704
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner1.imageset/background1Innerx3.jpg",
+          "scale": "3x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGB",
+          "bytes": 87433
+        }
+      ]
+    },
+    {
+      "name": "backgroundInner2",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/backgroundInner2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner2.imageset/backgroundInner2.png",
+          "scale": "1x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 57072
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner2.imageset/backgroundInner2@2x.png",
+          "scale": "2x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 57093
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner2.imageset/backgroundInner2@3x.png",
+          "scale": "3x",
+          "pixels": [
+            2982,
+            1490
+          ],
+          "mode": "RGBA",
+          "bytes": 158834
+        }
+      ]
+    },
+    {
+      "name": "backgroundInner3",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/backgroundInner3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner3.imageset/backgroundInner3.png",
+          "scale": "1x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 61847
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner3.imageset/backgroundInner3@2x.png",
+          "scale": "2x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 61868
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner3.imageset/backgroundInner3@3x.png",
+          "scale": "3x",
+          "pixels": [
+            2982,
+            1490
+          ],
+          "mode": "RGBA",
+          "bytes": 229808
+        }
+      ]
+    },
+    {
+      "name": "backgroundInner4",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/backgroundInner4.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner4.imageset/backgroundInner4.png",
+          "scale": "1x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 51654
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner4.imageset/backgroundInner4@2x.png",
+          "scale": "2x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 51675
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner4.imageset/backgroundInner4@3x.png",
+          "scale": "3x",
+          "pixels": [
+            2982,
+            1490
+          ],
+          "mode": "RGBA",
+          "bytes": 154345
+        }
+      ]
+    },
+    {
+      "name": "backgroundInner5",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/backgroundInner5.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner5.imageset/backgroundInner5.png",
+          "scale": "1x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 52983
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner5.imageset/backgroundInner5@2x.png",
+          "scale": "2x",
+          "pixels": [
+            1987,
+            993
+          ],
+          "mode": "RGBA",
+          "bytes": 53004
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/backgroundInner5.imageset/backgroundInner5@3x.png",
+          "scale": "3x",
+          "pixels": [
+            2982,
+            1490
+          ],
+          "mode": "RGBA",
+          "bytes": 173434
+        }
+      ]
+    },
+    {
+      "name": "lockedCell",
+      "directory": "Cubrism/Assets.xcassets/backgrounds/lockedCell.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/lockedCell.imageset/lockx1.png",
+          "scale": "1x",
+          "pixels": [
+            50,
+            50
+          ],
+          "mode": "RGBA",
+          "bytes": 8213
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/lockedCell.imageset/lockx2.png",
+          "scale": "2x",
+          "pixels": [
+            100,
+            100
+          ],
+          "mode": "RGBA",
+          "bytes": 14449
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/backgrounds/lockedCell.imageset/lockx3.png",
+          "scale": "3x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 35420
+        }
+      ]
+    },
+    {
+      "name": "bank",
+      "directory": "Cubrism/Assets.xcassets/bank.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bank.imageset/bankx1.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 6912
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bank.imageset/bankx2.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 10723
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bank.imageset/bankx3.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 25486
+        }
+      ]
+    },
+    {
+      "name": "bossBarBottom",
+      "directory": "Cubrism/Assets.xcassets/bossBarBottom.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarBottom.imageset/BossBarBottom.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23598
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarBottom.imageset/BossBarBottom-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23598
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarBottom.imageset/BossBarBottom-2.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23598
+        }
+      ]
+    },
+    {
+      "name": "bossBarTop",
+      "directory": "Cubrism/Assets.xcassets/bossBarTop.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarTop.imageset/BossBarTop.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarTop.imageset/BossBarTop-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossBarTop.imageset/BossBarTop-2.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 23797
+        }
+      ]
+    },
+    {
+      "name": "bossDragonFireball",
+      "directory": "Cubrism/Assets.xcassets/bossDragonFireball.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonFireball.imageset/bossDragonFireballx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5927
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonFireball.imageset/bossDragonFireballx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 8367
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonFireball.imageset/bossDragonFireballx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 23301
+        }
+      ]
+    },
+    {
+      "name": "bossDragonShot0",
+      "directory": "Cubrism/Assets.xcassets/bossDragonShot0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot0.imageset/bossDragonShot0x1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4948
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot0.imageset/bossDragonShot0x2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5387
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot0.imageset/bossDragonShot3x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20203
+        }
+      ]
+    },
+    {
+      "name": "bossDragonShot1",
+      "directory": "Cubrism/Assets.xcassets/bossDragonShot1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot1.imageset/bossDragonShot1x1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4956
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot1.imageset/bossDragonShot1x2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5415
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot1.imageset/bossDragonShot1x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20399
+        }
+      ]
+    },
+    {
+      "name": "bossDragonShot2",
+      "directory": "Cubrism/Assets.xcassets/bossDragonShot2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot2.imageset/bossDragonShot2x1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4952
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot2.imageset/bossDragonShot2x2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5370
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot2.imageset/bossDragonShot4x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20141
+        }
+      ]
+    },
+    {
+      "name": "bossDragonShot3",
+      "directory": "Cubrism/Assets.xcassets/bossDragonShot3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot3.imageset/bossDragonShot3x1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4957
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot3.imageset/bossDragonShot3x2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5432
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossDragonShot3.imageset/bossDragonShot2x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20448
+        }
+      ]
+    },
+    {
+      "name": "bossEnergy",
+      "directory": "Cubrism/Assets.xcassets/bossEnergy.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergy.imageset/bossEnergyx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 6827
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergy.imageset/bossEnergyx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 11095
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergy.imageset/bossEnergyx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 21150
+        }
+      ]
+    },
+    {
+      "name": "bossEnergyShot",
+      "directory": "Cubrism/Assets.xcassets/bossEnergyShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergyShot.imageset/bossShotEnergyx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 5070
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergyShot.imageset/bossShotEnergyx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 6006
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossEnergyShot.imageset/bossShotEnergyx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 21349
+        }
+      ]
+    },
+    {
+      "name": "bossGeneratorShot",
+      "directory": "Cubrism/Assets.xcassets/bossGeneratorShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossGeneratorShot.imageset/bossShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4974
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossGeneratorShot.imageset/bossShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5505
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossGeneratorShot.imageset/bossShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20676
+        }
+      ]
+    },
+    {
+      "name": "bossGolemRock",
+      "directory": "Cubrism/Assets.xcassets/bossGolemRock.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/bossGolemRock.imageset/GolemShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 5941
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossGolemRock.imageset/GolemShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 8298
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/bossGolemRock.imageset/GolemShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 22886
+        }
+      ]
+    },
+    {
+      "name": "closeButton",
+      "directory": "Cubrism/Assets.xcassets/closeButton.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/closeButton.imageset/closex1.png",
+          "scale": "1x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 2593
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/closeButton.imageset/closex2.png",
+          "scale": "2x",
+          "pixels": [
+            60,
+            60
+          ],
+          "mode": "RGBA",
+          "bytes": 5707
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/closeButton.imageset/closex3.png",
+          "scale": "3x",
+          "pixels": [
+            90,
+            90
+          ],
+          "mode": "RGBA",
+          "bytes": 7297
+        }
+      ]
+    },
+    {
+      "name": "dragonBoss",
+      "directory": "Cubrism/Assets.xcassets/dragonBoss.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/dragonBoss.imageset/dragonLongx3-2.png",
+          "scale": "1x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 249793
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonBoss.imageset/dragonLongx3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 249793
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonBoss.imageset/dragonLongx3.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 249793
+        }
+      ]
+    },
+    {
+      "name": "dragonMouth1",
+      "directory": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth1.imageset/dragonMouth1.png",
+          "scale": "1x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 244491
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth1.imageset/dragonMouth1-1.png",
+          "scale": "2x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 244491
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth1.imageset/dragonMouth1-2.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 244491
+        }
+      ]
+    },
+    {
+      "name": "dragonMouth2",
+      "directory": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth2.imageset/dragonMouth2.png",
+          "scale": "1x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242918
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth2.imageset/dragonMouth2-1.png",
+          "scale": "2x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242918
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth2.imageset/dragonMouth2-2.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242918
+        }
+      ]
+    },
+    {
+      "name": "dragonMouth3",
+      "directory": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth3.imageset/dragonMouth3.png",
+          "scale": "1x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242096
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth3.imageset/dragonMouth3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242096
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth3.imageset/dragonMouth3-2.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 242096
+        }
+      ]
+    },
+    {
+      "name": "dragonMouth4",
+      "directory": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth4.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth4.imageset/dragonMouth4-2.png",
+          "scale": "1x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 241599
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth4.imageset/dragonMouth4.png",
+          "scale": "2x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 241599
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/dragonMouthOpen.spriteatlas/dragonMouth4.imageset/dragonMouth4-1.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            703
+          ],
+          "mode": "RGBA",
+          "bytes": 241599
+        }
+      ]
+    },
+    {
+      "name": "generatorBoss",
+      "directory": "Cubrism/Assets.xcassets/generatorBoss.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/generatorBoss.imageset/boss x1.png",
+          "scale": "1x",
+          "pixels": [
+            333,
+            333
+          ],
+          "mode": "RGBA",
+          "bytes": 48242
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/generatorBoss.imageset/boss x2.png",
+          "scale": "2x",
+          "pixels": [
+            667,
+            667
+          ],
+          "mode": "RGBA",
+          "bytes": 80280
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/generatorBoss.imageset/boss x3.png",
+          "scale": "3x",
+          "pixels": [
+            1000,
+            1000
+          ],
+          "mode": "RGBA",
+          "bytes": 51059
+        }
+      ]
+    },
+    {
+      "name": "golemBoss",
+      "directory": "Cubrism/Assets.xcassets/golemBoss.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemBoss.imageset/golemx3-2.png",
+          "scale": "1x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemBoss.imageset/golemx3-1.png",
+          "scale": "2x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemBoss.imageset/golemx3.png",
+          "scale": "3x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        }
+      ]
+    },
+    {
+      "name": "golemJump0",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump0.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump0.imageset/golemx3.png",
+          "scale": "1x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump0.imageset/golemx3-1.png",
+          "scale": "2x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump0.imageset/golemx3-2.png",
+          "scale": "3x",
+          "pixels": [
+            852,
+            1005
+          ],
+          "mode": "RGBA",
+          "bytes": 26861
+        }
+      ]
+    },
+    {
+      "name": "golemJump1",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump1.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump1.imageset/golem17x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27242
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump1.imageset/golem17x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27242
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump1.imageset/golem17x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27242
+        }
+      ]
+    },
+    {
+      "name": "golemJump2",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump2.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump2.imageset/golem34x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27552
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump2.imageset/golem34x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27552
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump2.imageset/golem34x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27552
+        }
+      ]
+    },
+    {
+      "name": "golemJump3",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump3.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump3.imageset/golem51x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump3.imageset/golem51x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump3.imageset/golem51x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        }
+      ]
+    },
+    {
+      "name": "golemJump4",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump4.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump4.imageset/golem68x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump4.imageset/golem68x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump4.imageset/golem68x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        }
+      ]
+    },
+    {
+      "name": "golemJump5",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump5.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump5.imageset/golem85x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump5.imageset/golem85x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump5.imageset/golem85x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        }
+      ]
+    },
+    {
+      "name": "golemJump6",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump6.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump6.imageset/golem102x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump6.imageset/golem102x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump6.imageset/golem102x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        }
+      ]
+    },
+    {
+      "name": "golemJump7",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump7.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump7.imageset/golem119x3.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump7.imageset/golem119x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump7.imageset/golem119x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27797
+        }
+      ]
+    },
+    {
+      "name": "golemJump8",
+      "directory": "Cubrism/Assets.xcassets/golemJump/golemJump8.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump8.imageset/golem136x3-1.png",
+          "scale": "1x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump8.imageset/golem136x3.png",
+          "scale": "2x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/golemJump/golemJump8.imageset/golem136x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            851,
+            1003
+          ],
+          "mode": "RGBA",
+          "bytes": 27798
+        }
+      ]
+    },
+    {
+      "name": "healthBarBottom",
+      "directory": "Cubrism/Assets.xcassets/healthBarBottom.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarBottom.imageset/healthBarBottom x3.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22615
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarBottom.imageset/healthBarBottom x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22615
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarBottom.imageset/healthBarBottom x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22615
+        }
+      ]
+    },
+    {
+      "name": "healthBarTop",
+      "directory": "Cubrism/Assets.xcassets/healthBarTop.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarTop.imageset/healthBarTop x3.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22323
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarTop.imageset/healthBarTop x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22323
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/healthBarTop.imageset/healthBarTop x3-2.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22323
+        }
+      ]
+    },
+    {
+      "name": "loadingScreen",
+      "directory": "Cubrism/Assets.xcassets/loadingScreen.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/loadingScreen.imageset/cubrism_titlex1.png",
+          "scale": "1x",
+          "pixels": [
+            736,
+            414
+          ],
+          "mode": "RGBA",
+          "bytes": 69226
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/loadingScreen.imageset/cubrism_titlex2.png",
+          "scale": "2x",
+          "pixels": [
+            1472,
+            828
+          ],
+          "mode": "RGBA",
+          "bytes": 162316
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/loadingScreen.imageset/cubrism_titlex3.png",
+          "scale": "3x",
+          "pixels": [
+            2208,
+            1242
+          ],
+          "mode": "RGBA",
+          "bytes": 159685
+        }
+      ]
+    },
+    {
+      "name": "merchant",
+      "directory": "Cubrism/Assets.xcassets/merchant.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/merchant.imageset/ShopWide x1.png",
+          "scale": "1x",
+          "pixels": [
+            64,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 7079
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/merchant.imageset/ShopWide x2.png",
+          "scale": "2x",
+          "pixels": [
+            128,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 11009
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/merchant.imageset/ShopWide x3.png",
+          "scale": "3x",
+          "pixels": [
+            192,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 26123
+        }
+      ]
+    },
+    {
+      "name": "pauseButton",
+      "directory": "Cubrism/Assets.xcassets/pauseButton.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/pauseButton.imageset/pausex1.png",
+          "scale": "1x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 1876
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/pauseButton.imageset/pausex2.png",
+          "scale": "2x",
+          "pixels": [
+            60,
+            60
+          ],
+          "mode": "RGBA",
+          "bytes": 3849
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/pauseButton.imageset/pausex3.png",
+          "scale": "3x",
+          "pixels": [
+            90,
+            90
+          ],
+          "mode": "RGBA",
+          "bytes": 5811
+        }
+      ]
+    },
+    {
+      "name": "playerCannon",
+      "directory": "Cubrism/Assets.xcassets/playerCannon.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/playerCannon.imageset/playerCannonx1.png",
+          "scale": "1x",
+          "pixels": [
+            50,
+            50
+          ],
+          "mode": "RGBA",
+          "bytes": 2116
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerCannon.imageset/playerCannonx2.png",
+          "scale": "2x",
+          "pixels": [
+            100,
+            100
+          ],
+          "mode": "RGBA",
+          "bytes": 4427
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerCannon.imageset/playerCannonx3.png",
+          "scale": "3x",
+          "pixels": [
+            150,
+            150
+          ],
+          "mode": "RGBA",
+          "bytes": 7394
+        }
+      ]
+    },
+    {
+      "name": "playerIcon",
+      "directory": "Cubrism/Assets.xcassets/playerIcon.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/playerIcon.imageset/playerCubrism2x1.png",
+          "scale": "1x",
+          "pixels": [
+            32,
+            32
+          ],
+          "mode": "RGBA",
+          "bytes": 2357
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerIcon.imageset/playerCubrism2x2.png",
+          "scale": "2x",
+          "pixels": [
+            64,
+            64
+          ],
+          "mode": "RGBA",
+          "bytes": 5753
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerIcon.imageset/playerCubrism2x3.png",
+          "scale": "3x",
+          "pixels": [
+            96,
+            96
+          ],
+          "mode": "RGBA",
+          "bytes": 9812
+        }
+      ]
+    },
+    {
+      "name": "playerShot",
+      "directory": "Cubrism/Assets.xcassets/playerShot.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/playerShot.imageset/playerShotx1.png",
+          "scale": "1x",
+          "pixels": [
+            10,
+            10
+          ],
+          "mode": "RGBA",
+          "bytes": 4519
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerShot.imageset/playerShotx2.png",
+          "scale": "2x",
+          "pixels": [
+            20,
+            20
+          ],
+          "mode": "RGBA",
+          "bytes": 5056
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/playerShot.imageset/playerShotx3.png",
+          "scale": "3x",
+          "pixels": [
+            30,
+            30
+          ],
+          "mode": "RGBA",
+          "bytes": 20357
+        }
+      ]
+    },
+    {
+      "name": "popUp",
+      "directory": "Cubrism/Assets.xcassets/popUp.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/popUp.imageset/popUp2x1.png",
+          "scale": "1x",
+          "pixels": [
+            400,
+            256
+          ],
+          "mode": "RGBA",
+          "bytes": 5009
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/popUp.imageset/popUp2x2.png",
+          "scale": "2x",
+          "pixels": [
+            800,
+            512
+          ],
+          "mode": "RGBA",
+          "bytes": 14054
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/popUp.imageset/popUp2x3.png",
+          "scale": "3x",
+          "pixels": [
+            1200,
+            768
+          ],
+          "mode": "RGBA",
+          "bytes": 12644
+        }
+      ]
+    },
+    {
+      "name": "shieldBarBottom",
+      "directory": "Cubrism/Assets.xcassets/shieldBarBottom.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarBottom.imageset/shieldBarBottom x3-2.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22769
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarBottom.imageset/shieldBarBottom x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22769
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarBottom.imageset/shieldBarBottom x3.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22769
+        }
+      ]
+    },
+    {
+      "name": "shieldBarTop",
+      "directory": "Cubrism/Assets.xcassets/shieldBarTop.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarTop.imageset/shieldBarTop x3-2.png",
+          "scale": "1x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22449
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarTop.imageset/shieldBarTop x3-1.png",
+          "scale": "2x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22449
+        },
+        {
+          "file": "Cubrism/Assets.xcassets/shieldBarTop.imageset/shieldBarTop x3.png",
+          "scale": "3x",
+          "pixels": [
+            1883,
+            224
+          ],
+          "mode": "RGBA",
+          "bytes": 22449
+        }
+      ]
+    }
+  ]
+}

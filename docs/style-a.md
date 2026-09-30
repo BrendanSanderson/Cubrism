@@ -10,11 +10,22 @@ Production source images live in `Cubrism/Assets.xcassets/StyleA`:
 
 - `StyleEnemies`: 3 × 3 cells, in the order defined by `GameArt.enemies`.
 - `StyleBosses`: 2 × 2 cells, in the order defined by `GameArt.bosses`.
-- `StyleItems`: 3 × 2 cells, in the order defined by `GameArt.items`.
+- `StylePulsar`, `StyleSpecialPulsar`, `StyleShield`, `StyleArmorCore`,
+  `StylePowerCore`, `StyleAttachment`: each a 3 × 2 atlas ordered white, green,
+  blue, purple, orange, empty. These replace `StyleItems`.
 - `StyleGun`: isolated circular receiver and barrel; chassis is rendered separately.
 - `StyleFloor`: full-bleed sandstone floor, tinted per world.
 
 Sprite cells require genuine alpha, equal grid cells and transparent gutters. The catalog trims those gutters once. For a replacement, preserve the sheet ordering; for a new family, add its mapping and an original logical size. Legacy images remain as fallbacks and dimensional references. Generated-source provenance is in `art-sources.json`.
+
+Equipment uses proportional fitting and a small transparent inset rather than
+stretching wide guns into squares. Its rendered textures retain at least 288px
+per side while preserving logical point sizes. Common gear uses the white family
+image; higher tiers retain saved cosmetic variant suffixes 0–3 (green, blue,
+purple, orange). Inventory, shop and completion rewards share the same resolver.
+Equipment generation prompts and approved references are in
+`equipment-art-sources.json`. The current asset review and remaining design work
+are in [asset-audit.md](asset-audit.md).
 
 Dragon mouth and golem jump frames derive from the new boss art, so attack/movement animations stay in the selected style. Panels, buttons, doors, tier rims, player chassis and HUD are drawn at runtime for crisp scaling. SF Symbols provide interface icons. Health and shield artwork remains at full width while crop masks reveal the current fill. A separate outline preserves the capsule shape at low or zero health.
 

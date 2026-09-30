@@ -10,13 +10,6 @@
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleEnemies.imageset/art.png"
     },
     {
-      "name": "StyleItems",
-      "ref": "equipment-cores-v1.png",
-      "prompt": "Production 2D game inventory sprite sheet, truly transparent alpha background, 1536x1536 square canvas, EXACT 3 columns x 2 rows of equal 512x768 cells. Six objects centered in each cell, same 360x360 occupied area, ample transparent space, NO labels or tile backgrounds. Reading order: small segmented ivory green fictional arcade Pulsar device; twin-coil ivory green Special Pulsar module; ivory shield with green rim; ivory faceted armor-core polyhedron with green seams; ivory radial eight-vane power-core wheel green hub; ivory toothed rectangular attachment coupling green accents. Reference establishes core materials and silhouettes. Option A clean geometric enamel, charcoal outlines, no text, no real weapons or engineering diagrams. Do not include currency, badges or anything else.",
-      "source": "exec-e0e50b9b-c1f4-41ae-a39e-93aa10a1c362.png",
-      "asset": "Cubrism/Assets.xcassets/StyleA/StyleItems.imageset/art.png"
-    },
-    {
       "name": "StyleBosses",
       "ref": "character-bosses.png",
       "prompt": "Production arcade game boss sprite sheet, transparent alpha background, square1536x1536, EXACT 2x2 equal cells 768x768, no labels. Four bosses from reference isolated centered in each cell with at least10% transparent padding. Top left cyan-banded charcoal generator cylinder. Top right indigo dragon head/body green eyes facing LEFT, from overhead, preserve elongated shape contained within cell. Bottom left ochre square golem head with square eye/mouth notch. Bottom right dense angular golden energy cluster. Crisp geometric stone/enamel, minimal cast shadows, no effects outside occupied area, no variant thumbnails, no board background.",
@@ -37,5 +30,6 @@
       "brief": "P1 Classic central green circular receiver and short round barrel facing right, isolated with true transparent alpha. Yellow chassis rendered separately in GameArt."
     }
   ],
-  "notes": "Generated originals retained on the development host. The committed art.png files are production sources; GameArt performs runtime cropping and rendering. Player chassis and interface elements use Core Graphics and SF Symbols."
+  "notes": "Generated originals retained on the development host. The committed art.png files are production sources; GameArt performs runtime cropping and rendering. Player chassis and interface elements use Core Graphics and SF Symbols.",
+  "equipmentManifest": "equipment-art-sources.json"
 }

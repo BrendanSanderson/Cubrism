@@ -100,16 +100,7 @@ class ItemNode: SelectNode {
     init (i: Item)
     {
         self.item = i
-        if(i.isKind(of: Equipment.self) && (i as! Equipment).tier > 1)
-        {
-            let e = i as! Equipment
-            let imgName = e.type + String(e.variant)
-            super.init(texture: GameArt.texture( imgName), size: CGSize(width: 32, height: 32))
-        }
-        else
-        {
-            super.init(texture: GameArt.texture( i.type), size: CGSize(width: 32, height: 32))
-        }
+        super.init(texture: GameArt.texture(GameArt.imageName(for: i)), size: CGSize(width: 32, height: 32))
         if i.quantity > 1
         {
             quantity = SKLabelNode(text: String(i.quantity))
@@ -193,4 +184,3 @@ class SellNode: SKSpriteNode
         cost.zPosition = 1005
     }
 }
-
