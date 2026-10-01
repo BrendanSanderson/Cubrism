@@ -84,7 +84,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         frame.zPosition = -15
         let sn = SKSpriteNode()
         sn.zPosition = -25
-        if world >= 1
+        if world == 1 {
+            // Reactor art includes the floor and border in one continuous image.
+            frame.fillColor = .clear
+            frame.strokeColor = .clear
+            sn.texture = GameArt.texture("background1")
+        }
+        else if world >= 1
         {
             frame.fillColor = UIColor.white
             frame.fillTexture = GameArt.texture( String(format: "backgroundInner%i", world))

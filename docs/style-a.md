@@ -1,6 +1,6 @@
 # Stone & Enamel (Option A)
 
-Selected direction: P1 yellow chassis with a separate central green rotating gun; enamel enemies, bosses and equipment; quiet stone floor; charcoal panels with ivory typography and brass accents. Health and shield retain the stacked capsule, emerald above icy cyan, with icons on the left and no percentages.
+Selected direction: P1 yellow chassis with a separate central green rotating gun; enamel enemies, bosses and equipment; Reactor Arcade floor and machinery border for world 1; charcoal panels with ivory typography and brass accents. Health and shield retain the stacked capsule, emerald above icy cyan, with icons on the left and no percentages.
 
 ## Asset catalog
 
@@ -14,7 +14,8 @@ Production source images live in `Cubrism/Assets.xcassets/StyleA`:
   `StylePowerCore`, `StyleAttachment`: each a 3 × 2 atlas ordered white, green,
   blue, purple, orange, empty. These replace `StyleItems`.
 - `StyleGun`: isolated circular receiver and barrel; chassis is rendered separately.
-- `StyleFloor`: full-bleed sandstone floor, tinted per world.
+- `StyleReactorArena`: world 1's continuous blue floor and teal/orange machinery border. The catalog fits the painted opening to the existing collision rectangle; gameplay, doors and controls render separately above it. Exact generation prompts and source bounds are in `reactor-arena-art-source.json`.
+- `StyleFloor`: full-bleed sandstone floor, tinted for worlds 2–5.
 
 Sprite cells require genuine alpha, equal grid cells and transparent gutters. The catalog trims those gutters once. For a replacement, preserve the sheet ordering; for a new family, add its mapping and an original logical size. Legacy images remain as fallbacks and dimensional references. Generated-source provenance is in `art-sources.json`.
 
@@ -52,3 +53,20 @@ The video uses an automated pilot through the game's input handling. It retains 
 Restored the original bundled ammunition and projectile effect artwork, including the tracking bullet. Replaced the level picker with an explicit two-row page layout, reusable readable tiles, lock/cleared labels and Previous/Next world controls. Pages retain their position through layout updates; unlocking still uses global progress while labels remain 1–10 within each world. Catalyst consumes gameplay keys while the menu is open and clears them on return.
 
 Validation: 34 checks passed on Mac Catalyst and iPhone simulator, including exact original projectile image comparisons, page geometry, and presenting the menu, rejecting a locked choice and launching the selected unlocked world/floor. Final structured review had no actionable findings.
+
+## Reactor Arcade follow-up on 2026-10-01
+
+Applied the approved Reactor Arcade direction to world 1, including its home
+scene. The blue floor, teal pipes, orange collars and corner reactors form one
+continuous image. Native foreground nodes supply all controls, characters and
+doors; none are baked into the asset. The painted opening is fitted to the
+existing collision rectangle, preserving the 750 × 375 arena and sprite scale.
+
+Validation: the catalog, responsive arena-size and wall-bound projectile checks
+passed on iPhone 16e / iOS 18.5 and Mac Catalyst. Temporary native layer exports
+were visually inspected on both platforms. The installed Mac app was refreshed,
+its ad-hoc signature verified, and the home scene checked in the running app.
+`autoreview --mode local --no-web-search` returned no findings; none were accepted
+or rejected. Results and full-resolution previews are retained under
+`/Users/beep/codex-work/cubrism-validation/reactor-arena/`. This art pass did not
+repeat the earlier complete floor 1–2 playthrough.

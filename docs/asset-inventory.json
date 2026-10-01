@@ -2578,6 +2578,22 @@
       ]
     },
     {
+      "name": "StyleReactorArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleReactorArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleReactorArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1532577
+        }
+      ]
+    },
+    {
       "name": "StyleShield",
       "directory": "Cubrism/Assets.xcassets/StyleA/StyleShield.imageset",
       "files": [

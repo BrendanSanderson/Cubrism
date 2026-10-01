@@ -176,6 +176,22 @@ enum GameArt {
     }
     private static func interface(_ name: String, size: CGSize) -> UIImage? {
         if name == "popUp" { return render(size) { panel($0, radius: 10) } }
+        if ["background1", "backgroundInner1"].contains(name),
+           let arena = UIImage(named: "StyleReactorArena") {
+            return render(size) { rect in
+                // The painted opening is slightly inset from the gameplay bounds.
+                // Fit that opening to the existing 90% x 80% collision rectangle;
+                // the outermost art is clipped, without changing the arena or sprites.
+                let opening = CGRect(x: 0.058, y: 0.107, width: 0.884, height: 0.77)
+                let target = name == "background1"
+                    ? rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.1) : rect
+                let width = target.width / opening.width
+                let height = target.height / opening.height
+                arena.draw(in: CGRect(x: target.minX - opening.minX * width,
+                                      y: target.minY - opening.minY * height,
+                                      width: width, height: height))
+            }
+        }
         if name.hasPrefix("backgroundInner"), let floor = UIImage(named: "StyleFloor") {
             return render(size) { rect in
                 floor.draw(in: rect)
