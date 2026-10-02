@@ -31,7 +31,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var vender: VendorPopUpNode!
     var doorAccessed = String()
     var world = 1
-    let button = SKSpriteNode(imageNamed: "pauseButton")
+    // Home uses Reactor Arcade; room scenes resolve their controller's global level.
+    var arenaGlobalLevel: Int { 1 }
+    let button = GameArt.sprite("pauseButton")
     #if targetEnvironment(macCatalyst)
     var keyboardControls = KeyboardControlState()
     #endif
@@ -41,6 +43,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.view!.isMultipleTouchEnabled = true
         self.scene!.backgroundColor = UIColor(red: 20.0/255.0, green: 27.0/255.0, blue: 169.0/255.0, alpha: 1)
         self.scene!.backgroundColor = UIColor.clear
+        if let controller = Player.currentViewController { world = controller.world }
         createGrid()
         self.physicsWorld.contactDelegate = self
         super.didMove(to: view)
@@ -83,13 +86,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         frame.zPosition = -15
         let sn = SKSpriteNode()
         sn.zPosition = -25
-        if world >= 1
-        {
-            frame.fillColor = UIColor.white
-            frame.fillTexture = SKTexture(imageNamed: String(format: "backgroundInner%i", world))
-            frame.strokeColor = UIColor.black
-            frame.glowWidth = 0
-            sn.texture = SKTexture(imageNamed: String(format: "background%i", world))
+        if world >= 1 {
+            // Each arena includes the floor and border in one continuous image.
+            frame.fillColor = .clear
+            frame.strokeColor = .clear
+            sn.texture = GameArt.texture(GameArt.arena(forGlobalLevel: arenaGlobalLevel).assetName)
         }
         else
         {
@@ -133,7 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 else
                 {
                     self.vender.removeFromParent()
-                    button.texture = SKTexture(imageNamed: "pauseButton")
+                    button.texture = GameArt.texture( "pauseButton")
                     vending = false
                     Player.saveItems()
                     Player.updateEquipment()
@@ -302,7 +303,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 {
                     (secondBody.node as! VendorNode).Entity.act()
                     vending = true
-                    button.texture = SKTexture(imageNamed: "closeButton")
+                    button.texture = GameArt.texture( "closeButton")
                     self.vender = (secondBody.node as! VendorNode).Entity.popUp
                 }
             }

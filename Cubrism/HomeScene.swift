@@ -62,7 +62,7 @@ class HomeScene: GameScene {
             x: size.width/2,
             y: ((size.height * 0.8)))
       //  let teleporterSprite = SKSpriteNode(color: UIColor.whiteColor(), size: CGSize(width: 64, height: 32))
-        let teleporterSprite = SKSpriteNode(imageNamed: "horizontalDoor")
+        let teleporterSprite = GameArt.sprite("horizontalDoor")
         let teleporterNode = SKNode();
         teleporterNode.addChild(teleporterSprite)
         teleporterNode.position = teleporterPosition

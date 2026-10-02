@@ -24,8 +24,8 @@ class PopUpNode: SKNode {
     {
         super.init()
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
-        //mainFrame = SKSpriteNode(texture: SKTexture(imageNamed: "popUp"), size: CGSize(width: scene.frame.width * 0.8, height: scene.frame.height * 0.7))
-        mainFrame = SKSpriteNode(imageNamed: "popUp")
+        //mainFrame = SKSpriteNode(texture: GameArt.texture( "popUp"), size: CGSize(width: scene.frame.width * 0.8, height: scene.frame.height * 0.7))
+        mainFrame = GameArt.sprite("popUp")
         mainFrame.size = CGSize(width: scene.size.width * 0.8, height: scene.size.height * 0.75)
         mainFrame.zPosition = 1000
         label = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.33 - 25, width: mainFrame.size.width, height: 50))
@@ -48,11 +48,11 @@ class PopUpNode: SKNode {
         scene.button.texture = nil
 //        button1.titleLabel!.textAlignment = .Center
 //        button2.titleLabel!.textAlignment = .Center
-        button1.backgroundColor = Constants.darkColor
+        button1.backgroundColor = GameArt.gold
        button2.backgroundColor = Constants.darkColor
         button1.setTitle(button1Text, for: UIControl.State.normal)
         button2.setTitle(button2Text, for: UIControl.State.normal)
-        button1.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
+        button1.setTitleColor(GameArt.ink, for: UIControl.State.normal)
         button2.setTitleColor(Constants.lightColor, for: UIControl.State.normal)
 //        button1.backgroundColor = UIColor.redColor()
 //        button2.backgroundColor = UIColor.redColor()
@@ -61,7 +61,7 @@ class PopUpNode: SKNode {
         button1.titleLabel!.font = UIFont(name: Constants.font, size: 18)
         button2.titleLabel!.font = UIFont(name: Constants.font, size: 18)
         label.font = UIFont(name: Constants.font, size: 32)
-        label.textColor = UIColor(red:0.01, green:0.82, blue:0.96, alpha:1.0)
+        label.textColor = GameArt.ivory
         scene.view?.addSubview(button1)
         scene.view?.addSubview(button2)
         scene.view?.addSubview(label)
@@ -72,10 +72,10 @@ class PopUpNode: SKNode {
         button2.addTarget(self, action: b2Method, for: .touchUpInside)
         
         let expLabel = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.4, width: mainFrame.size.width, height: scene.size.height * 0.1))
-        expLabel.textColor = Constants.darkColor
+        expLabel.textColor = GameArt.ivory
         
         let expLeftLabel = UILabel(frame: CGRect(x: scene.size.width * 0.5 - (mainFrame.size.width/2), y: scene.size.height * 0.45, width: mainFrame.size.width, height: scene.size.height * 0.1))
-        expLeftLabel.textColor = Constants.darkColor
+        expLeftLabel.textColor = GameArt.ivory
         expLabel.textAlignment = .center
         expLeftLabel.textAlignment = .center
         if (text == "You are Dead.")
@@ -105,7 +105,7 @@ class PopUpNode: SKNode {
         levelLabel.font = UIFont(name: Constants.fontB, size: 18)
         levelLabel.text = String(format: "%i", Player.level)
         levelLabel.textAlignment = .right
-        levelLabel.textColor = Constants.darkColor
+        levelLabel.textColor = GameArt.gold
         scene.view!.addSubview(levelLabel)
         
     }
@@ -113,7 +113,7 @@ class PopUpNode: SKNode {
     @objc func play(_ sender: UIButton!) {
         remove()
         gameScene.isPaused = false
-        gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
+        gameScene.button.texture = GameArt.texture( "pauseButton")
         
         
     }
@@ -142,7 +142,7 @@ class PopUpNode: SKNode {
         if (gameScene.isKind(of: HomeScene.self))
         {
             gameScene.isPaused = false
-            gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
+            gameScene.button.texture = GameArt.texture( "pauseButton")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "ResetHomeViewController"), object: self)
 
         }
@@ -192,7 +192,7 @@ class PopUpNode: SKNode {
         if (gameScene.isKind(of: HomeScene.self))
         {
             gameScene.isPaused = false
-            gameScene.button.texture = SKTexture(imageNamed: "pauseButton")
+            gameScene.button.texture = GameArt.texture( "pauseButton")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "ResetHomeViewController"), object: self)
         }
         else

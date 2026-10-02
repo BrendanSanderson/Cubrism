@@ -206,7 +206,7 @@ class EnemyShotTargetingComponent: ActionComponent {
         let node = ShotNode()
         node.shooter = shooter
         //let sprite = SKSpriteNode(color: UIColor(red: 77.0/255.0, green: 135.0/255.0, blue: 14.0/255.0, alpha: 1), size: CGSize(width: 5, height: 5))
-        let sprite = SKSpriteNode(imageNamed: "enemyShot")
+        let sprite = GameArt.sprite("enemyShot")
         node.addChild(sprite)
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
@@ -261,7 +261,7 @@ class EnemyShotTrackingComponent: ActionComponent {
         self.enemySprite = shooter.sprite
         self.coordinate = shooter.sprite.position
         node.shooter = shooter
-        bullet = SKSpriteNode(imageNamed: "enemyTrackingShot")
+        bullet = GameArt.sprite("enemyTrackingShot")
         let componentDict = (entity.componentDict["shotTracking"] as? [String:Any])!
         shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
         shotLength = (componentDict["shotLength"] as? TimeInterval)!
@@ -494,7 +494,7 @@ class EnemyShotTrippleComponent: ActionComponent {
         node.shooter = shooter
         for i in 0 ..< 3
         {
-            let sprite = SKSpriteNode(imageNamed: "enemyTrippleShot")
+            let sprite = GameArt.sprite("enemyTrippleShot")
             node.addChild(sprite)
             sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
             sprite.physicsBody?.allowsRotation = false
@@ -585,7 +585,7 @@ class EnemyBombDroppingComponent: ActionComponent {
     func drop()
     {
         let node = ShotNode()
-        let bomb = SKSpriteNode(imageNamed: "bomberShot")
+        let bomb = GameArt.sprite("bomberShot")
         node.addChild(bomb)
         scene.addChild(node)
         bomb.physicsBody = SKPhysicsBody(rectangleOf: bomb.size)
@@ -599,10 +599,10 @@ class EnemyBombDroppingComponent: ActionComponent {
         bomb.physicsBody?.collisionBitMask = Constants.wallCategory
         bomb.position = enemySprite.position
         nodes.append(bomb)
-        let textures = [SKTexture(imageNamed: "bombLit1"), SKTexture(imageNamed: "bombLit2"), SKTexture(imageNamed: "bombLit3")]
+        let textures = [GameArt.texture( "bombLit1"), GameArt.texture( "bombLit2"), GameArt.texture( "bombLit3")]
         let changeSkin = SKAction.animate(with: textures, timePerFrame: 1)
         bomb.run(changeSkin)
-        let action = SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run({self.explode(bomb.position)}), SKAction.setTexture(SKTexture(imageNamed: "bossDragonShot1")), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.removeFromParent()])
+        let action = SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run({self.explode(bomb.position)}), SKAction.setTexture(GameArt.texture( "bossDragonShot1")), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.removeFromParent()])
         bomb.run(action)
     }
     
@@ -630,7 +630,7 @@ class EnemyBombDroppingComponent: ActionComponent {
     func fire(_ start: CGPoint, node: ShotNode)
     {
         
-        let sprite = SKSpriteNode(imageNamed: String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         sprite.position = start
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
@@ -702,7 +702,7 @@ class EnemySludgeDroppingComponent: ActionComponent {
     func drop()
     {
         let node = ShotNode()
-        let sludge = SKSpriteNode(imageNamed: "enemySludge")
+        let sludge = GameArt.sprite("enemySludge")
         node.addChild(sludge)
         scene.addChild(node)
         sludge.physicsBody = SKPhysicsBody(rectangleOf: sludge.size)
@@ -789,7 +789,7 @@ class EnemyRingShotComponent: ActionComponent {
     func fire(_ node: ShotNode)
     {
         
-        let sprite = SKSpriteNode(imageNamed: String(format: "enemyRingShot", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "enemyRingShot", Int(arc4random_uniform(UInt32(4)))))
         node.addChild(sprite)
         sprite.position = enemySprite.position
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)

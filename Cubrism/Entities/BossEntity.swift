@@ -68,7 +68,7 @@ class BossEntity: DynamicEntity {
         let effectBase = specifcBossDict["effectBase"] as! Int
         let meleeBase = specifcBossDict["meleeBase"] as! Int
         let healthBase = specifcBossDict["healthBase"] as! Int
-        self.sprite = SKSpriteNode(texture: SKTexture(imageNamed: (properties.value(forKey: "image") as? String)!), size: CGSize(width: (properties.value(forKey: "size") as? Int)!, height: (properties.value(forKey: "size") as? Int)!))
+        self.sprite = SKSpriteNode(texture: GameArt.texture( (properties.value(forKey: "image") as? String)!), size: CGSize(width: (properties.value(forKey: "size") as? Int)!, height: (properties.value(forKey: "size") as? Int)!))
         if (properties.value(forKey: "position") as? String)! == "center"
         {
             sprite.position = CGPoint(x: scene.frame.width/2.0, y: scene.frame.height/2.0)

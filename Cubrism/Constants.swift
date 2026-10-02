@@ -29,8 +29,8 @@ class Constants: NSObject {
     static var jsonDict: [String: Any]!
     static var merchantInventory = [Equipment]()
     static var itemType = ["Power Core", "Armor Core", "Pulsar", "Special Pulsar", "Shield", "Attachment"]
-    static let lightColor = UIColor(red:0.01, green:0.82, blue:0.96, alpha:1.0)
-    static let darkColor = UIColor(red:0.01, green:0.11, blue:0.58, alpha:1.0)
+    static let lightColor = GameArt.ivory
+    static let darkColor = GameArt.ink
     //static var dev = true;
     static func enemyMultiplier(_ level: Int) -> Double{
         return pow((Double(level) + 3)/4 , 1.4)

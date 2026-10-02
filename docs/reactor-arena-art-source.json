@@ -1,0 +1,18 @@
+{
+  "mode": "built-in image_gen",
+  "name": "StyleReactorArena",
+  "approvedReference": "exec-e4a9f4be-d2b3-466c-84d8-c2d9f465644b.png",
+  "source": "exec-43611554-13f1-40df-bd72-a0daea4412b5.png",
+  "asset": "Cubrism/Assets.xcassets/StyleA/StyleReactorArena.imageset/art.png",
+  "prompts": [
+    "Use case: precise-object-edit. Asset type: production background for an orthographic 2D arcade arena. Edit target: attached approved Reactor Arcade A concept. Remove ALL foreground gameplay: both stacked health/shield bars and icons at top left, pause button at top right, both bottom joysticks, central yellow player and gun, all three square enemies, and BOTH lock/door cards at top center and left center. Reconstruct the background under them. The top-right circular reactor should have the same orange lens as the other corners. Where door cards and HUD were, continue the teal machinery pipe modules, orange collars and occasional ivory connectors consistently. Where characters and joysticks were, continue the blue floor and its quiet broad panel seams. Preserve the exact approved palette, enamel illustration style, lighting, scale, composition and lively pipe-border design. The image is ONLY a single empty arena background, no gameplay objects, no text, icons, controls or placeholders. Aspect ratio EXACTLY 2:1 landscape, full bleed. Collision alignment requirement: the blue open floor begins exactly 5% from left and right and 10% from top and bottom. Keep all raised border machinery outside that rectangular playable floor. Corner housings must stay in the perimeter band, without intruding into that rectangle. Floor panel lines are subtle decoration, no obstacles. Keep the center open and readable; avoid gritty noise, extra effects or a center emblem. Render crisp high-resolution production art, preferably 2400x1200.",
+    "Use case: precise-object-edit. Input is the approved clean Reactor Arcade arena background. Make ONE technical correction for game collision alignment: make the inside edge of the machinery border a precise RECTANGLE with square 90-degree inside corners, at x=5% and x=95% of image width and y=10% and y=90% of image height. Expand the blue floor to fill that entire rectangular opening, all the way into its square corners. Squeeze the surrounding pipe modules and four reactor housings into the perimeter outside that opening: no protrusions, diagonal cut corners, or dark solid rim areas inside the open floor rectangle. Keep the approved appearance otherwise: exact teal enamel pipes, warm orange collars and four orange reactor lenses, ivory fittings, navy recesses, blue quiet broad panels, existing subtle lighting and cartoon polish. Same straight-down orthographic 2:1 full-bleed landscape image. Do NOT add any controls, characters, text, symbols, HUD, doors, obstacles or center emblem. This is the final production empty arena background."
+  ],
+  "sourceFloorOpening": {
+    "x": 0.058,
+    "y": 0.107,
+    "width": 0.884,
+    "height": 0.77
+  },
+  "notes": "World 1 uses one continuous arena image. Runtime drawing fits the measured painted opening to the existing 90% by 80% collision rectangle, clipping only the outer edge. Foreground gameplay remains separate."
+}

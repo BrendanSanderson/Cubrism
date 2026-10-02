@@ -68,7 +68,7 @@ class DoorEntity: GKEntity {
         }
         
         self.direction = direction
-        let sprite = SKSpriteNode(imageNamed: imageName)
+        let sprite = GameArt.sprite(imageName)
         node = SKNode();
         self.position = position
         node.position = position

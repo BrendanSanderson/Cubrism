@@ -52,7 +52,8 @@ class CompletedViewController: UIViewController {
         addLabel("Level \(Player.level) · \(Player.expToLevel(Player.level) - Player.exp) XP to next level")
         let progress = UIProgressView(progressViewStyle: .default)
         progress.progress = Float(Player.exp) / Float(Player.expToLevel(Player.level))
-        progress.progressTintColor = Constants.lightColor
+        progress.progressTintColor = GameArt.gold
+        progress.trackTintColor = UIColor(white: 0.22, alpha: 1)
         progress.accessibilityLabel = "Experience progress"
         stack.addArrangedSubview(progress)
         addLabel("Loot", size: 24)
@@ -61,7 +62,7 @@ class CompletedViewController: UIViewController {
             row.axis = .horizontal
             row.alignment = .center
             row.spacing = 16
-            let icon = UIImageView(image: UIImage(named: item.type))
+            let icon = UIImageView(image: GameArt.image(GameArt.imageName(for: item)))
             icon.contentMode = .scaleAspectFit
             icon.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -85,7 +86,7 @@ class CompletedViewController: UIViewController {
         button.setTitle("Continue", for: .normal)
         button.titleLabel?.font = UIFont(name: Constants.fontB, size: 24)
         button.setTitleColor(Constants.darkColor, for: .normal)
-        button.backgroundColor = Constants.lightColor
+        button.backgroundColor = GameArt.gold
         button.layer.cornerRadius = 8
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
         button.addTarget(self, action: #selector(goToHome(_:)), for: .touchUpInside)

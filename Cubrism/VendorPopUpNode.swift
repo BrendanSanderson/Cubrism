@@ -174,7 +174,7 @@ class BankPopUpNode: VendorPopUpNode {
         inventoryPage = min(max(0, page), max(0, (Player.inventory.count - 1) / 30))
         self.isUserInteractionEnabled = true
         self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
-        mainFrame = SKSpriteNode(imageNamed: "popUp")
+        mainFrame = GameArt.sprite("popUp")
         mainFrame.size = CGSize(width: scene.size.width * 0.9, height: scene.size.height * 0.8)
         mainFrame.zPosition = 999
         let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: scene.size.width * 0.03, height: scene.size.height * 0.8))
@@ -197,7 +197,7 @@ class BankPopUpNode: VendorPopUpNode {
         {
             for c in 0 ... 4
             {
-                let square = SelectNode(texture: SKTexture(imageNamed: "noEquipment"), size: size)
+                let square = SelectNode(texture: GameArt.texture( "noEquipment"), size: size)
                 let posX = invBotLeft.x + marginWidth * CGFloat(c + 1) + size.width/2 + size.width * CGFloat(c)
                 let posY = invBotLeft.y + marginHeight * CGFloat(r + 1) + size.height/2 + size.height * CGFloat(r)
                 square.position = CGPoint(x: posX, y: posY)
@@ -218,11 +218,11 @@ class BankPopUpNode: VendorPopUpNode {
             addChild(inv[col][row])
         }
         
-        let playerBackground = SKSpriteNode(texture: SKTexture(imageNamed: "playerIcon"), size: CGSize(width: mainFrame.size.height * 0.55, height: mainFrame.size.height * 0.55))
+        let playerBackground = SKSpriteNode(texture: GameArt.texture( "playerIcon"), size: CGSize(width: mainFrame.size.height * 0.55, height: mainFrame.size.height * 0.55))
         playerBackground.position = playerCenter
         playerBackground.zPosition = 1000
         addChild(playerBackground)
-        let playerCannonBackground = SKSpriteNode(texture: SKTexture(imageNamed: "playerCannon"), size: CGSize(width: mainFrame.size.height * 0.6, height: mainFrame.size.height * 0.6))
+        let playerCannonBackground = SKSpriteNode(texture: GameArt.texture( "playerCannon"), size: CGSize(width: mainFrame.size.height * 0.6, height: mainFrame.size.height * 0.6))
         playerCannonBackground.position = playerCenter
         playerCannonBackground.zPosition = 1001
         playerCannonBackground.position = playerCenter
@@ -389,7 +389,7 @@ class ShopPopUpNode: VendorPopUpNode {
             inventoryPage = min(max(0, page), max(0, (Player.inventory.count - 1) / 30))
         self.isUserInteractionEnabled = true
             self.position = CGPoint(x: scene.frame.width/2, y: scene.frame.height/2)
-            mainFrame = SKSpriteNode(imageNamed: "popUp")
+            mainFrame = GameArt.sprite("popUp")
             mainFrame.size = CGSize(width: scene.size.width * 0.9, height: scene.size.height * 0.8)
             mainFrame.zPosition = 999
             let centerLine = SKSpriteNode(color: Constants.darkColor, size: CGSize(width: scene.size.width * 0.03, height: scene.size.height * 0.8))
@@ -412,7 +412,7 @@ class ShopPopUpNode: VendorPopUpNode {
             {
                 for c in 0 ... 4
                 {
-                    let square = SelectNode(texture: SKTexture(imageNamed: "noEquipment"), size: size)
+                    let square = SelectNode(texture: GameArt.texture( "noEquipment"), size: size)
                     let posX = invBotLeft.x + marginWidth * CGFloat(c + 1) + size.width/2 + size.width * CGFloat(c)
                     let posY = invBotLeft.y + marginHeight * CGFloat(r + 1) + size.height/2 + size.height * CGFloat(r)
                     square.position = CGPoint(x: posX, y: posY)
@@ -440,7 +440,7 @@ class ShopPopUpNode: VendorPopUpNode {
             {
                 for c in 0 ... 4
                 {
-                    let square = SelectNode(texture: SKTexture(imageNamed: "noEquipment"), size: size)
+                    let square = SelectNode(texture: GameArt.texture( "noEquipment"), size: size)
                     let posX = 0 - (invBotLeft.x + marginWidth * CGFloat(c + 1) + size.width/2 + size.width * CGFloat(c))
                     let posY = 0 - (invBotLeft.y + marginHeight * CGFloat(r + 1) + size.height/2 + size.height * CGFloat(r))
                     square.position = CGPoint(x: posX, y: posY)
@@ -597,7 +597,7 @@ class ShopPopUpNode: VendorPopUpNode {
             let col = i % 5
             let row = 5 - (i / 5)
             let temp = inv[col][row]
-            inv[col][row] = SelectNode(texture: SKTexture(imageNamed: "noEquipment"), size: size)
+            inv[col][row] = SelectNode(texture: GameArt.texture( "noEquipment"), size: size)
             inv[col][row].position = temp.position
             inv[col][row].zPosition = temp.zPosition
             temp.removeFromParent()
@@ -620,7 +620,7 @@ class ShopPopUpNode: VendorPopUpNode {
             let col = 4 - (i % 5)
             let row = (i / 5)
             let temp = mInv[col][row]
-            mInv[col][row] = SelectNode(texture: SKTexture(imageNamed: "noEquipment"), size: size)
+            mInv[col][row] = SelectNode(texture: GameArt.texture( "noEquipment"), size: size)
             mInv[col][row].position = temp.position
             mInv[col][row].zPosition = temp.zPosition
             temp.removeFromParent()

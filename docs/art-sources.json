@@ -1,0 +1,37 @@
+{
+  "mode": "built-in image_gen",
+  "jobs": [
+    {
+      "name": "StyleEnemies",
+      "ref": "character-enemies.png",
+      "prompt": "Production 2D game sprite sheet on truly transparent alpha background, square 1536x1536 canvas, EXACT 3 columns x 3 rows equal 512x512 cells. NO text, labels, tile backgrounds or panel frames. Each sprite centered in its cell, occupies central 80% width and height, completely isolated transparent padding. Copy the nine reference enemies in exact reading order, red X, olive aperture, purple target, blue triple aperture, orange ring, cyan dash, charcoal bomb, mauve droplet, yellow burst. Option A geometric enamel stone style, crisp chamfers, minimal surface detail, orthographic straight-on square faces with NO projecting cast shadow outside silhouette. Exact uniform size and alignment. These are arcade game icons.",
+      "source": "exec-d5ccc88f-47b1-482a-b9a7-9529bcf59f29.png",
+      "revision": "Regenerated with true transparent alpha; the original opaque checkerboard sheet was rejected.",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleEnemies.imageset/art.png"
+    },
+    {
+      "name": "StyleBosses",
+      "ref": "character-bosses.png",
+      "prompt": "Production arcade game boss sprite sheet, transparent alpha background, square1536x1536, EXACT 2x2 equal cells 768x768, no labels. Four bosses from reference isolated centered in each cell with at least10% transparent padding. Top left cyan-banded charcoal generator cylinder. Top right indigo dragon head/body green eyes facing LEFT, from overhead, preserve elongated shape contained within cell. Bottom left ochre square golem head with square eye/mouth notch. Bottom right dense angular golden energy cluster. Crisp geometric stone/enamel, minimal cast shadows, no effects outside occupied area, no variant thumbnails, no board background.",
+      "source": "exec-a41520e6-f600-4919-944c-bd18a6f4f646.png",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleBosses.imageset/art.png"
+    },
+    {
+      "name": "StyleFloor",
+      "ref": "arena-drafts.png",
+      "prompt": "Production game floor texture only, landscape1536x768 full-bleed. Muted warm sandstone slabs with subtle irregular seams, shallow bevels and quiet painted texture, clean stylized geometric stone matching first reference arena. Completely flat orthographic overhead floor, continuous surface edge-to-edge. NO border, walls, objects, doorway, text, symbols, cracks glowing, decorations or cast shadows. Low contrast so bright small game sprites readable. Not a concept board. One seamless-looking quiet sandstone floor filling entire canvas.",
+      "source": "exec-f8f7a399-222e-4669-97df-09f7b936618e.png",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleFloor.imageset/art.png"
+    },
+    {
+      "name": "StyleGun",
+      "source": "exec-e9d34ccb-2cbc-4f1a-9ed9-86a5044be568.png",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleGun.imageset/art.png",
+      "brief": "P1 Classic central green circular receiver and short round barrel facing right, isolated with true transparent alpha. Yellow chassis rendered separately in GameArt."
+    }
+  ],
+  "notes": "Generated originals retained on the development host. The committed art.png files are production sources; GameArt performs runtime cropping and rendering. Player chassis and interface elements use Core Graphics and SF Symbols.",
+  "equipmentManifest": "equipment-art-sources.json",
+  "reactorArenaManifest": "reactor-arena-art-source.json",
+  "arenaManifest": "background-art-sources.json"
+}

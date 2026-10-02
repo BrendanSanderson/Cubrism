@@ -100,7 +100,7 @@ class EnemyEntity: DynamicEntity {
             speed = s
         }
         if(eType == "DragonFireball") {
-            self.sprite = SKSpriteNode(imageNamed: "bossDragonFireball")
+            self.sprite = GameArt.sprite("bossDragonFireball")
             if (scene as! RoomScene).doors[0].direction == 1
             {
                 sprite.position = CGPoint(x: scene.size.width * 0.15, y: scene.size.height/2)
@@ -110,7 +110,7 @@ class EnemyEntity: DynamicEntity {
                 sprite.position = CGPoint(x: scene.size.width * 0.85, y: scene.size.height/2)
             }
         }
-        else {self.sprite = SKSpriteNode(imageNamed: jType+"Enemy")}
+        else {self.sprite = GameArt.sprite(jType+"Enemy")}
         
         if eType == "Suicide" || eType == "DragonFireball" || eType == "Melee"
         {
@@ -258,15 +258,15 @@ class EnemyEntity: DynamicEntity {
             statusNode.size = sprite.size
             if (Double(currentHealth)/Double(health) <= 0.25)
             {
-                statusNode.texture = SKTexture(imageNamed: "damaged25")
+                statusNode.texture = GameArt.texture( "damaged25")
             }
             else if (Double(currentHealth)/Double(health) <= 0.5)
             {
-                statusNode.texture = SKTexture(imageNamed: "damaged50")
+                statusNode.texture = GameArt.texture( "damaged50")
             }
             else if (Double(currentHealth)/Double(health) <= 0.75)
             {
-                statusNode.texture = SKTexture(imageNamed: "damaged75")
+                statusNode.texture = GameArt.texture( "damaged75")
             }
         }
         else if (node.Entity.currentHealth <= 0)

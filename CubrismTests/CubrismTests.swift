@@ -13,6 +13,385 @@ import SpriteKit
 
 class CubrismTests: XCTestCase {
 
+    func testArenaBackgroundsFollowLevelAcrossWorldsAndRoomReentry() throws {
+        var seen = Set<ObjectIdentifier>()
+        let ranges: [(ClosedRange<Int>, String)] = [
+            (1...5, "StyleReactorArena"), (6...10, "StyleCargoArena"),
+            (11...15, "StyleBioArena"), (16...20, "StyleFungalArena"),
+            (21...25, "StyleCoralArena"), (26...30, "StyleClockworkArena"),
+            (31...35, "StyleStormArena"), (36...40, "StyleOrbitalArena"),
+            (41...45, "StyleHiveArena"), (46...50, "StyleForgeArena")
+        ]
+        for globalLevel in 1...50 {
+            let expectedAsset = try XCTUnwrap(ranges.first { $0.0.contains(globalLevel) }?.1)
+            let expectedTexture = GameArt.texture(expectedAsset)
+            let floor = FloorViewController(min: 4, max: 5,
+                level: (globalLevel - 1) % 10 + 1, world: (globalLevel - 1) / 10 + 1)
+            let first = RoomScene(size: GameScene.arenaSize)
+            first.viewController = floor
+            first.createGrid()
+            let background = try XCTUnwrap(first.children.first { $0.zPosition == -25 } as? SKSpriteNode)
+            let texture = try XCTUnwrap(background.texture)
+            XCTAssertTrue(texture === expectedTexture, "Background for global level \(globalLevel)")
+            XCTAssertEqual(first.arenaGlobalLevel, globalLevel)
+            seen.insert(ObjectIdentifier(texture))
+            XCTAssertEqual(background.size, GameScene.arenaSize)
+            XCTAssertNotNil(first.physicsBody)
+            let image = try XCTUnwrap(GameArt.image(expectedAsset))
+            XCTAssertEqual(image.size.width, 750, accuracy: 0.01)
+            XCTAssertEqual(image.size.height, 375, accuracy: 0.01)
+            XCTAssertGreaterThanOrEqual(try XCTUnwrap(image.cgImage).width, 1700)
+            let nextRoom = RoomScene(size: GameScene.arenaSize)
+            nextRoom.viewController = floor
+            nextRoom.createGrid()
+            let nextBackground = try XCTUnwrap(nextRoom.children.first { $0.zPosition == -25 } as? SKSpriteNode)
+            XCTAssertTrue(nextBackground.texture === texture, "The floor keeps its theme across rooms")
+            first.removeAllChildren()
+            first.createGrid()
+            XCTAssertTrue((first.children.first { $0.zPosition == -25 } as? SKSpriteNode)?.texture === texture)
+        }
+        XCTAssertEqual(seen.count, 10, "All ten backgrounds must appear across the fifty levels")
+        XCTAssertEqual(GameArt.arena(forGlobalLevel: 50).title, "Molten Forge")
+        XCTAssertEqual(HomeScene(size: GameScene.arenaSize).arenaGlobalLevel, 1)
+    }
+
+    func testTenArenaBackgroundsWithGameplayOverlay() throws {
+        let oldController = Player.currentViewController
+        let oldScene = Player.currentScene
+        let oldEntity = Player.entity
+        defer {
+            Player.currentViewController = oldController
+            Player.currentScene = oldScene
+            Player.entity = oldEntity
+        }
+        var captures = [UIImage]()
+        let view = SKView(frame: CGRect(origin: .zero, size: GameScene.arenaSize))
+        for globalLevel in stride(from: 1, through: 46, by: 5) {
+            let controller = FloorViewController(min: 4, max: 5,
+                level: (globalLevel - 1) % 10 + 1, world: (globalLevel - 1) / 10 + 1)
+            Player.currentViewController = controller
+            let scene = RoomScene(size: GameScene.arenaSize)
+            scene.viewController = controller
+            scene.name = "startRoom"
+            scene.startPosition = CGPoint(x: 375, y: 187.5)
+            scene.doors = [DoorEntity(scene: scene, direction: 0, type: "challenge"),
+                           DoorEntity(scene: scene, direction: 3, type: "challenge")]
+            view.presentScene(scene)
+            scene.isPaused = true
+            // Fixed samples make contrast comparable across all ten backgrounds.
+            for (index, name) in GameArt.enemies.enumerated() {
+                let sprite = GameArt.sprite(name)
+                sprite.size = CGSize(width: 32, height: 32)
+                sprite.position = CGPoint(x: 135 + CGFloat(index % 5) * 115,
+                                          y: index < 5 ? 265 : 110)
+                scene.addChild(sprite)
+            }
+            let capture = UIImage(cgImage: try XCTUnwrap(view.texture(from: scene,
+                crop: CGRect(origin: .zero, size: scene.size))).cgImage())
+            captures.append(capture)
+            if globalLevel == 6 || globalLevel == 46 {
+                let attachment = XCTAttachment(image: capture)
+                attachment.name = "Arena-\(globalLevel)-\(GameArt.arena(forGlobalLevel: globalLevel).title)"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+            }
+            view.presentScene(nil)
+        }
+        let gallery = GameArt.render(CGSize(width: 1500, height: 2075), scale: 1) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            for (index, capture) in captures.enumerated() {
+                let x = CGFloat(index % 2) * 750, y = CGFloat(index / 2) * 415
+                let firstLevel = index * 5 + 1
+                let title = "\(firstLevel)–\(firstLevel + 4). \(GameArt.arena(forGlobalLevel: firstLevel).title)"
+                (title as NSString).draw(at: CGPoint(x: x + 12, y: y + 9), withAttributes: [
+                    .font: UIFont.boldSystemFont(ofSize: 18), .foregroundColor: GameArt.ivory])
+                capture.draw(in: CGRect(x: x, y: y + 40, width: 750, height: 375))
+            }
+        }
+        let attachment = XCTAttachment(image: gallery)
+        attachment.name = "Ten-arenas-with-gameplay-overlay"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testStyleCatalogPreservesLogicalSizesAndHasTransparentSprites() throws {
+        let animationNames = (1...4).map { "dragonMouth\($0)" } + (0...8).map { "golemJump\($0)" }
+        let names = GameArt.enemies + GameArt.items + GameArt.bosses + ["playerIcon", "playerCannon"] + animationNames
+        for name in names {
+            let image = try XCTUnwrap(GameArt.image(name), name)
+            XCTAssertEqual(image.size, try XCTUnwrap(UIImage(named: name)).size, name)
+            XCTAssertTrue(GameArt.texture(name) === GameArt.texture(name), "Textures should be cached")
+        }
+        for name in animationNames {
+            XCTAssertNotEqual(GameArt.image(name)?.pngData(), UIImage(named: name)?.pngData(),
+                              "Animation frames must not fall back to the old artwork: \(name)")
+        }
+        for name in ["StyleGun", "StyleEnemies", "StyleBosses"] + GameArt.items.map({ "Style" + $0.replacingOccurrences(of: " ", with: "") }) {
+            let cg = try XCTUnwrap(UIImage(named: name)?.cgImage)
+            XCTAssertNotEqual(cg.alphaInfo, .none, name)
+            XCTAssertNotEqual(cg.alphaInfo, .noneSkipLast, name)
+        }
+    }
+
+    func testEquipmentAtlasCellsHaveRealTransparencyAndNoClippedEdges() throws {
+        for family in GameArt.items {
+            let sheet = "Style" + family.replacingOccurrences(of: " ", with: "")
+            let image = try XCTUnwrap(UIImage(named: sheet)?.cgImage, sheet)
+            let width = image.width / 3, height = image.height / 2
+            for cell in 0..<6 {
+                let crop = try XCTUnwrap(image.cropping(to: CGRect(x: cell % 3 * width, y: cell / 3 * height,
+                                                                   width: width, height: height)))
+                let pixels = rgbaPixels(crop)
+                let visible = stride(from: 3, to: pixels.count, by: 4).filter { pixels[$0] > 24 }
+                if cell == 5 {
+                    XCTAssertTrue(visible.isEmpty, "Unused atlas cell must be empty: \(family)")
+                } else {
+                    XCTAssertGreaterThan(visible.count, width * height / 10, "Missing art: \(family), \(cell)")
+                    XCTAssertLessThan(visible.count, width * height * 9 / 10, "Opaque background: \(family), \(cell)")
+                    for index in visible {
+                        let x = (index / 4) % width, y = (index / 4) / width
+                        XCTAssertTrue(x > 0 && x < width - 1 && y > 0 && y < height - 1,
+                                      "Art touches a crop boundary: \(family), \(cell)")
+                    }
+                }
+            }
+        }
+    }
+
+    func testEquipmentColorsSizesAndSilhouettes() throws {
+        for family in GameArt.items {
+            var variants = Set<Data>()
+            for (color, suffix) in ["", "0", "1", "2", "3"].enumerated() {
+                let name = family + suffix
+                let image = try XCTUnwrap(GameArt.image(name), name)
+                XCTAssertEqual(image.size, try XCTUnwrap(UIImage(named: name)).size, name)
+                variants.insert(try XCTUnwrap(image.pngData()))
+                let cg = try XCTUnwrap(image.cgImage)
+                XCTAssertGreaterThanOrEqual(cg.width, 288, "Detail views need full-resolution art: \(name)")
+                XCTAssertGreaterThanOrEqual(GameArt.texture(name).cgImage().width, 288,
+                                            "SpriteKit must retain the same item resolution: \(name)")
+                let pixels = rgbaPixels(cg)
+                var colored = [Int](repeating: 0, count: 4)
+                var opaque = 0
+                var minX = cg.width, maxX = 0, minY = cg.height, maxY = 0
+                for index in stride(from: 0, to: pixels.count, by: 4) where pixels[index + 3] > 180 {
+                    let r = Double(pixels[index]), g = Double(pixels[index + 1]), b = Double(pixels[index + 2])
+                    opaque += 1
+                    if g > r * 1.3 && g > b * 1.2 { colored[0] += 1 }
+                    if b > r * 1.3 && b > g * 1.1 { colored[1] += 1 }
+                    if r > g * 1.3 && b > g * 1.3 { colored[2] += 1 }
+                    if r > g * 1.2 && g > b * 1.4 { colored[3] += 1 }
+                    let x = index / 4 % cg.width, y = index / 4 / cg.width
+                    minX = min(minX, x); maxX = max(maxX, x)
+                    minY = min(minY, y); maxY = max(maxY, y)
+                }
+                XCTAssertGreaterThan(opaque, 0, name)
+                XCTAssertEqual(pixels[3], 0, "Inventory icons need transparent corners: \(name)")
+                if color == 0 {
+                    XCTAssertLessThan(colored.reduce(0, +), opaque / 8, "White should stay neutral: \(name)")
+                } else {
+                    XCTAssertGreaterThan(colored[color - 1], opaque / 8, "Variant must color the item, not just a badge: \(name)")
+                    if color != 1 { XCTAssertLessThan(colored[0], opaque / 50, "Green leaked into \(name)") }
+                }
+                let aspect = Double(maxX - minX + 1) / Double(maxY - minY + 1)
+                if family.contains("Pulsar") { XCTAssertGreaterThan(aspect, 1.2, "Do not squash guns into squares") }
+                if family == "Power Core" { XCTAssertEqual(aspect, 1, accuracy: 0.08, "Core must remain circular") }
+            }
+            XCTAssertEqual(variants.count, 5, "Five distinct colorways required for \(family)")
+        }
+    }
+
+    func testRewardAndInventoryUseTheSameSavedEquipmentAppearance() throws {
+        for family in GameArt.items {
+            for tier in 1...4 {
+                for variant in 0...3 {
+                    let equipment = Equipment(t: family, lev: 3, tie: tier, st: "", v: variant)
+                    let restored = Equipment(dic: equipment.toDictionary())
+                    let expectedName = tier == 1 ? family : family + String(variant)
+                    let node = ItemNode(i: restored)
+                    XCTAssertTrue(node.texture === GameArt.texture(expectedName))
+                    XCTAssertEqual(node.size, CGSize(width: 32, height: 32))
+                    let controller = CompletedViewController()
+                    controller.drops = [restored]
+                    controller.loadViewIfNeeded()
+                    let scroll = try XCTUnwrap(controller.view.subviews.first?.subviews.compactMap { $0 as? UIScrollView }.first)
+                    let stack = try XCTUnwrap(scroll.subviews.compactMap { $0 as? UIStackView }.first)
+                    let row = try XCTUnwrap(stack.arrangedSubviews.last as? UIStackView)
+                    let reward = try XCTUnwrap((row.arrangedSubviews.first as? UIImageView)?.image)
+                    XCTAssertEqual(reward.pngData(), GameArt.image(expectedName)?.pngData(), expectedName)
+                }
+            }
+        }
+        XCTAssertEqual(GameArt.imageName(for: Item(t: "Cubrixel")), "Cubrixel")
+    }
+
+    func testEquipmentCatalogVisualGallery() throws {
+        let gallery = GameArt.render(CGSize(width: 820, height: 790)) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            for (column, color) in ["White", "Green", "Blue", "Purple", "Orange"].enumerated() {
+                (color as NSString).draw(at: CGPoint(x: 160 + column * 130, y: 8), withAttributes: [.font: UIFont.boldSystemFont(ofSize: 16), .foregroundColor: UIColor.white])
+            }
+            for (row, family) in GameArt.items.enumerated() {
+                (family as NSString).draw(at: CGPoint(x: 8, y: 80 + row * 125), withAttributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.white])
+                for (column, suffix) in ["", "0", "1", "2", "3"].enumerated() {
+                    let image = GameArt.image(family + suffix)
+                    image?.draw(in: CGRect(x: 150 + column * 130, y: 35 + row * 125, width: 88, height: 88))
+                    image?.draw(in: CGRect(x: 242 + column * 130, y: 90 + row * 125, width: 32, height: 32))
+                }
+            }
+        }
+        let attachment = XCTAttachment(image: gallery)
+        attachment.name = "Equipment-all-30-large-and-32pt"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testEquipmentShopAndBankPreviews() throws {
+        let inventory = Player.inventory
+        let merchant = Constants.merchantInventory
+        defer { Player.inventory = inventory; Constants.merchantInventory = merchant }
+        let samples = GameArt.items.flatMap { family in
+            (0..<5).map { Equipment(t: family, lev: 3, tie: $0 == 0 ? 1 : 2, st: "", v: max(0, $0 - 1)) }
+        }
+        Player.inventory = samples
+        Constants.merchantInventory = Array(samples.prefix(15))
+        let scene = GameScene(size: GameScene.arenaSize)
+        let view = SKView(frame: CGRect(origin: .zero, size: scene.size))
+        let bank = BankPopUpNode(scene: scene)
+        let shop = ShopPopUpNode(scene: scene)
+        for node in [bank as SKNode, shop as SKNode] {
+            scene.addChild(node)
+            let texture = try XCTUnwrap(view.texture(from: node))
+            let attachment = XCTAttachment(image: UIImage(cgImage: texture.cgImage()))
+            attachment.name = node === bank ? "Equipment-bank" : "Equipment-shop"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            node.removeFromParent()
+        }
+        XCTAssertEqual(bank.pageItems.count, 30)
+        XCTAssertEqual(shop.pageItems.count, 30)
+    }
+
+    func testRemainingAssetAuditGalleries() throws {
+        let projectiles = ["playerShot", "enemyShot", "enemyTrackingShot", "enemyTrippleShot", "enemyRingShot",
+                           "enemySludge", "bomberShot", "bombLit1", "bombLit2", "bombLit3", "bossGeneratorShot",
+                           "bossEnergyShot", "bossGolemRock", "bossDragonFireball"] + (0...3).map { "bossDragonShot\($0)" }
+        let doors = ["horizontal", "vertical"].flatMap { orientation in
+            ["", "Lock", "Unlock", "BossLock", "BossUnlock"].map { orientation + "Door" + $0 }
+        }
+        let interface = ["bank", "merchant", "Cubrixel", "noEquipment", "pauseButton", "backButton", "closeButton", "popUp",
+                         "healthBarTop", "healthBarBottom", "shieldBarTop", "shieldBarBottom", "bossBarTop", "bossBarBottom", "experienceFill"] + (1...4).map { "tier\($0)" }
+        let animation = (1...4).map { "dragonMouth\($0)" } + (0...8).map { "golemJump\($0)" }
+        let surfaces = (1...5).flatMap { ["background\($0)", "backgroundInner\($0)", "background\($0)Cell"] } + ["lockedCell", "loadingScreen"]
+        for (group, names) in [("projectiles", projectiles), ("doors-and-controls", doors + interface),
+                               ("damage-and-animation", ["damaged25", "damaged50", "damaged75", "golemBlock"] + animation),
+                               ("world-surfaces", surfaces)] {
+            var resolved = [UIImage]()
+            for name in names { resolved.append(try XCTUnwrap(GameArt.image(name), "Missing live image: \(name)")) }
+            let image = GameArt.render(CGSize(width: 720, height: ((names.count + 4) / 5) * 115)) { rect in
+                GameArt.ink.setFill(); UIRectFill(rect)
+                for (index, name) in names.enumerated() {
+                    let box = CGRect(x: 10 + index % 5 * 142, y: 10 + index / 5 * 115, width: 120, height: 82)
+                    let source = resolved[index]
+                    let scale = min(box.width / source.size.width, box.height / source.size.height)
+                    let size = CGSize(width: source.size.width * scale, height: source.size.height * scale)
+                    source.draw(in: CGRect(x: box.midX - size.width / 2, y: box.midY - size.height / 2,
+                                           width: size.width, height: size.height))
+                    (name as NSString).draw(at: CGPoint(x: box.minX, y: box.maxY + 3), withAttributes: [.font: UIFont.systemFont(ofSize: 10), .foregroundColor: UIColor.white])
+                }
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "Audit-" + group
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
+    private func rgbaPixels(_ image: CGImage) -> [UInt8] {
+        var pixels = [UInt8](repeating: 0, count: image.width * image.height * 4)
+        let context = CGContext(data: &pixels, width: image.width, height: image.height, bitsPerComponent: 8,
+                                bytesPerRow: image.width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        return pixels
+    }
+
+    func testStyleCatalogVisualGallery() throws {
+        let names = ["playerIcon", "playerCannon"] + GameArt.enemies + GameArt.bosses + GameArt.items
+        let image = GameArt.render(CGSize(width: 720, height: 320)) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            for (index, name) in names.enumerated() {
+                let box = CGRect(x: 12 + (index % 8) * 88, y: 12 + (index / 8) * 100, width: 64, height: 64)
+                GameArt.image(name)?.draw(in: box)
+                (name as NSString).draw(at: CGPoint(x: box.minX, y: box.maxY + 2), withAttributes: [.font: UIFont.systemFont(ofSize: 8), .foregroundColor: UIColor.white])
+            }
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "StyleA-catalog"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testBarsKeepTheirTexturesAndLeftCapsWhileDepleting() throws {
+        let scene = GameScene(size: GameScene.arenaSize)
+        let bars = HealthBarComponent(scene: scene, playerNode: SKNode(), sprite: SKSpriteNode())
+        let xp = ExpBarComponent(scene: scene)
+        let boss = BossBarComponent(scene: scene)
+        let sprites = [bars.healthCropSprite, bars.shieldCropSprite, xp.expCropSprite!, boss.healthCropSprite!]
+        let sizes = sprites.map { $0.size }
+        let textures = sprites.map { $0.texture }
+        for fraction in [1.0, 0.75, 0.5, 0.25, 0.05, 0, -0.2, 1.2] {
+            bars.updateBars(Player.shield * fraction, health: Player.health * fraction)
+            xp.updateBars(Int(Double(Player.expToLevel(Player.level)) * fraction))
+            // The boss removes its HUD on death, so exercise zero via the fill helper.
+            updateBarFill(boss.healthCropSprite, value: fraction * 100, maximum: 100)
+            for (index, sprite) in sprites.enumerated() {
+                XCTAssertEqual(sprite.size, sizes[index], "Do not rescale cap or border pixels")
+                XCTAssertTrue(sprite.texture === textures[index])
+                XCTAssertEqual(sprite.anchorPoint, .zero)
+                let crop = try XCTUnwrap(sprite.parent as? SKCropNode)
+                let mask = try XCTUnwrap(crop.maskNode as? SKSpriteNode)
+                XCTAssertEqual(mask.anchorPoint, .zero)
+                XCTAssertEqual(mask.position, .zero)
+                XCTAssertEqual(mask.size.height, sizes[index].height)
+                XCTAssertGreaterThanOrEqual(mask.size.width, 0)
+                XCTAssertLessThanOrEqual(mask.size.width, sizes[index].width)
+                if index != 2 {
+                    XCTAssertEqual(mask.size.width, sizes[index].width * CGFloat(min(1, max(0, fraction))), accuracy: 0.001)
+                }
+                XCTAssertEqual(crop.isHidden, fraction <= 0)
+            }
+        }
+        updateBarFill(bars.shieldCropSprite, value: 1, maximum: 0)
+        XCTAssertTrue(bars.shieldCropSprite.parent!.isHidden)
+        boss.updateBars(0, totalHealth: 100)
+        XCTAssertNil(boss.healthCropSprite.parent?.parent)
+    }
+
+    func testBarFillVisualStates() throws {
+        let scene = GameScene(size: GameScene.arenaSize)
+        let gallery = SKNode()
+        scene.addChild(gallery)
+        for (row, fraction) in [1.0, 0.75, 0.5, 0.25, 0.05, 0].enumerated() {
+            let bars = HealthBarComponent(scene: scene, playerNode: SKNode(), sprite: SKSpriteNode())
+            bars.healthNode.removeFromParent()
+            bars.shieldNode.removeFromParent()
+            gallery.addChild(bars.healthNode)
+            gallery.addChild(bars.shieldNode)
+            let y = CGFloat(5 - row) * 45
+            bars.healthNode.position = CGPoint(x: 70, y: y)
+            bars.shieldNode.position = CGPoint(x: 70, y: y)
+            bars.updateBars(Player.shield * fraction, health: Player.health * fraction)
+
+        }
+        let view = SKView(frame: CGRect(origin: .zero, size: scene.size))
+        let texture = try XCTUnwrap(view.texture(from: gallery))
+        let attachment = XCTAttachment(image: UIImage(cgImage: texture.cgImage()))
+        attachment.name = "Health-and-shield-100-75-50-25-5-0-percent"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testArenaScaleIsIndependentOfWindowSize() {
         let floor = FloorViewController(min: 4, max: 5, level: 1, world: 1)
         floor.loadViewIfNeeded()
@@ -147,6 +526,44 @@ class CubrismTests: XCTestCase {
         let expectedWidth = controller.collectionView.bounds.width * pageCount
 
         XCTAssertEqual(controller.collectionView.collectionViewLayout.collectionViewContentSize.width, expectedWidth, accuracy: 1.0)
+    }
+
+    func testOriginalProjectileArtAndMenuPaging() throws {
+        for name in ["playerShot", "enemyShot", "enemyTrackingShot", "enemyTrippleShot", "bossDragonFireball", "bombLit1"] {
+            XCTAssertEqual(try XCTUnwrap(GameArt.image(name)).pngData(), try XCTUnwrap(UIImage(named: name)).pngData(), name)
+        }
+        for size in [CGSize(width: 844, height: 390), CGSize(width: 1440, height: 900)] {
+            let controller = LevelSelectCollectionViewController()
+            controller.loadViewIfNeeded()
+            controller.view.frame = CGRect(origin: .zero, size: size)
+            controller.viewDidLayoutSubviews()
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            controller.collectionView.layoutIfNeeded()
+            controller.pageControl.currentPage = 2
+            controller.pageControlChanged(controller.pageControl)
+            controller.collectionView.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let offset = CGPoint(x: controller.collectionView.bounds.width * 2, y: 0)
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            XCTAssertEqual(controller.collectionView.bounds.origin, offset, "Layout must not reset paging")
+            let layout = controller.collectionView.collectionViewLayout
+            for item in 0..<10 {
+                let frame = try XCTUnwrap(layout.layoutAttributesForItem(at: IndexPath(item: item, section: 2))).frame
+                XCTAssertTrue(CGRect(x: offset.x, y: 0, width: controller.collectionView.bounds.width, height: controller.collectionView.bounds.height).contains(frame), "offset=\(offset) bounds=\(controller.collectionView.bounds) frame=\(frame)")
+            }
+            controller.pageControl.currentPage = 0
+            controller.pageControlChanged(controller.pageControl)
+            controller.collectionView.layoutIfNeeded()
+            let image = UIGraphicsImageRenderer(size: size).image { context in
+                controller.view.layer.render(in: context.cgContext)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "Level selection \(Int(size.width))x\(Int(size.height))"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
     }
 
     func testLevelSelectUnlocksUsingGlobalLevelNumber() {
@@ -443,7 +860,9 @@ class CubrismPlaythroughTests: XCTestCase {
         floor.skView.presentScene(nil)
         let completed = CompletedViewController()
         completed.expGained = 147
-        completed.drops = (0..<8).map { Equipment(t: "Power Core", lev: $0 + 1, tie: 1, st: "") }
+        // Ensure overflow even when Catalyst restores a tall desktop window.
+        let dropCount = max(8, Int(window.bounds.height / 48) + 1)
+        completed.drops = (0..<dropCount).map { Equipment(t: "Power Core", lev: $0 + 1, tie: 2, st: "", v: $0 % 4) }
         completed.modalPresentationStyle = .fullScreen
         floor.present(completed, animated: false)
         RunLoop.main.run(until: Date().addingTimeInterval(0.2))
@@ -457,6 +876,31 @@ class CubrismPlaythroughTests: XCTestCase {
         XCTAssertNil(home.presentedViewController)
         XCTAssertTrue(home.skView.scene is HomeScene)
         XCTAssertNil(Player.currentViewController)
+    }
+
+    func testLevelSelectionStartsChosenFloor() throws {
+        guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else { throw XCTSkip("Acceptance scheme required") }
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let home = try XCTUnwrap(window.rootViewController as? HomeViewController)
+        let defaults = UserDefaults.standard
+        let saved = defaults.object(forKey: "LevelCompleted")
+        defer {
+            home.dismiss(animated: false)
+            if let saved = saved { defaults.set(saved, forKey: "LevelCompleted") }
+            else { defaults.removeObject(forKey: "LevelCompleted") }
+        }
+        defaults.set(10, forKey: "LevelCompleted")
+        let menu = try XCTUnwrap(home.levelSelectView)
+        home.present(menu, animated: false)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        menu.collectionView(menu.collectionView, didSelectItemAt: IndexPath(item: 1, section: 1))
+        XCTAssertTrue(home.presentedViewController === menu, "Locked floor must not start")
+        menu.collectionView(menu.collectionView, didSelectItemAt: IndexPath(item: 0, section: 1))
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
+        XCTAssertTrue(home.presentedViewController === home.floorView)
+        XCTAssertEqual(home.floorView.world, 2)
+        XCTAssertEqual(home.floorView.level, 1)
+        XCTAssertNotNil(home.floorView.scene)
     }
 
     func testFirstTwoFloorsThroughCombatAndDoors() throws {
