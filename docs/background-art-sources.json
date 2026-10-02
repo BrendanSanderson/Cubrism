@@ -1,0 +1,158 @@
+{
+  "mode": "built-in image_gen",
+  "mapping": "One theme per local level 1\u201310, repeated across the five existing worlds. Home uses Reactor Arcade.",
+  "notes": "User approved the complete set, including the revised Cargo Hold. Runtime fitting preserves arena size, collisions, foreground sprites and controls. Original PNG pixels are retained in the asset catalog.",
+  "arenas": [
+    {
+      "level": 1,
+      "name": "Reactor Arcade",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleReactorArena.imageset/art.png",
+      "source": "exec-43611554-13f1-40df-bd72-a0daea4412b5.png",
+      "prompts": [
+        "Use case: precise-object-edit. Asset type: production background for an orthographic 2D arcade arena. Edit target: attached approved Reactor Arcade A concept. Remove ALL foreground gameplay: both stacked health/shield bars and icons at top left, pause button at top right, both bottom joysticks, central yellow player and gun, all three square enemies, and BOTH lock/door cards at top center and left center. Reconstruct the background under them. The top-right circular reactor should have the same orange lens as the other corners. Where door cards and HUD were, continue the teal machinery pipe modules, orange collars and occasional ivory connectors consistently. Where characters and joysticks were, continue the blue floor and its quiet broad panel seams. Preserve the exact approved palette, enamel illustration style, lighting, scale, composition and lively pipe-border design. The image is ONLY a single empty arena background, no gameplay objects, no text, icons, controls or placeholders. Aspect ratio EXACTLY 2:1 landscape, full bleed. Collision alignment requirement: the blue open floor begins exactly 5% from left and right and 10% from top and bottom. Keep all raised border machinery outside that rectangular playable floor. Corner housings must stay in the perimeter band, without intruding into that rectangle. Floor panel lines are subtle decoration, no obstacles. Keep the center open and readable; avoid gritty noise, extra effects or a center emblem. Render crisp high-resolution production art, preferably 2400x1200.",
+        "Use case: precise-object-edit. Input is the approved clean Reactor Arcade arena background. Make ONE technical correction for game collision alignment: make the inside edge of the machinery border a precise RECTANGLE with square 90-degree inside corners, at x=5% and x=95% of image width and y=10% and y=90% of image height. Expand the blue floor to fill that entire rectangular opening, all the way into its square corners. Squeeze the surrounding pipe modules and four reactor housings into the perimeter outside that opening: no protrusions, diagonal cut corners, or dark solid rim areas inside the open floor rectangle. Keep the approved appearance otherwise: exact teal enamel pipes, warm orange collars and four orange reactor lenses, ivory fittings, navy recesses, blue quiet broad panels, existing subtle lighting and cartoon polish. Same straight-down orthographic 2:1 full-bleed landscape image. Do NOT add any controls, characters, text, symbols, HUD, doors, obstacles or center emblem. This is the final production empty arena background."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.058,
+        "y": 0.107,
+        "width": 0.884,
+        "height": 0.77
+      }
+    },
+    {
+      "level": 2,
+      "name": "Cargo Hold",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleCargoArena.imageset/art.png",
+      "source": "exec-30d3e8bc-c536-4a80-98a1-0806f09f9841.png",
+      "prompts": [
+        "Use case: style-transfer. Edit target is IMAGE 1, Cargo Hold arena. IMAGE 2, Reactor Arcade, is the PRIMARY ART-STYLE reference. IMAGE 3, Molten Forge, is a SECONDARY ART-STYLE reference. Redraw Cargo Hold so it clearly belongs to the exact same illustrated game as references 2 and 3. Preserve Cargo Hold's theme: red/cobalt/ivory shipping crates, brown timber, chunky tan ropes, a few navy cargo straps with gold buckles, and a muted brown wooden deck. Keep the same 2:1 straight-down rectangular arena composition and open central play area. Do NOT copy the pipe-border machinery or metal-panel floor of images 2 or 3. The correction is rendering language, not changing the environment into another reactor.\nCritical style corrections: use the same clean thick chamfers, broad smooth enamel-like highlights, simplified softly rounded geometric masses, strong readable silhouettes, saturated clean color blocks and single consistent upper-left lighting as image 2. Remove the realistic/painterly weathering from image 1: no scratches, chipped paint, tiny rivets, fabric wrinkles, fine wood grain, noisy patina, splinters or realistic texture. Fewer, larger border objects, around 5-7 substantial modules along each long edge and 2-3 along each short edge. Crates should have solid clean sculpted X-braces, broad blank colored faces, oversized chamfered corner protectors and at most a few large simplified round fasteners. Rope is a thick graphic shape with just a few rounded twists, no tiny fibers. Fabric straps are smooth flat navy bands, not draped cloth. Timber is recognizable through warm color, plank seams and one or two very broad subtle grain strokes, not dense grain. Shadows are shallow and controlled, not murky crevices or a heavy brown vignette. Retain colorful crate and strap variety and asymmetrical cargo clusters without clutter.\nFloor: simplify to fewer wider low-contrast wooden deck boards in a broad diagonal herringbone arrangement, gently beveled seams, almost smooth matte warm medium brown, no nails, cracks, grain noise or weathering. Floor stays quiet so bright small sprites and projectiles remain visible. Raised cargo stays outside the rectangular floor opening x5\u201395% and y10\u201390%; no oversized corner piles intruding into it. Orthographic overhead, not isometric. No text, labels, HUD, characters, enemies, player, joysticks or center emblem. Output one clean revised Cargo Hold background, no comparison layout, no border outside the game art, EXACT 2:1 landscape."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.086,
+        "y": 0.14,
+        "width": 0.828,
+        "height": 0.706
+      }
+    },
+    {
+      "level": 3,
+      "name": "Bio Lab",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleBioArena.imageset/art.png",
+      "source": "exec-5f3a869c-486f-45d6-93ca-4e5e034257a5.png",
+      "prompts": [
+        "Use case: style-transfer. Create one concept for a new world background in the same 2D arcade game as the reference. Reference role: approved Reactor Arcade art style, camera, framing, and level of finish. Preserve its crisp chunky enamel illustration, playful engineered border, clean broad color surfaces and readable low-detail floor. Make a DISTINCT themed environment, changing border component shapes and floor panel design as well as color; do not simply recolor the teal pipes. Straight-down orthographic view, full-bleed landscape EXACT 2:1. Arena opening is a large unobstructed rectangle spanning x5\u201395% and y10\u201390%. Concentrate personality in the narrow perimeter, keep all raised machinery outside the playable rectangle. Large low-contrast floor panels; floor should occupy 80% of height and 90% of width, with no center emblem or distracting lights. No characters, enemies, HUD, text, icons, doors, joystick circles, weapons, projectiles, obstacles, labels, concept-board frame or watermark. One empty arena background, not a collage. Match the reference's cheerful richly colored polish, avoid photorealism, grit, generic gray sci-fi or flat monochrome. Theme: BIO LAB. A mischievous living-machine laboratory. Border of ivory ceramic housings, emerald segmented hoses, transparent green nutrient chambers with big rounded bubbles, copper-orange valves, a few neat curled vines wound around OUTER machinery. Four corner pods are green-glass rounded pressure vessels held by cream armor bands, NOT copied circular orange reactor lenses. Distinct ribbed hose segments and capsule tanks, charming chunky silhouettes. The central floor is warm muted pale sage-gray ceramic, with broad rounded rectangular panels and subtle honeycomb details at the perimeter only. Floor medium-light and desaturated enough to distinguish vivid green enemies and white/cyan bullets. Green and cream dominate border, small copper accents; no spilled slime inside arena."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.06,
+        "y": 0.115,
+        "width": 0.88,
+        "height": 0.745
+      }
+    },
+    {
+      "level": 4,
+      "name": "Fungal Hollow",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleFungalArena.imageset/art.png",
+      "source": "exec-501e3516-61ea-4a74-87be-a21674e9c2b3.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: one empty overhead 2D arcade arena background, landscape EXACTLY 2:1, full bleed, approximately 1800x900. Art direction: polished playful dimensional game illustration, bold chunky shapes, clean bevels, soft enamel-like highlights, rich but carefully controlled colors, restrained texture. Orthographic STRAIGHT DOWN view with no horizon or cinematic camera angle. Large clear RECTANGULAR playable floor spanning x5\u201395% and y10\u201390% of image. All raised objects and detailed decoration are confined to the narrow perimeter OUTSIDE that rectangle. Floor has broad low-contrast material shapes and a large quiet center for small colorful game enemies and bullets; absolutely no raised central objects, bright central motifs or hazards. The border must have its own irregular silhouette and recognizable materials, rather than four identical corner ornaments. No sci-fi pipe rails, connected glowing coolant tubes, circular reactor pods or bolted square sheet-metal floor. No text, labels, characters, weapons, enemies, doors, HUD, joysticks, watermark or collage. One finished arena scene. Not photorealistic, gritty or noisy. Border character and floor material should be visibly different. Theme: FUNGAL HOLLOW, a strange whimsical organic underground forest clearing. The perimeter is tangled thick dark aubergine roots and dark warm-brown bark, large rounded crimson-orange mushroom caps with pale peach undersides, clusters of a few small buttery-yellow shelf fungi, and occasional tiny mint bioluminescent spores embedded in roots. Larger mushroom caps differ in shape and location, with clean cheerful sculpted forms rather than hundreds of tiny specks. NO green laboratory tanks, vines over machinery, pipes or metal. Central floor is muted cool dark mauve packed earth with broad smooth earthen plates, subtle shallow root impressions near the edges and a quiet open center; NOT a cracked tile grid. No mushrooms, roots or spores inside playable area. Glowing mint accents are sparse and confined to the border. Perimeter should look soft, knotty and entirely organic, strong silhouette variety, chunky arcade-art finish. Center light enough to show dark enemies and dark enough for bright bullets."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.068,
+        "y": 0.125,
+        "width": 0.864,
+        "height": 0.725
+      }
+    },
+    {
+      "level": 5,
+      "name": "Coral Vault",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleCoralArena.imageset/art.png",
+      "source": "exec-d993d53b-f38b-4a63-93b5-56a14b7e6ef8.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: one empty overhead 2D arcade arena background, landscape EXACTLY 2:1, full bleed, approximately 1800x900. Art direction: polished playful dimensional game illustration, bold chunky shapes, clean bevels, soft enamel-like highlights, rich but carefully controlled colors, restrained texture. Orthographic STRAIGHT DOWN view with no horizon or cinematic camera angle. Large clear RECTANGULAR playable floor spanning x5\u201395% and y10\u201390% of image. All raised objects and detailed decoration are confined to the narrow perimeter OUTSIDE that rectangle. Floor has broad low-contrast material shapes and a large quiet center for small colorful game enemies and bullets; absolutely no raised central objects, bright central motifs or hazards. The border must have its own irregular silhouette and recognizable materials, rather than four identical corner ornaments. No sci-fi pipe rails, connected glowing coolant tubes, circular reactor pods or bolted square sheet-metal floor. No text, labels, characters, weapons, enemies, doors, HUD, joysticks, watermark or collage. One finished arena scene. Not photorealistic, gritty or noisy. Border character and floor material should be visibly different. Theme: CORAL VAULT, an underwater arena enclosed by a colorful reef and pearly shell architecture. Border formed from chunky sculpted pink-coral branches, broad salmon and coral-orange fan corals, smooth ivory shells, turquoise worn reef stone, a few tiny muted ochre sea sponges. Make these large simple masses rather than dense delicate branches; they curl along the outside edge while retaining a straight rectangular inner boundary. Corner groups differ: one spiral shell, one fan coral, another stacked scallop shells, another worn reef arch fragment. Central floor is muted medium teal-blue flat limestone with broad organically rounded mosaic-like stone shapes, quiet gentle shading and sparse subtle pale sand seams. It is a continuous hard floor, not water, no reflections or sparkling caustics. Deep navy water visible only beyond outer reef. Pink/ivory/orange perimeter contrasts with tranquil teal center. No fish, sea creatures, bubbles crossing battlefield, machinery, gold gears, metal panels or fantasy gems. Cheerful high-end cartoon game finish; vivid border, quiet floor."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.078,
+        "y": 0.157,
+        "width": 0.844,
+        "height": 0.68
+      }
+    },
+    {
+      "level": 6,
+      "name": "Clockwork Ruins",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleClockworkArena.imageset/art.png",
+      "source": "exec-1cb952de-a943-4ebb-9e8d-7e672d2f91ae.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: empty top-down 2D arcade game arena background, one image, 2:1 landscape, approximately 1800x900. Clean bold stylized game illustration: chunky dimensional shapes, crisp beveled edges, smooth enamel-like highlights, rich colors, restrained soft texture. Orthographic straight-down camera, no perspective or horizon. A large unobstructed rectangular playable floor extends from x5% to x95% and y10% to y90%. The thin surrounding perimeter contains all raised decoration. Keep the center low contrast and readable for small colorful square enemies and bullets. No characters, UI, text, doors, symbols painted in the center, joysticks, projectiles, obstacles or watermark. IMPORTANT art direction: This must look fundamentally different from a rectangular sci-fi pipe frame. NO connected pipes, glowing coolant tubes, identical four circular corner reactors, bolted square metal floor panels, or symmetrical repeated sci-fi connector modules. Different silhouette, floor construction and material identity. The borders should be fun, characterful and instantly recognizable at thumbnail scale. Theme: CLOCKWORK RUINS, a buried ancient machine inside a warm ochre stone temple. Border formed from uneven thick golden sandstone blocks with broad chamfered edges and simple zigzag architectural relief, tucked half-exposed antique brass toothed gears and dark wooden cog axles between blocks. Large partial gear rims emerge at irregular positions along the OUTSIDE edge; gears vary in size, never four matching corner devices. A few tiny turquoise enamel inlays in stone joints and a couple of muted terracotta ceramic fragments add color. Small soft sand drifts accumulate only along the outer border. Corners are chunky staggered masonry interlocks with different gear fragments, all respecting rectangular inner edge. Central floor is warm medium tan matte stone flagstones with irregular large polygonal shapes, sparse soft seams, broad quiet unmarked center, very subtle edge wear, no rivets or metal sheets. This should instantly read as stone-and-brass archaeology, almost a friendly mechanical temple, rather than a factory. Bright inviting golden border with teal accents; central floor less saturated than border. No plants, vegetation, lava or flames."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.075,
+        "y": 0.138,
+        "width": 0.852,
+        "height": 0.705
+      }
+    },
+    {
+      "level": 7,
+      "name": "Storm Citadel",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleStormArena.imageset/art.png",
+      "source": "exec-8f720e37-3154-466f-a787-84ae7d4ef7df.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: one empty overhead 2D arcade arena background, landscape EXACTLY 2:1, full bleed, approximately 1800x900. Art direction: polished playful dimensional game illustration, bold chunky shapes, clean bevels, soft enamel-like highlights, rich but carefully controlled colors, restrained texture. Orthographic STRAIGHT DOWN view with no horizon or cinematic camera angle. Large clear RECTANGULAR playable floor spanning x5\u201395% and y10\u201390% of image. All raised objects and detailed decoration are confined to the narrow perimeter OUTSIDE that rectangle. Floor has broad low-contrast material shapes and a large quiet center for small colorful game enemies and bullets; absolutely no raised central objects, bright central motifs or hazards. The border must have its own irregular silhouette and recognizable materials, rather than four identical corner ornaments. No sci-fi pipe rails, connected glowing coolant tubes, circular reactor pods or bolted square sheet-metal floor. No text, labels, characters, weapons, enemies, doors, HUD, joysticks, watermark or collage. One finished arena scene. Not photorealistic, gritty or noisy. Border character and floor material should be visibly different. Theme: STORM CITADEL, a fortress platform high above dense rolling clouds. The perimeter is chunky cool white-gray carved stone parapets with stepped crenellations, angular stone buttresses and short broad brass lightning-catcher fins set in a few irregular positions along the outer edge. A handful of deep royal-blue cloth pennants wrap outward over the parapet, NO heraldic symbols. Billowing sculpted ivory cloud masses and small deep indigo gaps lie OUTSIDE the floor beyond the outer edge, visible around perimeter only. Corners formed by differently stepped stone bastions rather than round turrets. Central floor medium desaturated slate-blue wide octagonal and square paving stones, very subtle seams, slight soft wear, large quiet areas and no center insignia. No towers viewed from the side; true overhead composition. A few small warm yellow-orange electrical glows at the tips of OUTER brass fins suggest storm energy but no lightning across the arena. Distinct stone-and-cloud silhouette, saturated royal-blue pennants and warm brass give personality, no sci-fi pipes, coolant modules, gears or icy surfaces."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.084,
+        "y": 0.145,
+        "width": 0.832,
+        "height": 0.69
+      }
+    },
+    {
+      "level": 8,
+      "name": "Orbital Scrapyard",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleOrbitalArena.imageset/art.png",
+      "source": "exec-f5a498df-64c2-4b8c-aa4e-fdd15327cd89.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: empty top-down 2D arcade game arena background, one image, 2:1 landscape, approximately 1800x900. Clean bold stylized game illustration: chunky dimensional shapes, crisp beveled edges, smooth enamel-like highlights, rich colors, restrained soft texture. Orthographic straight-down camera, no perspective or horizon. A large unobstructed rectangular playable floor extends from x5% to x95% and y10% to y90%. The thin surrounding perimeter contains all raised decoration. Keep the center low contrast and readable for small colorful square enemies and bullets. No characters, UI, text, doors, symbols painted in the center, joysticks, projectiles, obstacles or watermark. IMPORTANT art direction: This must look fundamentally different from a rectangular sci-fi pipe frame. NO connected pipes, glowing coolant tubes, identical four circular corner reactors, bolted square metal floor panels, or symmetrical repeated sci-fi connector modules. Different silhouette, floor construction and material identity. The borders should be fun, characterful and instantly recognizable at thumbnail scale. Theme: ORBITAL SCRAPYARD, a colorful salvaged battle platform embedded in an asteroid. Border is an irregular collage of chunky dark plum/slate asteroid boulders, curved broken ivory spacecraft hull fragments with bold faded red-orange stripes, occasional banana-yellow folded solar-panel fins, and a few tiny copper cable loops. These parts overlap in varied playful silhouettes rather than forming a uniform continuous machine rail. Corners are distinctly different rock-and-wreckage clusters, no big circular corner devices. A thin strip of deep ink-blue space with very sparse tiny dim stars is visible beyond the OUTSIDE edge only; the playable floor is solid, continuous and rectangular with no holes or floating platforms. Central floor is cool medium gray-violet smooth asteroid bedrock, a few very broad natural fractured stone shapes and shallow flattened crater arcs at the edges only, subdued matte finish and a large calm unmarked center. Floor is clearly ROCK, not a grid of machined metal panels. All clutter and yellow hazard parts outside playable rectangle. Crisp cheerful hand-painted/enamel game rendering, not photorealistic rubble, not grimdark, not noisy trash. It should read as a strange improvised space junkyard with distinctive organic rock perimeter and scattered salvage color."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.072,
+        "y": 0.14,
+        "width": 0.856,
+        "height": 0.72
+      }
+    },
+    {
+      "level": 9,
+      "name": "Alien Hive",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleHiveArena.imageset/art.png",
+      "source": "exec-1a674783-883c-4f3c-839e-de96cdc9c995.png",
+      "prompts": [
+        "Use case: stylized-concept. Asset type: one empty overhead 2D arcade arena background, landscape EXACTLY 2:1, full bleed, approximately 1800x900. Art direction: polished playful dimensional game illustration, bold chunky shapes, clean bevels, soft enamel-like highlights, rich but carefully controlled colors, restrained texture. Orthographic STRAIGHT DOWN view with no horizon or cinematic camera angle. Large clear RECTANGULAR playable floor spanning x5\u201395% and y10\u201390% of image. All raised objects and detailed decoration are confined to the narrow perimeter OUTSIDE that rectangle. Floor has broad low-contrast material shapes and a large quiet center for small colorful game enemies and bullets; absolutely no raised central objects, bright central motifs or hazards. The border must have its own irregular silhouette and recognizable materials, rather than four identical corner ornaments. No sci-fi pipe rails, connected glowing coolant tubes, circular reactor pods or bolted square sheet-metal floor. No text, labels, characters, weapons, enemies, doors, HUD, joysticks, watermark or collage. One finished arena scene. Not photorealistic, gritty or noisy. Border character and floor material should be visibly different. Theme: ALIEN HIVE, an otherworldly living fortress built of sculpted chitin, shell and membrane. The perimeter is made of large overlapping deep burgundy and aubergine carapace plates, pale ivory rib arches curving OUTWARD, several organically shaped amber translucent egg sacs tucked behind the shell, and a few small acid-lime seam glows. Crisp smooth insect-shell surfaces with broad polished highlights; NO blood, gore, teeth, bones, creatures, tentacles or horror imagery. Ivory ribs are clearly continuous shell supports, not skeletal remains. Corners are asymmetrical layered shell clusters rather than identical machines. Central floor is muted medium dusty rose-gray organic resin, smooth and matte with a few VERY broad irregular hexagonal growth cells and shallow overlapping organic seams. No slimy high-gloss puddles, eggs or roots inside the playable rectangle. No mushrooms, vegetation, stones, metal, circuitry, tubes or factory components. The contrast is burgundy armor + ivory organic arches + warm amber accents around a quiet mauve center. Distinctly alien but polished and playful enough for a geometric arcade game. Keep the inner arena edge straight so it can align with rectangular gameplay boundaries."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.08,
+        "y": 0.14,
+        "width": 0.845,
+        "height": 0.733
+      }
+    },
+    {
+      "level": 10,
+      "name": "Molten Forge",
+      "asset": "Cubrism/Assets.xcassets/StyleA/StyleForgeArena.imageset/art.png",
+      "source": "exec-f8ada7a8-a229-44b5-a4f1-8b186cbe0ed9.png",
+      "prompts": [
+        "Use case: style-transfer. Create one concept for a new world background in the same 2D arcade game as the reference. Reference role: approved Reactor Arcade art style, camera, framing, and level of finish. Preserve its crisp chunky enamel illustration, playful engineered border, clean broad color surfaces and readable low-detail floor. Make a DISTINCT themed environment, changing border component shapes and floor panel design as well as color; do not simply recolor the teal pipes. Straight-down orthographic view, full-bleed landscape EXACT 2:1. Arena opening is a large unobstructed rectangle spanning x5\u201395% and y10\u201390%. Concentrate personality in the narrow perimeter, keep all raised machinery outside the playable rectangle. Large low-contrast floor panels; floor should occupy 80% of height and 90% of width, with no center emblem or distracting lights. No characters, enemies, HUD, text, icons, doors, joystick circles, weapons, projectiles, obstacles, labels, concept-board frame or watermark. One empty arena background, not a collage. Match the reference's cheerful richly colored polish, avoid photorealism, grit, generic gray sci-fi or flat monochrome. Theme: MOLTEN FORGE. A powerful colorful furnace arena further inside the machine. Border built from burnt-orange and vermilion enamel armor, stout charcoal bellows, brass clamps and glowing amber furnace windows protected by dark three-bar grills. Four corners are compact hexagonal riveted smelter housings with molten orange interiors behind robust black slats, distinct from plain round reactor lenses. Add restrained black-and-gold diagonal hazard tabs only at outer joins, occasional big copper pressure valves. Central floor muted warm dark blue-charcoal steel in a few broad staggered rectangular slabs, with subtle warm edge shading and faint worn bevels. Floor is medium-dark rather than black, no cracks leaking lava, sparks, fire, lava puddles or hazards inside arena. Rich bright tangerine/crimson/brass border and readable quiet charcoal floor. Warmth and power without gritty industrial realism."
+      ],
+      "sourceFloorOpening": {
+        "x": 0.068,
+        "y": 0.12,
+        "width": 0.864,
+        "height": 0.758
+      }
+    }
+  ]
+}

@@ -32,5 +32,6 @@
   ],
   "notes": "Generated originals retained on the development host. The committed art.png files are production sources; GameArt performs runtime cropping and rendering. Player chassis and interface elements use Core Graphics and SF Symbols.",
   "equipmentManifest": "equipment-art-sources.json",
-  "reactorArenaManifest": "reactor-arena-art-source.json"
+  "reactorArenaManifest": "reactor-arena-art-source.json",
+  "arenaManifest": "background-art-sources.json"
 }

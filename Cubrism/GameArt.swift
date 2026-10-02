@@ -16,6 +16,29 @@ enum GameArt {
     static let items = ["Pulsar", "Special Pulsar", "Shield", "Armor Core", "Power Core", "Attachment"]
     static let bosses = ["generatorBoss", "dragonBoss", "golemBoss", "bossEnergy"]
 
+    struct Arena {
+        let title: String
+        let assetName: String
+        // Measured floor opening in the source image, in top-left normalized coordinates.
+        let opening: CGRect
+    }
+    static let arenas = [
+        Arena(title: "Reactor Arcade", assetName: "StyleReactorArena", opening: CGRect(x: 0.058, y: 0.107, width: 0.884, height: 0.77)),
+        Arena(title: "Cargo Hold", assetName: "StyleCargoArena", opening: CGRect(x: 0.086, y: 0.14, width: 0.828, height: 0.706)),
+        Arena(title: "Bio Lab", assetName: "StyleBioArena", opening: CGRect(x: 0.06, y: 0.115, width: 0.88, height: 0.745)),
+        Arena(title: "Fungal Hollow", assetName: "StyleFungalArena", opening: CGRect(x: 0.068, y: 0.125, width: 0.864, height: 0.725)),
+        Arena(title: "Coral Vault", assetName: "StyleCoralArena", opening: CGRect(x: 0.078, y: 0.157, width: 0.844, height: 0.68)),
+        Arena(title: "Clockwork Ruins", assetName: "StyleClockworkArena", opening: CGRect(x: 0.075, y: 0.138, width: 0.852, height: 0.705)),
+        Arena(title: "Storm Citadel", assetName: "StyleStormArena", opening: CGRect(x: 0.084, y: 0.145, width: 0.832, height: 0.69)),
+        Arena(title: "Orbital Scrapyard", assetName: "StyleOrbitalArena", opening: CGRect(x: 0.072, y: 0.14, width: 0.856, height: 0.72)),
+        Arena(title: "Alien Hive", assetName: "StyleHiveArena", opening: CGRect(x: 0.08, y: 0.14, width: 0.845, height: 0.733)),
+        Arena(title: "Molten Forge", assetName: "StyleForgeArena", opening: CGRect(x: 0.068, y: 0.12, width: 0.864, height: 0.758))
+    ]
+
+    static func arena(forLevel level: Int) -> Arena {
+        arenas[max(0, min(arenas.count - 1, level - 1))]
+    }
+
     /// Common equipment uses the white family icon. Saved cosmetic variants are
     /// independent of rarity and retain their original 0...3 identifiers.
     static func imageName(for item: Item) -> String {
@@ -36,6 +59,16 @@ enum GameArt {
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }
         let original = UIImage(named: name)
+        if let arena = arenas.first(where: { $0.assetName == name }), let source = original {
+            // Use an integer Retina scale to keep the logical size exact after pixel rounding.
+            let size = GameScene.arenaSize
+            let result = render(size) { rect in
+                let target = rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.1)
+                drawArena(source, opening: arena.opening, target: target)
+            }
+            images[name] = result
+            return result
+        }
         // Keep the original projectile silhouettes, especially the tracking bullet.
         if name.lowercased().contains("shot") || name.hasPrefix("bombLit") ||
             ["bossDragonFireball", "bossGolemRock", "enemySludge"].contains(name) {
@@ -116,6 +149,13 @@ enum GameArt {
         format.scale = scale
         return UIGraphicsImageRenderer(size: size, format: format).image { _ in draw(CGRect(origin: .zero, size: size)) }
     }
+    private static func drawArena(_ source: UIImage, opening: CGRect, target: CGRect) {
+        let width = target.width / opening.width
+        let height = target.height / opening.height
+        source.draw(in: CGRect(x: target.minX - opening.minX * width,
+                               y: target.minY - opening.minY * height,
+                               width: width, height: height))
+    }
     private static func cell(_ sheet: String, _ index: Int, columns: Int, rows: Int) -> UIImage? {
         let key = "\(sheet)-\(index)"
         if let cached = images[key] { return cached }
@@ -182,14 +222,9 @@ enum GameArt {
                 // The painted opening is slightly inset from the gameplay bounds.
                 // Fit that opening to the existing 90% x 80% collision rectangle;
                 // the outermost art is clipped, without changing the arena or sprites.
-                let opening = CGRect(x: 0.058, y: 0.107, width: 0.884, height: 0.77)
                 let target = name == "background1"
                     ? rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.1) : rect
-                let width = target.width / opening.width
-                let height = target.height / opening.height
-                arena.draw(in: CGRect(x: target.minX - opening.minX * width,
-                                      y: target.minY - opening.minY * height,
-                                      width: width, height: height))
+                drawArena(arena, opening: arenas[0].opening, target: target)
             }
         }
         if name.hasPrefix("backgroundInner"), let floor = UIImage(named: "StyleFloor") {

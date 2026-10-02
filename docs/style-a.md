@@ -1,6 +1,6 @@
 # Stone & Enamel (Option A)
 
-Selected direction: P1 yellow chassis with a separate central green rotating gun; enamel enemies, bosses and equipment; Reactor Arcade floor and machinery border for world 1; charcoal panels with ivory typography and brass accents. Health and shield retain the stacked capsule, emerald above icy cyan, with icons on the left and no percentages.
+Selected direction: P1 yellow chassis with a separate central green rotating gun; enamel enemies, bosses and equipment; ten distinct level backgrounds; charcoal panels with ivory typography and brass accents. Health and shield retain the stacked capsule, emerald above icy cyan, with icons on the left and no percentages.
 
 ## Asset catalog
 
@@ -14,8 +14,15 @@ Production source images live in `Cubrism/Assets.xcassets/StyleA`:
   `StylePowerCore`, `StyleAttachment`: each a 3 × 2 atlas ordered white, green,
   blue, purple, orange, empty. These replace `StyleItems`.
 - `StyleGun`: isolated circular receiver and barrel; chassis is rendered separately.
-- `StyleReactorArena`: world 1's continuous blue floor and teal/orange machinery border. The catalog fits the painted opening to the existing collision rectangle; gameplay, doors and controls render separately above it. Exact generation prompts and source bounds are in `reactor-arena-art-source.json`.
-- `StyleFloor`: full-bleed sandstone floor, tinted for worlds 2–5.
+- `StyleReactorArena`, `StyleCargoArena`, `StyleBioArena`, `StyleFungalArena`, `StyleCoralArena`, `StyleClockworkArena`, `StyleStormArena`, `StyleOrbitalArena`, `StyleHiveArena`, `StyleForgeArena`: continuous floor/border art for local levels 1–10, in that order, repeated in each existing world. Home uses Reactor Arcade. Cargo Hold uses the approved smoother revision; Molten Forge is always level 10. Generation prompts, source filenames and measured opening bounds are in `background-art-sources.json`.
+- `StyleFloor`: retained for legacy background-name rendering; active scenes use the ten arena assets above.
+
+`GameArt.arenas` owns each background's name and measured source opening. Runtime
+drawing fits that opening to the existing 90% × 80% collision rectangle, with a
+750 × 375 logical size and Retina rendering. Each room resolves its
+own floor controller's local level, so room changes, reentry and later worlds
+keep the selected level's artwork. SpriteKit and UIKit cache the results.
+Gameplay, doors and controls remain separate foreground nodes.
 
 Sprite cells require genuine alpha, equal grid cells and transparent gutters. The catalog trims those gutters once. For a replacement, preserve the sheet ordering; for a new family, add its mapping and an original logical size. Legacy images remain as fallbacks and dimensional references. Generated-source provenance is in `art-sources.json`.
 
@@ -70,3 +77,32 @@ its ad-hoc signature verified, and the home scene checked in the running app.
 or rejected. Results and full-resolution previews are retained under
 `/Users/beep/codex-work/cubrism-validation/reactor-arena/`. This art pass did not
 repeat the earlier complete floor 1–2 playthrough.
+
+## Ten-background rollout on 2026-10-01
+
+All ten approved arenas now follow local levels 1–10 in every world. The asset
+catalog contains 145 image sets, including the revised Cargo Hold. All ten
+production PNGs match their approved generated originals byte for byte.
+
+Final targeted regression runs passed on iPhone 16e / iOS 18.5 (7 tests) and
+Mac Catalyst (6 tests). They cover all ten background selections, room reentry,
+world changes, logical arena size, wall-bound green shots and platform controls.
+The iOS run also checks the restored projectile art and level-picker paging.
+Both platforms rendered all ten scenes with the player, enemy samples, doors
+and HUD for visual inspection. These galleries are render fixtures, not combat
+victories. An initial fractional-scale pixel-rounding issue was corrected by
+using an integer Retina scale; the final images retain exactly 750 × 375 points.
+
+The fresh iPhone simulator acceptance run cleared floor 1 on attempt 1 and
+floor 2 on attempt 4 through normal combat and door traversal (203 seconds).
+Recorded totals were 141 XP / 2 inventory entries after floor 1 and 436 XP /
+3 entries after floor 2, including normal progression from failed attempts.
+The separate menu test also launched the selected unlocked floor successfully.
+The automated pilot exercised joystick input handling; physical input testing
+is not claimed.
+
+`autoreview --mode local --no-web-search` returned no actionable findings; none
+were accepted or rejected. The installed Mac app was refreshed, its ad-hoc
+signature verified and its home scene checked after launch. Logs, result
+bundles, review output and the iPhone/Mac preview galleries are retained under
+`/Users/beep/codex-work/cubrism-validation/ten-backgrounds/`.

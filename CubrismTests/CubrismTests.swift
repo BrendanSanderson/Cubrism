@@ -13,6 +13,94 @@ import SpriteKit
 
 class CubrismTests: XCTestCase {
 
+    func testArenaBackgroundsFollowLevelAcrossWorldsAndRoomReentry() throws {
+        var seen = Set<ObjectIdentifier>()
+        for level in 1...10 {
+            let floor = FloorViewController(min: 4, max: 5, level: level, world: 1)
+            let first = RoomScene(size: GameScene.arenaSize)
+            first.viewController = floor
+            first.createGrid()
+            let background = try XCTUnwrap(first.children.first { $0.zPosition == -25 } as? SKSpriteNode)
+            let texture = try XCTUnwrap(background.texture)
+            seen.insert(ObjectIdentifier(texture))
+            XCTAssertEqual(background.size, GameScene.arenaSize)
+            XCTAssertNotNil(first.physicsBody)
+            let image = try XCTUnwrap(GameArt.image(GameArt.arena(forLevel: level).assetName))
+            XCTAssertEqual(image.size.width, 750, accuracy: 0.01)
+            XCTAssertEqual(image.size.height, 375, accuracy: 0.01)
+            XCTAssertGreaterThanOrEqual(try XCTUnwrap(image.cgImage).width, 1700)
+            floor.world = 5
+            let nextRoom = RoomScene(size: GameScene.arenaSize)
+            nextRoom.viewController = floor
+            nextRoom.createGrid()
+            let nextBackground = try XCTUnwrap(nextRoom.children.first { $0.zPosition == -25 } as? SKSpriteNode)
+            XCTAssertTrue(nextBackground.texture === texture, "The local level keeps its theme across rooms and worlds")
+            first.removeAllChildren()
+            first.createGrid()
+            XCTAssertTrue((first.children.first { $0.zPosition == -25 } as? SKSpriteNode)?.texture === texture)
+        }
+        XCTAssertEqual(seen.count, 10, "Every level needs its own background")
+        XCTAssertEqual(GameArt.arena(forLevel: 10).title, "Molten Forge")
+        XCTAssertEqual(HomeScene(size: GameScene.arenaSize).arenaLevel, 1)
+    }
+
+    func testTenArenaBackgroundsWithGameplayOverlay() throws {
+        let oldController = Player.currentViewController
+        let oldScene = Player.currentScene
+        let oldEntity = Player.entity
+        defer {
+            Player.currentViewController = oldController
+            Player.currentScene = oldScene
+            Player.entity = oldEntity
+        }
+        var captures = [UIImage]()
+        let view = SKView(frame: CGRect(origin: .zero, size: GameScene.arenaSize))
+        for level in 1...10 {
+            let controller = FloorViewController(min: 4, max: 5, level: level, world: 1)
+            Player.currentViewController = controller
+            let scene = RoomScene(size: GameScene.arenaSize)
+            scene.viewController = controller
+            scene.name = "startRoom"
+            scene.startPosition = CGPoint(x: 375, y: 187.5)
+            scene.doors = [DoorEntity(scene: scene, direction: 0, type: "challenge"),
+                           DoorEntity(scene: scene, direction: 3, type: "challenge")]
+            view.presentScene(scene)
+            scene.isPaused = true
+            // Fixed samples make contrast comparable across all ten backgrounds.
+            for (index, name) in GameArt.enemies.enumerated() {
+                let sprite = GameArt.sprite(name)
+                sprite.size = CGSize(width: 32, height: 32)
+                sprite.position = CGPoint(x: 135 + CGFloat(index % 5) * 115,
+                                          y: index < 5 ? 265 : 110)
+                scene.addChild(sprite)
+            }
+            let capture = UIImage(cgImage: try XCTUnwrap(view.texture(from: scene,
+                crop: CGRect(origin: .zero, size: scene.size))).cgImage())
+            captures.append(capture)
+            if level == 2 || level == 10 {
+                let attachment = XCTAttachment(image: capture)
+                attachment.name = "Arena-\(level)-\(GameArt.arena(forLevel: level).title)"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+            }
+            view.presentScene(nil)
+        }
+        let gallery = GameArt.render(CGSize(width: 1500, height: 2075), scale: 1) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            for (index, capture) in captures.enumerated() {
+                let x = CGFloat(index % 2) * 750, y = CGFloat(index / 2) * 415
+                let title = "\(index + 1). \(GameArt.arena(forLevel: index + 1).title)"
+                (title as NSString).draw(at: CGPoint(x: x + 12, y: y + 9), withAttributes: [
+                    .font: UIFont.boldSystemFont(ofSize: 18), .foregroundColor: GameArt.ivory])
+                capture.draw(in: CGRect(x: x, y: y + 40, width: 750, height: 375))
+            }
+        }
+        let attachment = XCTAttachment(image: gallery)
+        attachment.name = "Ten-arenas-with-gameplay-overlay"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testStyleCatalogPreservesLogicalSizesAndHasTransparentSprites() throws {
         let animationNames = (1...4).map { "dragonMouth\($0)" } + (0...8).map { "golemJump\($0)" }
         let names = GameArt.enemies + GameArt.items + GameArt.bosses + ["playerIcon", "playerCannon"] + animationNames

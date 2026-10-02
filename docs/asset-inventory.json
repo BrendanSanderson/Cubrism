@@ -2482,6 +2482,22 @@
       ]
     },
     {
+      "name": "StyleBioArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleBioArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleBioArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1758949
+        }
+      ]
+    },
+    {
       "name": "StyleBosses",
       "directory": "Cubrism/Assets.xcassets/StyleA/StyleBosses.imageset",
       "files": [
@@ -2494,6 +2510,54 @@
           ],
           "mode": "RGBA",
           "bytes": 1417203
+        }
+      ]
+    },
+    {
+      "name": "StyleCargoArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleCargoArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleCargoArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1811726
+        }
+      ]
+    },
+    {
+      "name": "StyleClockworkArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleClockworkArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleClockworkArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1949232
+        }
+      ]
+    },
+    {
+      "name": "StyleCoralArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleCoralArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleCoralArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 2419365
         }
       ]
     },
@@ -2530,6 +2594,38 @@
       ]
     },
     {
+      "name": "StyleForgeArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleForgeArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleForgeArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1778046
+        }
+      ]
+    },
+    {
+      "name": "StyleFungalArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleFungalArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleFungalArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1982012
+        }
+      ]
+    },
+    {
       "name": "StyleGun",
       "directory": "Cubrism/Assets.xcassets/StyleA/StyleGun.imageset",
       "files": [
@@ -2542,6 +2638,38 @@
           ],
           "mode": "RGBA",
           "bytes": 706930
+        }
+      ]
+    },
+    {
+      "name": "StyleHiveArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleHiveArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleHiveArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 1856520
+        }
+      ]
+    },
+    {
+      "name": "StyleOrbitalArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleOrbitalArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleOrbitalArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 2126866
         }
       ]
     },
@@ -2622,6 +2750,22 @@
           ],
           "mode": "RGBA",
           "bytes": 1759777
+        }
+      ]
+    },
+    {
+      "name": "StyleStormArena",
+      "directory": "Cubrism/Assets.xcassets/StyleA/StyleStormArena.imageset",
+      "files": [
+        {
+          "file": "Cubrism/Assets.xcassets/StyleA/StyleStormArena.imageset/art.png",
+          "scale": "1x",
+          "pixels": [
+            1774,
+            887
+          ],
+          "mode": "RGB",
+          "bytes": 2268586
         }
       ]
     },
