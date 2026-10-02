@@ -15,6 +15,15 @@ enum GameArt {
     static let enemies = ["meleeEnemy", "rangeEnemy", "rangeTrackingEnemy", "rangeTrippleEnemy", "rangeRingEnemy", "dashEnemy", "bomberEnemy", "sludgeEnemy", "suicideEnemy"]
     static let items = ["Pulsar", "Special Pulsar", "Shield", "Armor Core", "Power Core", "Attachment"]
     static let bosses = ["generatorBoss", "dragonBoss", "golemBoss", "bossEnergy"]
+    private static let damageSources: [String: (asset: String, column: Int, columns: Int)] = [
+        "damaged75": ("StyleDamage", 0, 3),
+        // The previously approved heavy stage is now medium, without repainting it.
+        "damaged50": ("StyleDamage", 2, 3),
+        "damaged25": ("StyleDamageHeavy", 0, 1),
+        "dragonDamaged75": ("StyleFireballDamage", 0, 3),
+        "dragonDamaged50": ("StyleFireballDamage", 1, 3),
+        "dragonDamaged25": ("StyleFireballDamage", 2, 3)
+    ]
 
     struct Arena {
         let title: String
@@ -59,12 +68,13 @@ enum GameArt {
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }
         let original = UIImage(named: name)
-        if let index = ["damaged75", "damaged50", "damaged25"].firstIndex(of: name),
-           let sheet = UIImage(named: "StyleDamage")?.cgImage,
-           let crop = sheet.cropping(to: CGRect(x: index * (sheet.width / 3), y: 0,
-                                               width: sheet.width / 3, height: sheet.height)) {
+        if let source = damageSources[name],
+           let sheet = UIImage(named: source.asset)?.cgImage,
+           let crop = sheet.cropping(to: CGRect(x: source.column * (sheet.width / source.columns), y: 0,
+                                               width: sheet.width / source.columns, height: sheet.height)) {
             // Keep transparent margins: trimming would stretch cracks across the center symbol.
-            let result = render(original?.size ?? CGSize(width: 32, height: 32)) {
+            let size = original?.size ?? UIImage(named: "bossDragonFireball")?.size ?? CGSize(width: 32, height: 32)
+            let result = render(size) {
                 UIImage(cgImage: crop).draw(in: $0)
             }
             images[name] = result

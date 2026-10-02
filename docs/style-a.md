@@ -147,3 +147,23 @@ checked. Evidence is under
 Final `autoreview --mode local` returned no actionable findings. An earlier
 claim that integer CGRect arguments would not compile was rejected against
 successful builds on both platforms and the SDK's explicit Int initializer.
+
+## Stronger heavy damage and dragon fireball stages
+
+The previously approved heavy square overlay now serves as medium damage,
+reusing its original atlas cell unchanged. `StyleDamageHeavy` adds a more
+pronounced fractured rim while keeping the center symbol clear.
+`StyleFireballDamage` provides three circular scorched-fissure stages for the
+dragon's tracking fireball, selected by enemy type at the same health thresholds.
+The fireball's original base sprite remains in use. Built-in generation prompts
+and asset locations are in `damage-art-v2-sources.json`.
+
+Three focused tests passed on both iPhone simulator and Mac Catalyst: exact
+old-heavy/new-medium image equality, stronger heavy coverage with a transparent
+center, round progressive fireball damage, preserved size/physics/tracking,
+and the projectile's existing destruction behavior without room-clear credit
+or experience. The runtime gallery includes every enemy and the fireball at
+64 and 32 points. This is a visual/behavior fixture, not a combat playthrough.
+`autoreview --mode local` returned no findings; none were accepted or rejected.
+The installed Mac app was refreshed and its signature verified. Evidence is in
+`/Users/beep/codex-work/cubrism-validation/damage-v2/`.

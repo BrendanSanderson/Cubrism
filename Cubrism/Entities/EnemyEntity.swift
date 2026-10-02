@@ -263,17 +263,18 @@ class EnemyEntity: DynamicEntity {
         if (node.Entity.currentHealth > 0)
         {
             statusNode.size = sprite.size
+            let damageArt = type == "DragonFireball" ? "dragonDamaged" : "damaged"
             if (Double(currentHealth)/Double(health) <= 0.25)
             {
-                statusNode.texture = GameArt.texture( "damaged25")
+                statusNode.texture = GameArt.texture(damageArt + "25")
             }
             else if (Double(currentHealth)/Double(health) <= 0.5)
             {
-                statusNode.texture = GameArt.texture( "damaged50")
+                statusNode.texture = GameArt.texture(damageArt + "50")
             }
             else if (Double(currentHealth)/Double(health) <= 0.75)
             {
-                statusNode.texture = GameArt.texture( "damaged75")
+                statusNode.texture = GameArt.texture(damageArt + "75")
             }
         }
         else if (node.Entity.currentHealth <= 0)

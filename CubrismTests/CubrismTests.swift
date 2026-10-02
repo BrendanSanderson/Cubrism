@@ -139,6 +139,13 @@ class CubrismTests: XCTestCase {
     }
 
     func testEnemyDamagePreservesSilhouetteAndClearCenter() throws {
+        let previousAtlas = try XCTUnwrap(UIImage(named: "StyleDamage")?.cgImage)
+        let previousHeavy = try XCTUnwrap(previousAtlas.cropping(to: CGRect(
+            x: previousAtlas.width * 2 / 3, y: 0, width: previousAtlas.width / 3, height: previousAtlas.height)))
+        let originalSize = try XCTUnwrap(UIImage(named: "damaged50")).size
+        let expectedMedium = GameArt.render(originalSize) { UIImage(cgImage: previousHeavy).draw(in: $0) }
+        XCTAssertEqual(GameArt.image("damaged50")?.pngData(), expectedMedium.pngData(),
+                       "The previous heavy artwork becomes medium unchanged")
         var previousCoverage = 0
         for name in ["damaged75", "damaged50", "damaged25"] {
             let image = try XCTUnwrap(GameArt.image(name))
@@ -158,6 +165,9 @@ class CubrismTests: XCTestCase {
                 }
             }
             XCTAssertGreaterThan(coverage, previousCoverage, "More damage should be visibly more worn")
+            if name == "damaged25" {
+                XCTAssertGreaterThan(coverage, previousCoverage * 2, "Heavy must be clearly stronger than the previous heavy")
+            }
             XCTAssertLessThan(coverage, cg.width * cg.height / 5, "Cracks must not obscure the enemy")
             previousCoverage = coverage
         }
@@ -189,19 +199,72 @@ class CubrismTests: XCTestCase {
         XCTAssertEqual(enemy.currentHealth, 25)
     }
 
+    func testDragonTrackingFireballUsesRoundDamageThroughDestruction() throws {
+        let floor = FloorViewController(min: 4, max: 5, level: 10, world: 1)
+        let room = RoomScene(size: GameScene.arenaSize)
+        room.viewController = floor
+        room.doors = [DoorEntity(scene: room, direction: 1, type: "bossChallenge")]
+        let fireball = EnemyEntity(scene: room, eType: "DragonFireball", lev: 1, elite: false)
+        let tracking = try XCTUnwrap(fireball.component(ofType: EnemyTrackingComponent.self))
+        let body = try XCTUnwrap(fireball.sprite.physicsBody)
+        let size = fireball.sprite.size
+        let initialPosition = fireball.sprite.position
+        tracking.action(0)
+        XCTAssertNotEqual(fireball.sprite.position, initialPosition, "The damaged projectile must still home toward the player")
+        var previousCoverage = 0
+        for remaining in [75, 50, 25] {
+            let targetHealth = fireball.health * remaining / 100
+            fireball.damageEnemy(fireball.currentHealth - targetHealth)
+            let name = "dragonDamaged\(remaining)"
+            XCTAssertEqual(fireball.currentHealth, targetHealth)
+            XCTAssertTrue(fireball.statusNode.texture === GameArt.texture(name))
+            XCTAssertTrue(fireball.component(ofType: EnemyTrackingComponent.self) === tracking)
+            XCTAssertTrue(fireball.sprite.physicsBody === body)
+            XCTAssertEqual(fireball.statusNode.size, size)
+            XCTAssertEqual(fireball.sprite.size, size)
+            XCTAssertTrue(fireball.sprite.texture === GameArt.texture("bossDragonFireball"))
+            let image = try XCTUnwrap(GameArt.image(name))
+            XCTAssertEqual(image.size, size)
+            let cg = try XCTUnwrap(image.cgImage)
+            let pixels = rgbaPixels(cg)
+            var coverage = 0
+            for y in 0..<cg.height {
+                for x in 0..<cg.width {
+                    let alpha = pixels[(y * cg.width + x) * 4 + 3]
+                    if alpha > 24 { coverage += 1 }
+                    let dx = (Double(x) + 0.5) / Double(cg.width) - 0.5
+                    let dy = (Double(y) + 0.5) / Double(cg.height) - 0.5
+                    if hypot(dx, dy) > 0.49 || hypot(dx, dy) < 0.08 {
+                        XCTAssertLessThan(alpha, 8, "Fireball damage must retain its round footprint and glowing center")
+                    }
+                }
+            }
+            XCTAssertGreaterThan(coverage, previousCoverage)
+            previousCoverage = coverage
+        }
+        fireball.damageEnemy(fireball.currentHealth)
+        XCTAssertNil(fireball.sprite.physicsBody)
+        XCTAssertNil(fireball.component(ofType: EnemyTrackingComponent.self))
+        XCTAssertNotNil(fireball.component(ofType: EnemyDyingComponent.self))
+        XCTAssertEqual(room.killedEnemies, 0, "Destroying a dragon projectile must not count as clearing an enemy")
+        XCTAssertEqual(floor.levelExp, 0)
+    }
+
     func testEnemyDamageVisualGallery() throws {
-        let gallery = GameArt.render(CGSize(width: 1000, height: 800), scale: 2) { rect in
+        let gallery = GameArt.render(CGSize(width: 1000, height: 880), scale: 2) { rect in
             GameArt.ink.setFill(); UIRectFill(rect)
-            for (column, title) in ["Healthy", "Before: heavy", "Light damage", "Medium damage", "Heavy damage"].enumerated() {
+            for (column, title) in ["Healthy", "Previous heavy", "Light damage", "Medium damage", "Heavy damage"].enumerated() {
                 (title as NSString).draw(at: CGPoint(x: 175 + column * 162, y: 18), withAttributes: [
                     .font: UIFont.boldSystemFont(ofSize: 14), .foregroundColor: GameArt.ivory])
             }
-            for (row, name) in GameArt.enemies.enumerated() {
+            for (row, name) in (GameArt.enemies + ["bossDragonFireball"]).enumerated() {
                 let y = CGFloat(58 + row * 80)
-                (name.replacingOccurrences(of: "Enemy", with: "") as NSString).draw(at: CGPoint(x: 16, y: y + 24), withAttributes: [
+                let label = name == "bossDragonFireball" ? "dragon fireball" : name.replacingOccurrences(of: "Enemy", with: "")
+                (label as NSString).draw(at: CGPoint(x: 16, y: y + 24), withAttributes: [
                     .font: UIFont.systemFont(ofSize: 13), .foregroundColor: GameArt.ivory])
                 for column in 0..<5 {
-                    let overlay: UIImage? = column == 0 ? nil : column == 1 ? UIImage(named: "damaged25") : GameArt.image(["damaged75", "damaged50", "damaged25"][column - 2])
+                    let prefix = name == "bossDragonFireball" ? "dragonDamaged" : "damaged"
+                    let overlay: UIImage? = column == 0 ? nil : column == 1 ? GameArt.image("damaged50") : GameArt.image(prefix + ["75", "50", "25"][column - 2])
                     for (offset, size) in [(CGFloat(0), CGFloat(64)), (CGFloat(82), CGFloat(32))] {
                         let frame = CGRect(x: CGFloat(175 + column * 162) + offset, y: y + 64 - size, width: size, height: size)
                         GameArt.image(name)?.draw(in: frame)
