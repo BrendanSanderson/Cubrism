@@ -22,7 +22,7 @@ enum GameArt {
         "damaged25": ("StyleDamageHeavy", 0, 1),
         "dragonDamaged75": ("StyleFireballDamage", 0, 3),
         "dragonDamaged50": ("StyleFireballDamage", 1, 3),
-        "dragonDamaged25": ("StyleFireballDamage", 2, 3)
+        "dragonDamaged25": ("StyleFireballDamageHeavy", 0, 1)
     ]
 
     struct Arena {
@@ -72,7 +72,7 @@ enum GameArt {
            let sheet = UIImage(named: source.asset)?.cgImage,
            let crop = sheet.cropping(to: CGRect(x: source.column * (sheet.width / source.columns), y: 0,
                                                width: sheet.width / source.columns, height: sheet.height)) {
-            // Keep transparent margins: trimming would stretch cracks across the center symbol.
+            // Keep transparent margins so each damage stage stays registered to the enemy face.
             let size = original?.size ?? UIImage(named: "bossDragonFireball")?.size ?? CGSize(width: 32, height: 32)
             let result = render(size) {
                 UIImage(cgImage: crop).draw(in: $0)

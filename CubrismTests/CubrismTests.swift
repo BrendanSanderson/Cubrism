@@ -138,7 +138,7 @@ class CubrismTests: XCTestCase {
         }
     }
 
-    func testEnemyDamagePreservesSilhouetteAndClearCenter() throws {
+    func testEnemyDamagePreservesSilhouetteAndReadableFace() throws {
         let previousAtlas = try XCTUnwrap(UIImage(named: "StyleDamage")?.cgImage)
         let previousHeavy = try XCTUnwrap(previousAtlas.cropping(to: CGRect(
             x: previousAtlas.width * 2 / 3, y: 0, width: previousAtlas.width / 3, height: previousAtlas.height)))
@@ -154,19 +154,27 @@ class CubrismTests: XCTestCase {
             let cg = try XCTUnwrap(image.cgImage)
             let pixels = rgbaPixels(cg)
             var coverage = 0
+            var centerCoverage = 0
+            var centerPixels = 0
             for y in 0..<cg.height {
                 for x in 0..<cg.width {
                     let alpha = pixels[(y * cg.width + x) * 4 + 3]
                     if alpha > 24 { coverage += 1 }
                     if x > cg.width * 3 / 10 && x < cg.width * 7 / 10 &&
                        y > cg.height * 3 / 10 && y < cg.height * 7 / 10 {
-                        XCTAssertLessThan(alpha, 8, "Damage must leave the center symbol readable")
+                        centerPixels += 1
+                        if alpha > 24 { centerCoverage += 1 }
+                        if name != "damaged25" {
+                            XCTAssertLessThan(alpha, 8, "Light and medium keep the original clear center")
+                        }
                     }
                 }
             }
             XCTAssertGreaterThan(coverage, previousCoverage, "More damage should be visibly more worn")
             if name == "damaged25" {
                 XCTAssertGreaterThan(coverage, previousCoverage * 2, "Heavy must be clearly stronger than the previous heavy")
+                XCTAssertGreaterThan(centerCoverage, centerPixels / 20, "Heavy fractures must cross the face, not form an outer rim")
+                XCTAssertLessThan(centerCoverage, centerPixels / 2, "Most of the center symbol must remain visible")
             }
             XCTAssertLessThan(coverage, cg.width * cg.height / 5, "Cracks must not obscure the enemy")
             previousCoverage = coverage
@@ -228,18 +236,24 @@ class CubrismTests: XCTestCase {
             let cg = try XCTUnwrap(image.cgImage)
             let pixels = rgbaPixels(cg)
             var coverage = 0
+            var interiorCoverage = 0
             for y in 0..<cg.height {
                 for x in 0..<cg.width {
                     let alpha = pixels[(y * cg.width + x) * 4 + 3]
                     if alpha > 24 { coverage += 1 }
                     let dx = (Double(x) + 0.5) / Double(cg.width) - 0.5
                     let dy = (Double(y) + 0.5) / Double(cg.height) - 0.5
-                    if hypot(dx, dy) > 0.49 || hypot(dx, dy) < 0.08 {
-                        XCTAssertLessThan(alpha, 8, "Fireball damage must retain its round footprint and glowing center")
+                    if hypot(dx, dy) < 0.2 && alpha > 24 { interiorCoverage += 1 }
+                    if hypot(dx, dy) > 0.49 || (remaining != 25 && hypot(dx, dy) < 0.08) {
+                        XCTAssertLessThan(alpha, 8, "Fireball damage must stay inside its round footprint")
                     }
                 }
             }
             XCTAssertGreaterThan(coverage, previousCoverage)
+            if remaining == 25 {
+                XCTAssertGreaterThan(interiorCoverage, cg.width * cg.height / 100, "Heavy damage must fracture the fireball interior")
+                XCTAssertLessThan(coverage, cg.width * cg.height / 2, "The red orb must remain visible between fissures")
+            }
             previousCoverage = coverage
         }
         fireball.damageEnemy(fireball.currentHealth)

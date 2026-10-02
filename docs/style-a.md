@@ -167,3 +167,21 @@ or experience. The runtime gallery includes every enemy and the fireball at
 `autoreview --mode local` returned no findings; none were accepted or rejected.
 The installed Mac app was refreshed and its signature verified. Evidence is in
 `/Users/beep/codex-work/cubrism-validation/damage-v2/`.
+
+## Interior crack refinement
+
+Heavy damage now branches across the enemy face instead of forming a continuous
+outer rim. The fireball's heavy stage likewise has scorched interior fractures,
+using the single-cell `StyleFireballDamageHeavy` asset. Light and medium stages
+retain their artwork and routing. The new source prompts and paths are in
+`damage-interior-art-sources.json`; that file supersedes the earlier rim-heavy
+square source description.
+
+Three focused tests passed on both iPhone simulator and Mac Catalyst. They check
+interior damage coverage without obscuring most of the enemy face, exact reuse
+of the approved medium stage, the round fireball footprint, and existing
+tracking/collision/destruction behavior. The 64/32-point runtime gallery was
+visually inspected. This is an art and behavior fixture, not a new combat run.
+The Mac app was refreshed and its signature verified. Evidence is under
+`/Users/beep/codex-work/cubrism-validation/damage-interior/`.
+Final `autoreview --mode local` returned no findings; none were accepted or rejected.
