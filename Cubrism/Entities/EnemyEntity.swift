@@ -253,6 +253,13 @@ class EnemyEntity: DynamicEntity {
     {
         guard currentHealth > 0 else { return }
         node.Entity.currentHealth -= damage
+        if damage > 0 {
+            // Repeated hits restart one short flash instead of stacking tint actions.
+            sprite.run(.sequence([
+                .colorize(with: GameArt.ivory, colorBlendFactor: 0.55, duration: 0.025),
+                .colorize(withColorBlendFactor: 0, duration: 0.12)
+            ]), withKey: "damageFlash")
+        }
         if (node.Entity.currentHealth > 0)
         {
             statusNode.size = sprite.size

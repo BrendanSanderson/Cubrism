@@ -59,6 +59,17 @@ enum GameArt {
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }
         let original = UIImage(named: name)
+        if let index = ["damaged75", "damaged50", "damaged25"].firstIndex(of: name),
+           let sheet = UIImage(named: "StyleDamage")?.cgImage,
+           let crop = sheet.cropping(to: CGRect(x: index * (sheet.width / 3), y: 0,
+                                               width: sheet.width / 3, height: sheet.height)) {
+            // Keep transparent margins: trimming would stretch cracks across the center symbol.
+            let result = render(original?.size ?? CGSize(width: 32, height: 32)) {
+                UIImage(cgImage: crop).draw(in: $0)
+            }
+            images[name] = result
+            return result
+        }
         if let arena = arenas.first(where: { $0.assetName == name }), let source = original {
             // Use an integer Retina scale to keep the logical size exact after pixel rounding.
             let size = GameScene.arenaSize

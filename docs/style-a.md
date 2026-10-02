@@ -117,3 +117,33 @@ combat was not repeated for this mapping-only correction. The updated iPhone
 gallery was visually inspected and the installed Mac build refreshed, signature
 verified and launch checked. Structured review returned no findings. Results
 are under `/Users/beep/codex-work/cubrism-validation/five-level-backgrounds/`.
+
+## Completion and enemy damage follow-up on 2026-10-01
+
+The completion page now places XP beside a dedicated scrolling loot list, with
+Continue in a fixed footer. A dimmed background identifies the cleared global
+floor's arena. Compact spacing keeps both normal drops visible on short
+landscape phones; wider Mac windows center the panel instead of stretching it.
+The XP bar uses a rounded track and fill, and item icons retain their saved
+appearance through the shared resolver.
+
+`StyleDamage` replaces the three legacy crack overlays with registered transparent
+edge chips, leaving enemy symbols clear. Its source prompt is recorded in
+`damage-art-source.json`. A brief ivory flash restarts on each positive hit and
+returns to the original sprite tint. Health thresholds, collision sizes and
+rewards are unchanged.
+
+Validation: the new two-drop visibility test failed on all three phone sizes
+before the layout change. The final iPhone 16e/iOS 18.5 run passed all 44 unit
+and rendering tests. Mac Catalyst passed the three focused layout/damage tests,
+and the reward presentation/Continue test passed on both platforms. Native Mac
+pointer input scrolled to the final item of a 27-item fixture. The presentation
+test now yields asynchronously so AppKit can process input during inspection.
+Fixtures and damage galleries are visual checks, not a new combat playthrough.
+The installed Mac app was refreshed, its ad-hoc signature verified, and launch
+checked. Evidence is under
+`/Users/beep/codex-work/cubrism-validation/completion-damage/`.
+
+Final `autoreview --mode local` returned no actionable findings. An earlier
+claim that integer CGRect arguments would not compile was rejected against
+successful builds on both platforms and the SDK's explicit Int initializer.
