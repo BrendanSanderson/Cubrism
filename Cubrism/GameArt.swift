@@ -35,8 +35,8 @@ enum GameArt {
         Arena(title: "Molten Forge", assetName: "StyleForgeArena", opening: CGRect(x: 0.068, y: 0.12, width: 0.864, height: 0.758))
     ]
 
-    static func arena(forLevel level: Int) -> Arena {
-        arenas[max(0, min(arenas.count - 1, level - 1))]
+    static func arena(forGlobalLevel level: Int) -> Arena {
+        arenas[(max(1, min(50, level)) - 1) / 5]
     }
 
     /// Common equipment uses the white family icon. Saved cosmetic variants are

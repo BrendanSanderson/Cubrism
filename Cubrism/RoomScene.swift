@@ -36,7 +36,7 @@ class RoomScene: GameScene {
     var completed = false
     var startTime: TimeInterval!
     weak var viewController: FloorViewController!
-    override var arenaLevel: Int { viewController?.level ?? 1 }
+    override var arenaGlobalLevel: Int { viewController?.globalLevel ?? 1 }
     var enemyPoints = 4
     override func didMove(to view: SKView) {
         /* Setup your scene here */

@@ -31,8 +31,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var vender: VendorPopUpNode!
     var doorAccessed = String()
     var world = 1
-    // Home uses Reactor Arcade; room scenes resolve their own controller's level.
-    var arenaLevel: Int { 1 }
+    // Home uses Reactor Arcade; room scenes resolve their controller's global level.
+    var arenaGlobalLevel: Int { 1 }
     let button = GameArt.sprite("pauseButton")
     #if targetEnvironment(macCatalyst)
     var keyboardControls = KeyboardControlState()
@@ -90,7 +90,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // Each arena includes the floor and border in one continuous image.
             frame.fillColor = .clear
             frame.strokeColor = .clear
-            sn.texture = GameArt.texture(GameArt.arena(forLevel: arenaLevel).assetName)
+            sn.texture = GameArt.texture(GameArt.arena(forGlobalLevel: arenaGlobalLevel).assetName)
         }
         else
         {

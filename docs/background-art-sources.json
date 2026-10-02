@@ -1,10 +1,9 @@
 {
   "mode": "built-in image_gen",
-  "mapping": "One theme per local level 1\u201310, repeated across the five existing worlds. Home uses Reactor Arcade.",
+  "mapping": "One theme per five global levels across levels 1\u201350, in the approved order. Home uses Reactor Arcade.",
   "notes": "User approved the complete set, including the revised Cargo Hold. Runtime fitting preserves arena size, collisions, foreground sprites and controls. Original PNG pixels are retained in the asset catalog.",
   "arenas": [
     {
-      "level": 1,
       "name": "Reactor Arcade",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleReactorArena.imageset/art.png",
       "source": "exec-43611554-13f1-40df-bd72-a0daea4412b5.png",
@@ -17,10 +16,11 @@
         "y": 0.107,
         "width": 0.884,
         "height": 0.77
-      }
+      },
+      "firstLevel": 1,
+      "lastLevel": 5
     },
     {
-      "level": 2,
       "name": "Cargo Hold",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleCargoArena.imageset/art.png",
       "source": "exec-30d3e8bc-c536-4a80-98a1-0806f09f9841.png",
@@ -32,10 +32,11 @@
         "y": 0.14,
         "width": 0.828,
         "height": 0.706
-      }
+      },
+      "firstLevel": 6,
+      "lastLevel": 10
     },
     {
-      "level": 3,
       "name": "Bio Lab",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleBioArena.imageset/art.png",
       "source": "exec-5f3a869c-486f-45d6-93ca-4e5e034257a5.png",
@@ -47,10 +48,11 @@
         "y": 0.115,
         "width": 0.88,
         "height": 0.745
-      }
+      },
+      "firstLevel": 11,
+      "lastLevel": 15
     },
     {
-      "level": 4,
       "name": "Fungal Hollow",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleFungalArena.imageset/art.png",
       "source": "exec-501e3516-61ea-4a74-87be-a21674e9c2b3.png",
@@ -62,10 +64,11 @@
         "y": 0.125,
         "width": 0.864,
         "height": 0.725
-      }
+      },
+      "firstLevel": 16,
+      "lastLevel": 20
     },
     {
-      "level": 5,
       "name": "Coral Vault",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleCoralArena.imageset/art.png",
       "source": "exec-d993d53b-f38b-4a63-93b5-56a14b7e6ef8.png",
@@ -77,10 +80,11 @@
         "y": 0.157,
         "width": 0.844,
         "height": 0.68
-      }
+      },
+      "firstLevel": 21,
+      "lastLevel": 25
     },
     {
-      "level": 6,
       "name": "Clockwork Ruins",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleClockworkArena.imageset/art.png",
       "source": "exec-1cb952de-a943-4ebb-9e8d-7e672d2f91ae.png",
@@ -92,10 +96,11 @@
         "y": 0.138,
         "width": 0.852,
         "height": 0.705
-      }
+      },
+      "firstLevel": 26,
+      "lastLevel": 30
     },
     {
-      "level": 7,
       "name": "Storm Citadel",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleStormArena.imageset/art.png",
       "source": "exec-8f720e37-3154-466f-a787-84ae7d4ef7df.png",
@@ -107,10 +112,11 @@
         "y": 0.145,
         "width": 0.832,
         "height": 0.69
-      }
+      },
+      "firstLevel": 31,
+      "lastLevel": 35
     },
     {
-      "level": 8,
       "name": "Orbital Scrapyard",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleOrbitalArena.imageset/art.png",
       "source": "exec-f5a498df-64c2-4b8c-aa4e-fdd15327cd89.png",
@@ -122,10 +128,11 @@
         "y": 0.14,
         "width": 0.856,
         "height": 0.72
-      }
+      },
+      "firstLevel": 36,
+      "lastLevel": 40
     },
     {
-      "level": 9,
       "name": "Alien Hive",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleHiveArena.imageset/art.png",
       "source": "exec-1a674783-883c-4f3c-839e-de96cdc9c995.png",
@@ -137,10 +144,11 @@
         "y": 0.14,
         "width": 0.845,
         "height": 0.733
-      }
+      },
+      "firstLevel": 41,
+      "lastLevel": 45
     },
     {
-      "level": 10,
       "name": "Molten Forge",
       "asset": "Cubrism/Assets.xcassets/StyleA/StyleForgeArena.imageset/art.png",
       "source": "exec-f8ada7a8-a229-44b5-a4f1-8b186cbe0ed9.png",
@@ -152,7 +160,9 @@
         "y": 0.12,
         "width": 0.864,
         "height": 0.758
-      }
+      },
+      "firstLevel": 46,
+      "lastLevel": 50
     }
   ]
 }

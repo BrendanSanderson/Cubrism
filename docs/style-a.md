@@ -14,14 +14,14 @@ Production source images live in `Cubrism/Assets.xcassets/StyleA`:
   `StylePowerCore`, `StyleAttachment`: each a 3 × 2 atlas ordered white, green,
   blue, purple, orange, empty. These replace `StyleItems`.
 - `StyleGun`: isolated circular receiver and barrel; chassis is rendered separately.
-- `StyleReactorArena`, `StyleCargoArena`, `StyleBioArena`, `StyleFungalArena`, `StyleCoralArena`, `StyleClockworkArena`, `StyleStormArena`, `StyleOrbitalArena`, `StyleHiveArena`, `StyleForgeArena`: continuous floor/border art for local levels 1–10, in that order, repeated in each existing world. Home uses Reactor Arcade. Cargo Hold uses the approved smoother revision; Molten Forge is always level 10. Generation prompts, source filenames and measured opening bounds are in `background-art-sources.json`.
+- `StyleReactorArena`, `StyleCargoArena`, `StyleBioArena`, `StyleFungalArena`, `StyleCoralArena`, `StyleClockworkArena`, `StyleStormArena`, `StyleOrbitalArena`, `StyleHiveArena`, `StyleForgeArena`: continuous floor/border art for successive groups of five global levels (1–5, 6–10, through 46–50), in that order. Home uses Reactor Arcade. Cargo Hold uses the approved smoother revision; Molten Forge covers levels 46–50. Generation prompts, source filenames and measured opening bounds are in `background-art-sources.json`.
 - `StyleFloor`: retained for legacy background-name rendering; active scenes use the ten arena assets above.
 
 `GameArt.arenas` owns each background's name and measured source opening. Runtime
 drawing fits that opening to the existing 90% × 80% collision rectangle, with a
 750 × 375 logical size and Retina rendering. Each room resolves its
-own floor controller's local level, so room changes, reentry and later worlds
-keep the selected level's artwork. SpriteKit and UIKit cache the results.
+own floor controller's global level, so room changes and reentry keep the
+selected floor's artwork, while later worlds continue through the ten themes. SpriteKit and UIKit cache the results.
 Gameplay, doors and controls remain separate foreground nodes.
 
 Sprite cells require genuine alpha, equal grid cells and transparent gutters. The catalog trims those gutters once. For a replacement, preserve the sheet ordering; for a new family, add its mapping and an original logical size. Legacy images remain as fallbacks and dimensional references. Generated-source provenance is in `art-sources.json`.
@@ -80,7 +80,7 @@ repeat the earlier complete floor 1–2 playthrough.
 
 ## Ten-background rollout on 2026-10-01
 
-All ten approved arenas now follow local levels 1–10 in every world. The asset
+All ten approved arenas now span global levels 1–50, changing every five levels. The asset
 catalog contains 145 image sets, including the revised Cargo Hold. All ten
 production PNGs match their approved generated originals byte for byte.
 
@@ -106,3 +106,14 @@ were accepted or rejected. The installed Mac app was refreshed, its ad-hoc
 signature verified and its home scene checked after launch. Logs, result
 bundles, review output and the iPhone/Mac preview galleries are retained under
 `/Users/beep/codex-work/cubrism-validation/ten-backgrounds/`.
+
+The subsequent progression correction uses the floor controller's global level:
+Reactor Arcade 1–5, Cargo Hold 6–10, Bio Lab 11–15, Fungal Hollow 16–20,
+Coral Vault 21–25, Clockwork Ruins 26–30, Storm Citadel 31–35, Orbital Scrapyard
+36–40, Alien Hive 41–45 and Molten Forge 46–50. Two focused tests passed on each
+platform, checking all 50 assignments, room reentry and rendering all ten themes.
+The acceptance-only level-picker test was skipped by the regular test scheme;
+combat was not repeated for this mapping-only correction. The updated iPhone
+gallery was visually inspected and the installed Mac build refreshed, signature
+verified and launch checked. Structured review returned no findings. Results
+are under `/Users/beep/codex-work/cubrism-validation/five-level-backgrounds/`.

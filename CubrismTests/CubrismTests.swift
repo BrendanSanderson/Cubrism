@@ -15,33 +15,44 @@ class CubrismTests: XCTestCase {
 
     func testArenaBackgroundsFollowLevelAcrossWorldsAndRoomReentry() throws {
         var seen = Set<ObjectIdentifier>()
-        for level in 1...10 {
-            let floor = FloorViewController(min: 4, max: 5, level: level, world: 1)
+        let ranges: [(ClosedRange<Int>, String)] = [
+            (1...5, "StyleReactorArena"), (6...10, "StyleCargoArena"),
+            (11...15, "StyleBioArena"), (16...20, "StyleFungalArena"),
+            (21...25, "StyleCoralArena"), (26...30, "StyleClockworkArena"),
+            (31...35, "StyleStormArena"), (36...40, "StyleOrbitalArena"),
+            (41...45, "StyleHiveArena"), (46...50, "StyleForgeArena")
+        ]
+        for globalLevel in 1...50 {
+            let expectedAsset = try XCTUnwrap(ranges.first { $0.0.contains(globalLevel) }?.1)
+            let expectedTexture = GameArt.texture(expectedAsset)
+            let floor = FloorViewController(min: 4, max: 5,
+                level: (globalLevel - 1) % 10 + 1, world: (globalLevel - 1) / 10 + 1)
             let first = RoomScene(size: GameScene.arenaSize)
             first.viewController = floor
             first.createGrid()
             let background = try XCTUnwrap(first.children.first { $0.zPosition == -25 } as? SKSpriteNode)
             let texture = try XCTUnwrap(background.texture)
+            XCTAssertTrue(texture === expectedTexture, "Background for global level \(globalLevel)")
+            XCTAssertEqual(first.arenaGlobalLevel, globalLevel)
             seen.insert(ObjectIdentifier(texture))
             XCTAssertEqual(background.size, GameScene.arenaSize)
             XCTAssertNotNil(first.physicsBody)
-            let image = try XCTUnwrap(GameArt.image(GameArt.arena(forLevel: level).assetName))
+            let image = try XCTUnwrap(GameArt.image(expectedAsset))
             XCTAssertEqual(image.size.width, 750, accuracy: 0.01)
             XCTAssertEqual(image.size.height, 375, accuracy: 0.01)
             XCTAssertGreaterThanOrEqual(try XCTUnwrap(image.cgImage).width, 1700)
-            floor.world = 5
             let nextRoom = RoomScene(size: GameScene.arenaSize)
             nextRoom.viewController = floor
             nextRoom.createGrid()
             let nextBackground = try XCTUnwrap(nextRoom.children.first { $0.zPosition == -25 } as? SKSpriteNode)
-            XCTAssertTrue(nextBackground.texture === texture, "The local level keeps its theme across rooms and worlds")
+            XCTAssertTrue(nextBackground.texture === texture, "The floor keeps its theme across rooms")
             first.removeAllChildren()
             first.createGrid()
             XCTAssertTrue((first.children.first { $0.zPosition == -25 } as? SKSpriteNode)?.texture === texture)
         }
-        XCTAssertEqual(seen.count, 10, "Every level needs its own background")
-        XCTAssertEqual(GameArt.arena(forLevel: 10).title, "Molten Forge")
-        XCTAssertEqual(HomeScene(size: GameScene.arenaSize).arenaLevel, 1)
+        XCTAssertEqual(seen.count, 10, "All ten backgrounds must appear across the fifty levels")
+        XCTAssertEqual(GameArt.arena(forGlobalLevel: 50).title, "Molten Forge")
+        XCTAssertEqual(HomeScene(size: GameScene.arenaSize).arenaGlobalLevel, 1)
     }
 
     func testTenArenaBackgroundsWithGameplayOverlay() throws {
@@ -55,8 +66,9 @@ class CubrismTests: XCTestCase {
         }
         var captures = [UIImage]()
         let view = SKView(frame: CGRect(origin: .zero, size: GameScene.arenaSize))
-        for level in 1...10 {
-            let controller = FloorViewController(min: 4, max: 5, level: level, world: 1)
+        for globalLevel in stride(from: 1, through: 46, by: 5) {
+            let controller = FloorViewController(min: 4, max: 5,
+                level: (globalLevel - 1) % 10 + 1, world: (globalLevel - 1) / 10 + 1)
             Player.currentViewController = controller
             let scene = RoomScene(size: GameScene.arenaSize)
             scene.viewController = controller
@@ -77,9 +89,9 @@ class CubrismTests: XCTestCase {
             let capture = UIImage(cgImage: try XCTUnwrap(view.texture(from: scene,
                 crop: CGRect(origin: .zero, size: scene.size))).cgImage())
             captures.append(capture)
-            if level == 2 || level == 10 {
+            if globalLevel == 6 || globalLevel == 46 {
                 let attachment = XCTAttachment(image: capture)
-                attachment.name = "Arena-\(level)-\(GameArt.arena(forLevel: level).title)"
+                attachment.name = "Arena-\(globalLevel)-\(GameArt.arena(forGlobalLevel: globalLevel).title)"
                 attachment.lifetime = .keepAlways
                 add(attachment)
             }
@@ -89,7 +101,8 @@ class CubrismTests: XCTestCase {
             GameArt.ink.setFill(); UIRectFill(rect)
             for (index, capture) in captures.enumerated() {
                 let x = CGFloat(index % 2) * 750, y = CGFloat(index / 2) * 415
-                let title = "\(index + 1). \(GameArt.arena(forLevel: index + 1).title)"
+                let firstLevel = index * 5 + 1
+                let title = "\(firstLevel)–\(firstLevel + 4). \(GameArt.arena(forGlobalLevel: firstLevel).title)"
                 (title as NSString).draw(at: CGPoint(x: x + 12, y: y + 9), withAttributes: [
                     .font: UIFont.boldSystemFont(ofSize: 18), .foregroundColor: GameArt.ivory])
                 capture.draw(in: CGRect(x: x, y: y + 40, width: 750, height: 375))
