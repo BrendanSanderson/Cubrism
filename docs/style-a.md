@@ -185,3 +185,30 @@ visually inspected. This is an art and behavior fixture, not a new combat run.
 The Mac app was refreshed and its signature verified. Evidence is under
 `/Users/beep/codex-work/cubrism-validation/damage-interior/`.
 Final `autoreview --mode local` returned no findings; none were accepted or rejected.
+
+## Original crack layouts in the current art style
+
+The latest square damage revision supersedes the perimeter and freeform interior
+experiments above. `StyleDamageLight`, `StyleDamageMedium`, and `StyleDamageHeavy`
+are separate transparent repaints of the original `damaged75`, `damaged50`, and
+`damaged25` layouts. Each keeps the original branching, density progression and
+canvas placement closely, with dark recessed gaps and slim enamel highlights.
+The unused `StyleDamage` perimeter atlas has been removed. Legacy source images
+remain available as layout references; the dragon's round damage assets are unchanged.
+
+Built-in generation prompts, refinements and final asset paths are recorded in
+`damage-original-layout-sources.json`. The visual gallery compares every original
+tier against its repaint over the same enemy artwork at 96 and 32 points.
+The damage test now checks both directions of path agreement within 1.5 points
+of the original, increasing crack coverage, unchanged sprite sizes, health
+thresholds and transient hit flash. Separate fireball coverage still verifies
+tracking, collision and destruction without experience or room-clear credit.
+Evidence is saved under
+`/Users/beep/codex-work/cubrism-validation/damage-original-layout/`.
+
+The final three focused tests passed on both iPhone simulator and Mac Catalyst.
+The runtime comparison was visually inspected after restoring the medium tier's
+short inward branch. `autoreview --mode local` returned no findings; none were
+accepted or rejected. The installed Mac build was refreshed, its signature
+verified, and its home screen checked. These are art and behavior fixtures,
+not a new combat playthrough.

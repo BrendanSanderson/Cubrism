@@ -16,9 +16,9 @@ enum GameArt {
     static let items = ["Pulsar", "Special Pulsar", "Shield", "Armor Core", "Power Core", "Attachment"]
     static let bosses = ["generatorBoss", "dragonBoss", "golemBoss", "bossEnergy"]
     private static let damageSources: [String: (asset: String, column: Int, columns: Int)] = [
-        "damaged75": ("StyleDamage", 0, 3),
-        // The previously approved heavy stage is now medium, without repainting it.
-        "damaged50": ("StyleDamage", 2, 3),
+        // Each repaint follows its corresponding legacy crack layout on the full canvas.
+        "damaged75": ("StyleDamageLight", 0, 1),
+        "damaged50": ("StyleDamageMedium", 0, 1),
         "damaged25": ("StyleDamageHeavy", 0, 1),
         "dragonDamaged75": ("StyleFireballDamage", 0, 3),
         "dragonDamaged50": ("StyleFireballDamage", 1, 3),

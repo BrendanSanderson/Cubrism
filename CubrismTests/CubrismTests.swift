@@ -139,44 +139,42 @@ class CubrismTests: XCTestCase {
     }
 
     func testEnemyDamagePreservesSilhouetteAndReadableFace() throws {
-        let previousAtlas = try XCTUnwrap(UIImage(named: "StyleDamage")?.cgImage)
-        let previousHeavy = try XCTUnwrap(previousAtlas.cropping(to: CGRect(
-            x: previousAtlas.width * 2 / 3, y: 0, width: previousAtlas.width / 3, height: previousAtlas.height)))
-        let originalSize = try XCTUnwrap(UIImage(named: "damaged50")).size
-        let expectedMedium = GameArt.render(originalSize) { UIImage(cgImage: previousHeavy).draw(in: $0) }
-        XCTAssertEqual(GameArt.image("damaged50")?.pngData(), expectedMedium.pngData(),
-                       "The previous heavy artwork becomes medium unchanged")
         var previousCoverage = 0
         for name in ["damaged75", "damaged50", "damaged25"] {
             let image = try XCTUnwrap(GameArt.image(name))
-            XCTAssertEqual(image.size, UIImage(named: name)?.size)
-            XCTAssertNotEqual(image.pngData(), UIImage(named: name)?.pngData())
+            let original = try XCTUnwrap(UIImage(named: name))
+            XCTAssertEqual(image.size, original.size)
+            XCTAssertNotEqual(image.pngData(), original.pngData())
             let cg = try XCTUnwrap(image.cgImage)
+            // Compare at the same resolution even when UIKit chooses a different asset scale.
+            let reference = GameArt.render(image.size, scale: image.scale) { original.draw(in: $0) }
+            let originalCG = try XCTUnwrap(reference.cgImage)
             let pixels = rgbaPixels(cg)
-            var coverage = 0
-            var centerCoverage = 0
-            var centerPixels = 0
-            for y in 0..<cg.height {
-                for x in 0..<cg.width {
-                    let alpha = pixels[(y * cg.width + x) * 4 + 3]
-                    if alpha > 24 { coverage += 1 }
-                    if x > cg.width * 3 / 10 && x < cg.width * 7 / 10 &&
-                       y > cg.height * 3 / 10 && y < cg.height * 7 / 10 {
-                        centerPixels += 1
-                        if alpha > 24 { centerCoverage += 1 }
-                        if name != "damaged25" {
-                            XCTAssertLessThan(alpha, 8, "Light and medium keep the original clear center")
+            let originalPixels = rgbaPixels(originalCG)
+            let coverage = stride(from: 3, to: pixels.count, by: 4).filter { pixels[$0] > 24 }.count
+            XCTAssertGreaterThan(coverage, previousCoverage, "Each tier adds visible fractures")
+            XCTAssertLessThan(coverage, cg.width * cg.height / 3, "Most of the colored face must remain visible")
+            // Allow narrow bevels and smoothing within 1.5 points of the legacy path.
+            // Check both directions so a rim or an omitted interior branch cannot pass.
+            let radius = Int((1.5 * image.scale).rounded(.down))
+            func agreement(_ source: [UInt8], _ target: [UInt8]) -> Double {
+                var matched = 0
+                var visible = 0
+                for y in 0..<cg.height {
+                    for x in 0..<cg.width where source[(y * cg.width + x) * 4 + 3] > 24 {
+                        visible += 1
+                        let nearby = (max(0, y - radius)...min(cg.height - 1, y + radius)).contains { yy in
+                            (max(0, x - radius)...min(cg.width - 1, x + radius)).contains { xx in
+                                target[(yy * cg.width + xx) * 4 + 3] > 24
+                            }
                         }
+                        if nearby { matched += 1 }
                     }
                 }
+                return Double(matched) / Double(max(1, visible))
             }
-            XCTAssertGreaterThan(coverage, previousCoverage, "More damage should be visibly more worn")
-            if name == "damaged25" {
-                XCTAssertGreaterThan(coverage, previousCoverage * 2, "Heavy must be clearly stronger than the previous heavy")
-                XCTAssertGreaterThan(centerCoverage, centerPixels / 20, "Heavy fractures must cross the face, not form an outer rim")
-                XCTAssertLessThan(centerCoverage, centerPixels / 2, "Most of the center symbol must remain visible")
-            }
-            XCTAssertLessThan(coverage, cg.width * cg.height / 5, "Cracks must not obscure the enemy")
+            XCTAssertGreaterThan(agreement(pixels, originalPixels), 0.95, "New cracks must follow the original paths: \(name)")
+            XCTAssertGreaterThan(agreement(originalPixels, pixels), 0.95, "Retain the original network across the face: \(name)")
             previousCoverage = coverage
         }
         let scene = SKScene(size: CGSize(width: 240, height: 160))
@@ -265,30 +263,46 @@ class CubrismTests: XCTestCase {
     }
 
     func testEnemyDamageVisualGallery() throws {
-        let gallery = GameArt.render(CGSize(width: 1000, height: 880), scale: 2) { rect in
+        let gallery = GameArt.render(CGSize(width: 1100, height: 810), scale: 2) { rect in
             GameArt.ink.setFill(); UIRectFill(rect)
-            for (column, title) in ["Healthy", "Previous heavy", "Light damage", "Medium damage", "Heavy damage"].enumerated() {
-                (title as NSString).draw(at: CGPoint(x: 175 + column * 162, y: 18), withAttributes: [
-                    .font: UIFont.boldSystemFont(ofSize: 14), .foregroundColor: GameArt.ivory])
+            ("ORIGINAL CRACK LAYOUTS · UPDATED ENAMEL FINISH" as NSString).draw(at: CGPoint(x: 24, y: 20), withAttributes: [
+                .font: UIFont.boldSystemFont(ofSize: 21), .foregroundColor: GameArt.ivory])
+            ("Original and updated overlays on the same current enemy artwork. Large previews plus 32-point gameplay size." as NSString).draw(at: CGPoint(x: 24, y: 54), withAttributes: [
+                .font: UIFont.systemFont(ofSize: 13), .foregroundColor: GameArt.ivory.withAlphaComponent(0.7)])
+            for (tier, title) in ["LIGHT", "MEDIUM", "HEAVY"].enumerated() {
+                let x = 140 + tier * 320
+                (title as NSString).draw(at: CGPoint(x: x + 90, y: 92), withAttributes: [
+                    .font: UIFont.boldSystemFont(ofSize: 17), .foregroundColor: GameArt.ivory])
+                for (column, label) in ["Original", "Updated"].enumerated() {
+                    (label as NSString).draw(at: CGPoint(x: x + column * 148 + 27, y: 122), withAttributes: [
+                        .font: UIFont.systemFont(ofSize: 14), .foregroundColor: column == 0 ? GameArt.ivory : GameArt.ice])
+                }
             }
-            for (row, name) in (GameArt.enemies + ["bossDragonFireball"]).enumerated() {
-                let y = CGFloat(58 + row * 80)
-                let label = name == "bossDragonFireball" ? "dragon fireball" : name.replacingOccurrences(of: "Enemy", with: "")
-                (label as NSString).draw(at: CGPoint(x: 16, y: y + 24), withAttributes: [
-                    .font: UIFont.systemFont(ofSize: 13), .foregroundColor: GameArt.ivory])
-                for column in 0..<5 {
-                    let prefix = name == "bossDragonFireball" ? "dragonDamaged" : "damaged"
-                    let overlay: UIImage? = column == 0 ? nil : column == 1 ? GameArt.image("damaged50") : GameArt.image(prefix + ["75", "50", "25"][column - 2])
-                    for (offset, size) in [(CGFloat(0), CGFloat(64)), (CGFloat(82), CGFloat(32))] {
-                        let frame = CGRect(x: CGFloat(175 + column * 162) + offset, y: y + 64 - size, width: size, height: size)
-                        GameArt.image(name)?.draw(in: frame)
-                        overlay?.draw(in: frame)
+            let rows = [("Cracks", ""), ("Melee", "meleeEnemy"), ("Ranged", "rangeEnemy"),
+                        ("Tracking", "rangeTrackingEnemy"), ("Bomber", "bomberEnemy")]
+            for (row, entry) in rows.enumerated() {
+                let y = CGFloat(157 + row * 124)
+                (entry.0 as NSString).draw(at: CGPoint(x: 24, y: y + 40), withAttributes: [
+                    .font: UIFont.systemFont(ofSize: 14), .foregroundColor: GameArt.ivory])
+                for (tier, stage) in ["75", "50", "25"].enumerated() {
+                    for column in 0..<2 {
+                        let overlay = column == 0 ? UIImage(named: "damaged" + stage) : GameArt.image("damaged" + stage)
+                        for (offset, size) in [(CGFloat(0), CGFloat(96)), (CGFloat(104), CGFloat(32))] {
+                            let frame = CGRect(x: CGFloat(140 + tier * 320 + column * 148) + offset,
+                                               y: y + 96 - size, width: size, height: size)
+                            if entry.1.isEmpty {
+                                UIColor(white: 0.35, alpha: 1).setFill(); UIRectFill(frame)
+                            } else {
+                                GameArt.image(entry.1)?.draw(in: frame)
+                            }
+                            overlay?.draw(in: frame)
+                        }
                     }
                 }
             }
         }
         let attachment = XCTAttachment(image: gallery)
-        attachment.name = "Enemy-damage-before-and-after-64-and-32pt"
+        attachment.name = "Original-cracks-and-updated-art-at-gameplay-size"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
