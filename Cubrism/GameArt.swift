@@ -15,6 +15,15 @@ enum GameArt {
     static let enemies = ["meleeEnemy", "rangeEnemy", "rangeTrackingEnemy", "rangeTrippleEnemy", "rangeRingEnemy", "dashEnemy", "bomberEnemy", "sludgeEnemy", "suicideEnemy"]
     static let items = ["Pulsar", "Special Pulsar", "Shield", "Armor Core", "Power Core", "Attachment"]
     static let bosses = ["generatorBoss", "dragonBoss", "golemBoss", "bossEnergy"]
+    private static let damageSources: [String: (asset: String, column: Int, columns: Int)] = [
+        // Approved option A: light, medium, heavy, each on its full square canvas.
+        "damaged75": ("StyleDamageFine", 0, 3),
+        "damaged50": ("StyleDamageFine", 1, 3),
+        "damaged25": ("StyleDamageFine", 2, 3),
+        "dragonDamaged75": ("StyleFireballDamage", 0, 3),
+        "dragonDamaged50": ("StyleFireballDamage", 1, 3),
+        "dragonDamaged25": ("StyleFireballDamageHeavy", 0, 1)
+    ]
 
     struct Arena {
         let title: String
@@ -59,6 +68,18 @@ enum GameArt {
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }
         let original = UIImage(named: name)
+        if let source = damageSources[name],
+           let sheet = UIImage(named: source.asset)?.cgImage,
+           let crop = sheet.cropping(to: CGRect(x: source.column * (sheet.width / source.columns), y: 0,
+                                               width: sheet.width / source.columns, height: sheet.height)) {
+            // Keep transparent margins so each damage stage stays registered to the enemy face.
+            let size = original?.size ?? UIImage(named: "bossDragonFireball")?.size ?? CGSize(width: 32, height: 32)
+            let result = render(size) {
+                UIImage(cgImage: crop).draw(in: $0)
+            }
+            images[name] = result
+            return result
+        }
         if let arena = arenas.first(where: { $0.assetName == name }), let source = original {
             // Use an integer Retina scale to keep the logical size exact after pixel rounding.
             let size = GameScene.arenaSize

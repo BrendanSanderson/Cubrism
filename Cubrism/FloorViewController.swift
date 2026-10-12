@@ -319,6 +319,7 @@ class FloorViewController: UIViewController {
         
         
         let completeViewController = CompletedViewController()
+        completeViewController.floorLevel = globalLevel
         completeViewController.expGained = levelExp
         completeViewController.drops = drops
         completeViewController.modalPresentationStyle = .fullScreen

@@ -117,3 +117,119 @@ combat was not repeated for this mapping-only correction. The updated iPhone
 gallery was visually inspected and the installed Mac build refreshed, signature
 verified and launch checked. Structured review returned no findings. Results
 are under `/Users/beep/codex-work/cubrism-validation/five-level-backgrounds/`.
+
+## Completion and enemy damage follow-up on 2026-10-01
+
+The completion page now places XP beside a dedicated scrolling loot list, with
+Continue in a fixed footer. A dimmed background identifies the cleared global
+floor's arena. Compact spacing keeps both normal drops visible on short
+landscape phones; wider Mac windows center the panel instead of stretching it.
+The XP bar uses a rounded track and fill, and item icons retain their saved
+appearance through the shared resolver.
+
+`StyleDamage` replaces the three legacy crack overlays with registered transparent
+edge chips, leaving enemy symbols clear. Its source prompt is recorded in
+`damage-art-source.json`. A brief ivory flash restarts on each positive hit and
+returns to the original sprite tint. Health thresholds, collision sizes and
+rewards are unchanged.
+
+Validation: the new two-drop visibility test failed on all three phone sizes
+before the layout change. The final iPhone 16e/iOS 18.5 run passed all 44 unit
+and rendering tests. Mac Catalyst passed the three focused layout/damage tests,
+and the reward presentation/Continue test passed on both platforms. Native Mac
+pointer input scrolled to the final item of a 27-item fixture. The presentation
+test now yields asynchronously so AppKit can process input during inspection.
+Fixtures and damage galleries are visual checks, not a new combat playthrough.
+The installed Mac app was refreshed, its ad-hoc signature verified, and launch
+checked. Evidence is under
+`/Users/beep/codex-work/cubrism-validation/completion-damage/`.
+
+Final `autoreview --mode local` returned no actionable findings. An earlier
+claim that integer CGRect arguments would not compile was rejected against
+successful builds on both platforms and the SDK's explicit Int initializer.
+
+## Stronger heavy damage and dragon fireball stages
+
+The previously approved heavy square overlay now serves as medium damage,
+reusing its original atlas cell unchanged. `StyleDamageHeavy` adds a more
+pronounced fractured rim while keeping the center symbol clear.
+`StyleFireballDamage` provides three circular scorched-fissure stages for the
+dragon's tracking fireball, selected by enemy type at the same health thresholds.
+The fireball's original base sprite remains in use. Built-in generation prompts
+and asset locations are in `damage-art-v2-sources.json`.
+
+Three focused tests passed on both iPhone simulator and Mac Catalyst: exact
+old-heavy/new-medium image equality, stronger heavy coverage with a transparent
+center, round progressive fireball damage, preserved size/physics/tracking,
+and the projectile's existing destruction behavior without room-clear credit
+or experience. The runtime gallery includes every enemy and the fireball at
+64 and 32 points. This is a visual/behavior fixture, not a combat playthrough.
+`autoreview --mode local` returned no findings; none were accepted or rejected.
+The installed Mac app was refreshed and its signature verified. Evidence is in
+`/Users/beep/codex-work/cubrism-validation/damage-v2/`.
+
+## Interior crack refinement
+
+Heavy damage now branches across the enemy face instead of forming a continuous
+outer rim. The fireball's heavy stage likewise has scorched interior fractures,
+using the single-cell `StyleFireballDamageHeavy` asset. Light and medium stages
+retain their artwork and routing. The new source prompts and paths are in
+`damage-interior-art-sources.json`; that file supersedes the earlier rim-heavy
+square source description.
+
+Three focused tests passed on both iPhone simulator and Mac Catalyst. They check
+interior damage coverage without obscuring most of the enemy face, exact reuse
+of the approved medium stage, the round fireball footprint, and existing
+tracking/collision/destruction behavior. The 64/32-point runtime gallery was
+visually inspected. This is an art and behavior fixture, not a new combat run.
+The Mac app was refreshed and its signature verified. Evidence is under
+`/Users/beep/codex-work/cubrism-validation/damage-interior/`.
+Final `autoreview --mode local` returned no findings; none were accepted or rejected.
+
+## Original crack layouts in the current art style
+
+The latest square damage revision supersedes the perimeter and freeform interior
+experiments above. `StyleDamageLight`, `StyleDamageMedium`, and `StyleDamageHeavy`
+are separate transparent repaints of the original `damaged75`, `damaged50`, and
+`damaged25` layouts. Each keeps the original branching, density progression and
+canvas placement closely, with dark recessed gaps and slim enamel highlights.
+The unused `StyleDamage` perimeter atlas has been removed. Legacy source images
+remain available as layout references; the dragon's round damage assets are unchanged.
+
+Built-in generation prompts, refinements and final asset paths are recorded in
+`damage-original-layout-sources.json`. The visual gallery compares every original
+tier against its repaint over the same enemy artwork at 96 and 32 points.
+The damage test now checks both directions of path agreement within 1.5 points
+of the original, increasing crack coverage, unchanged sprite sizes, health
+thresholds and transient hit flash. Separate fireball coverage still verifies
+tracking, collision and destruction without experience or room-clear credit.
+Evidence is saved under
+`/Users/beep/codex-work/cubrism-validation/damage-original-layout/`.
+
+The final three focused tests passed on both iPhone simulator and Mac Catalyst.
+The runtime comparison was visually inspected after restoring the medium tier's
+short inward branch. `autoreview --mode local` returned no findings; none were
+accepted or rejected. The installed Mac build was refreshed, its signature
+verified, and its home screen checked. These are art and behavior fixtures,
+not a new combat playthrough.
+
+## Approved option A on 2026-10-12
+
+The final square damage choice is **option A: fine recessed cracks**. The exact
+approved three-cell atlas now lives in `StyleDamageFine`, ordered light, medium,
+heavy. Full transparent cells preserve the approved placement over each enemy.
+This supersedes the three separate original-layout repaint assets above, which
+have been removed. The dragon fireball retains its approved circular stages.
+The source prompt, asset hash and approval date are in
+`damage-option-a-source.json`; the approved all-enemies comparison is
+[saved here](art/damage-option-a.png).
+
+All 45 unit and rendering tests passed on both iPhone 16e/iOS 18.5 and Mac
+Catalyst. The two acceptance fixtures for level selection and reward-page
+scrolling/Continue navigation also passed on both platforms. Coverage verifies
+exact approved atlas cells, increasing crack coverage, preserved sizes and
+health thresholds, hit-flash reset, and fireball behavior. Rendered damage at
+gameplay size and the completion page at 568 by 320 points were visually
+inspected. These are presentation and behavior checks, not a new combat run.
+Result bundles, screenshots and logs are under
+`/Users/beep/codex-work/cubrism-validation/damage-option-a-2026-10-12/`.

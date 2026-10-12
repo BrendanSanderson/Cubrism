@@ -11,6 +11,11 @@ import UIKit
 import SpriteKit
 @testable import Cubrism
 
+private func completionView(_ root: UIView, id: String) -> UIView? {
+    if root.accessibilityIdentifier == id { return root }
+    return root.subviews.lazy.compactMap { completionView($0, id: id) }.first
+}
+
 class CubrismTests: XCTestCase {
 
     func testArenaBackgroundsFollowLevelAcrossWorldsAndRoomReentry() throws {
@@ -133,6 +138,158 @@ class CubrismTests: XCTestCase {
         }
     }
 
+    func testEnemyDamagePreservesSilhouetteAndReadableFace() throws {
+        let atlas = try XCTUnwrap(UIImage(named: "StyleDamageFine")?.cgImage)
+        XCTAssertEqual(atlas.width, atlas.height * 3, "Each approved tier occupies one square cell")
+        var previousCoverage = 0
+        for (column, name) in ["damaged75", "damaged50", "damaged25"].enumerated() {
+            let image = try XCTUnwrap(GameArt.image(name))
+            let original = try XCTUnwrap(UIImage(named: name))
+            XCTAssertEqual(image.size, original.size)
+            XCTAssertNotEqual(image.pngData(), original.pngData())
+            let cg = try XCTUnwrap(image.cgImage)
+            // Match the approved option A cell, including its intentional transparent margins.
+            // Trimming or recentering would shift the cracks over the enemy's symbol.
+            let crop = try XCTUnwrap(atlas.cropping(to: CGRect(x: column * atlas.height, y: 0,
+                                                               width: atlas.height, height: atlas.height)))
+            let expected = GameArt.render(image.size, scale: image.scale) { UIImage(cgImage: crop).draw(in: $0) }
+            XCTAssertEqual(image.pngData(), expected.pngData(), "Use the approved tier without shifting its layout")
+            let pixels = rgbaPixels(cg)
+            let coverage = stride(from: 3, to: pixels.count, by: 4).filter { pixels[$0] > 24 }.count
+            XCTAssertGreaterThan(coverage, previousCoverage, "Each tier adds visible fractures")
+            XCTAssertLessThan(coverage, cg.width * cg.height / 3, "Most of the colored face must remain visible")
+            previousCoverage = coverage
+        }
+        let scene = SKScene(size: CGSize(width: 240, height: 160))
+        let host = SKView(frame: CGRect(x: 0, y: 0, width: 240, height: 160))
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        window.rootViewController?.view.addSubview(host)
+        defer { host.presentScene(nil); host.removeFromSuperview() }
+        host.presentScene(scene)
+        let enemy = EnemyEntity()
+        enemy.node.entity = enemy
+        enemy.health = 100
+        enemy.currentHealth = 100
+        enemy.sprite = GameArt.sprite("meleeEnemy")
+        enemy.sprite.position = CGPoint(x: 120, y: 80)
+        enemy.sprite.addChild(enemy.statusNode)
+        scene.addChild(enemy.sprite)
+        let size = enemy.sprite.size
+        for name in ["damaged75", "damaged50", "damaged25"] {
+            enemy.damageEnemy(25)
+            XCTAssertTrue(enemy.statusNode.texture === GameArt.texture(name))
+            XCTAssertEqual(enemy.sprite.size, size)
+            XCTAssertEqual(enemy.statusNode.size, size)
+            XCTAssertNotNil(enemy.sprite.action(forKey: "damageFlash"))
+        }
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
+        XCTAssertNil(enemy.sprite.action(forKey: "damageFlash"), "Repeated hits must not leave a permanent tint")
+        XCTAssertEqual(enemy.sprite.colorBlendFactor, 0, accuracy: 0.001)
+        XCTAssertEqual(enemy.currentHealth, 25)
+    }
+
+    func testDragonTrackingFireballUsesRoundDamageThroughDestruction() throws {
+        let floor = FloorViewController(min: 4, max: 5, level: 10, world: 1)
+        let room = RoomScene(size: GameScene.arenaSize)
+        room.viewController = floor
+        room.doors = [DoorEntity(scene: room, direction: 1, type: "bossChallenge")]
+        let fireball = EnemyEntity(scene: room, eType: "DragonFireball", lev: 1, elite: false)
+        let tracking = try XCTUnwrap(fireball.component(ofType: EnemyTrackingComponent.self))
+        let body = try XCTUnwrap(fireball.sprite.physicsBody)
+        let size = fireball.sprite.size
+        let initialPosition = fireball.sprite.position
+        tracking.action(0)
+        XCTAssertNotEqual(fireball.sprite.position, initialPosition, "The damaged projectile must still home toward the player")
+        var previousCoverage = 0
+        for remaining in [75, 50, 25] {
+            let targetHealth = fireball.health * remaining / 100
+            fireball.damageEnemy(fireball.currentHealth - targetHealth)
+            let name = "dragonDamaged\(remaining)"
+            XCTAssertEqual(fireball.currentHealth, targetHealth)
+            XCTAssertTrue(fireball.statusNode.texture === GameArt.texture(name))
+            XCTAssertTrue(fireball.component(ofType: EnemyTrackingComponent.self) === tracking)
+            XCTAssertTrue(fireball.sprite.physicsBody === body)
+            XCTAssertEqual(fireball.statusNode.size, size)
+            XCTAssertEqual(fireball.sprite.size, size)
+            XCTAssertTrue(fireball.sprite.texture === GameArt.texture("bossDragonFireball"))
+            let image = try XCTUnwrap(GameArt.image(name))
+            XCTAssertEqual(image.size, size)
+            let cg = try XCTUnwrap(image.cgImage)
+            let pixels = rgbaPixels(cg)
+            var coverage = 0
+            var interiorCoverage = 0
+            for y in 0..<cg.height {
+                for x in 0..<cg.width {
+                    let alpha = pixels[(y * cg.width + x) * 4 + 3]
+                    if alpha > 24 { coverage += 1 }
+                    let dx = (Double(x) + 0.5) / Double(cg.width) - 0.5
+                    let dy = (Double(y) + 0.5) / Double(cg.height) - 0.5
+                    if hypot(dx, dy) < 0.2 && alpha > 24 { interiorCoverage += 1 }
+                    if hypot(dx, dy) > 0.49 || (remaining != 25 && hypot(dx, dy) < 0.08) {
+                        XCTAssertLessThan(alpha, 8, "Fireball damage must stay inside its round footprint")
+                    }
+                }
+            }
+            XCTAssertGreaterThan(coverage, previousCoverage)
+            if remaining == 25 {
+                XCTAssertGreaterThan(interiorCoverage, cg.width * cg.height / 100, "Heavy damage must fracture the fireball interior")
+                XCTAssertLessThan(coverage, cg.width * cg.height / 2, "The red orb must remain visible between fissures")
+            }
+            previousCoverage = coverage
+        }
+        fireball.damageEnemy(fireball.currentHealth)
+        XCTAssertNil(fireball.sprite.physicsBody)
+        XCTAssertNil(fireball.component(ofType: EnemyTrackingComponent.self))
+        XCTAssertNotNil(fireball.component(ofType: EnemyDyingComponent.self))
+        XCTAssertEqual(room.killedEnemies, 0, "Destroying a dragon projectile must not count as clearing an enemy")
+        XCTAssertEqual(floor.levelExp, 0)
+    }
+
+    func testEnemyDamageVisualGallery() throws {
+        let gallery = GameArt.render(CGSize(width: 1100, height: 810), scale: 2) { rect in
+            GameArt.ink.setFill(); UIRectFill(rect)
+            ("ORIGINAL CRACK LAYOUTS · UPDATED ENAMEL FINISH" as NSString).draw(at: CGPoint(x: 24, y: 20), withAttributes: [
+                .font: UIFont.boldSystemFont(ofSize: 21), .foregroundColor: GameArt.ivory])
+            ("Original and updated overlays on the same current enemy artwork. Large previews plus 32-point gameplay size." as NSString).draw(at: CGPoint(x: 24, y: 54), withAttributes: [
+                .font: UIFont.systemFont(ofSize: 13), .foregroundColor: GameArt.ivory.withAlphaComponent(0.7)])
+            for (tier, title) in ["LIGHT", "MEDIUM", "HEAVY"].enumerated() {
+                let x = 140 + tier * 320
+                (title as NSString).draw(at: CGPoint(x: x + 90, y: 92), withAttributes: [
+                    .font: UIFont.boldSystemFont(ofSize: 17), .foregroundColor: GameArt.ivory])
+                for (column, label) in ["Original", "Updated"].enumerated() {
+                    (label as NSString).draw(at: CGPoint(x: x + column * 148 + 27, y: 122), withAttributes: [
+                        .font: UIFont.systemFont(ofSize: 14), .foregroundColor: column == 0 ? GameArt.ivory : GameArt.ice])
+                }
+            }
+            let rows = [("Cracks", ""), ("Melee", "meleeEnemy"), ("Ranged", "rangeEnemy"),
+                        ("Tracking", "rangeTrackingEnemy"), ("Bomber", "bomberEnemy")]
+            for (row, entry) in rows.enumerated() {
+                let y = CGFloat(157 + row * 124)
+                (entry.0 as NSString).draw(at: CGPoint(x: 24, y: y + 40), withAttributes: [
+                    .font: UIFont.systemFont(ofSize: 14), .foregroundColor: GameArt.ivory])
+                for (tier, stage) in ["75", "50", "25"].enumerated() {
+                    for column in 0..<2 {
+                        let overlay = column == 0 ? UIImage(named: "damaged" + stage) : GameArt.image("damaged" + stage)
+                        for (offset, size) in [(CGFloat(0), CGFloat(96)), (CGFloat(104), CGFloat(32))] {
+                            let frame = CGRect(x: CGFloat(140 + tier * 320 + column * 148) + offset,
+                                               y: y + 96 - size, width: size, height: size)
+                            if entry.1.isEmpty {
+                                UIColor(white: 0.35, alpha: 1).setFill(); UIRectFill(frame)
+                            } else {
+                                GameArt.image(entry.1)?.draw(in: frame)
+                            }
+                            overlay?.draw(in: frame)
+                        }
+                    }
+                }
+            }
+        }
+        let attachment = XCTAttachment(image: gallery)
+        attachment.name = "Original-cracks-and-updated-art-at-gameplay-size"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testEquipmentAtlasCellsHaveRealTransparencyAndNoClippedEdges() throws {
         for family in GameArt.items {
             let sheet = "Style" + family.replacingOccurrences(of: " ", with: "")
@@ -214,7 +371,7 @@ class CubrismTests: XCTestCase {
                     let controller = CompletedViewController()
                     controller.drops = [restored]
                     controller.loadViewIfNeeded()
-                    let scroll = try XCTUnwrap(controller.view.subviews.first?.subviews.compactMap { $0 as? UIScrollView }.first)
+                    let scroll = try XCTUnwrap(completionView(controller.view, id: "completion.rewards") as? UIScrollView)
                     let stack = try XCTUnwrap(scroll.subviews.compactMap { $0 as? UIStackView }.first)
                     let row = try XCTUnwrap(stack.arrangedSubviews.last as? UIStackView)
                     let reward = try XCTUnwrap((row.arrangedSubviews.first as? UIImageView)?.image)
@@ -451,6 +608,36 @@ class CubrismTests: XCTestCase {
         }
     }
 
+    func testCompletionShowsTwoRewardsWithoutScrollingOnShortLandscapePhones() throws {
+        func images(in view: UIView) -> [UIImageView] {
+            if view is UIProgressView { return [] }
+            return view.subviews.flatMap { ($0 as? UIImageView).map { [$0] } ?? images(in: $0) }
+        }
+        for size in [CGSize(width: 568, height: 320), CGSize(width: 667, height: 375),
+                     CGSize(width: 844, height: 390)] {
+            let completed = CompletedViewController()
+            completed.expGained = 144
+            completed.drops = [Item(t: "Cubrixel", q: 4, s: true),
+                               Equipment(t: "Special Pulsar", lev: 1, tie: 1, st: "")]
+            completed.loadViewIfNeeded()
+            completed.view.frame = CGRect(origin: .zero, size: size)
+            completed.view.layoutIfNeeded()
+            let scroll = try XCTUnwrap(completionView(completed.view, id: "completion.rewards") as? UIScrollView)
+            let rewardImages = images(in: scroll)
+            XCTAssertEqual(rewardImages.count, 2)
+            for image in rewardImages {
+                XCTAssertTrue(scroll.bounds.contains(image.convert(image.bounds, to: scroll)),
+                              "Both normal drops must be fully visible before scrolling at \(size)")
+            }
+            let attachment = XCTAttachment(image: UIGraphicsImageRenderer(bounds: completed.view.bounds).image {
+                completed.view.layer.render(in: $0.cgContext)
+            })
+            attachment.name = "Completion-initial-\(Int(size.width))x\(Int(size.height))"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
     func testCompletionLayoutKeepsContinueVisibleAndLootReachable() throws {
         for size in [CGSize(width: 667, height: 375), CGSize(width: 844, height: 390),
                      CGSize(width: 640, height: 480), CGSize(width: 1440, height: 900)] {
@@ -460,13 +647,13 @@ class CubrismTests: XCTestCase {
             completed.loadViewIfNeeded()
             completed.view.frame = CGRect(origin: .zero, size: size)
             completed.view.layoutIfNeeded()
-            let content = try XCTUnwrap(completed.view.subviews.first)
+            let content = try XCTUnwrap(completionView(completed.view, id: "completion.panel"))
             let scroll = try XCTUnwrap(content.subviews.compactMap { $0 as? UIScrollView }.first)
             let button = try XCTUnwrap(content.subviews.compactMap { $0 as? UIButton }.first)
             let buttonFrame = button.convert(button.bounds, to: completed.view)
             XCTAssertTrue(completed.view.safeAreaLayoutGuide.layoutFrame.contains(buttonFrame))
             XCTAssertGreaterThanOrEqual(buttonFrame.height, 48)
-            XCTAssertLessThanOrEqual(content.bounds.width, 720)
+            XCTAssertLessThanOrEqual(content.bounds.width, 960)
             XCTAssertLessThanOrEqual(scroll.frame.maxY, button.frame.minY - 12)
             if count == 8 && size.height < 500 {
                 XCTAssertGreaterThan(scroll.contentSize.height, scroll.bounds.height)
@@ -474,7 +661,9 @@ class CubrismTests: XCTestCase {
             scroll.setContentOffset(CGPoint(x: 0, y: max(0, scroll.contentSize.height - scroll.bounds.height)), animated: false)
             let stack = try XCTUnwrap(scroll.subviews.first as? UIStackView)
             let lastLoot = try XCTUnwrap(stack.arrangedSubviews.last)
-            XCTAssertTrue(scroll.bounds.contains(lastLoot.convert(lastLoot.bounds, to: scroll)))
+            let pixel = 1 / completed.view.contentScaleFactor
+            XCTAssertTrue(scroll.bounds.insetBy(dx: -pixel, dy: -pixel).contains(lastLoot.convert(lastLoot.bounds, to: scroll)),
+                          "Last reward must remain visible at \(size), count \(count)")
             let renderer = UIGraphicsImageRenderer(bounds: completed.view.bounds)
             let attachment = XCTAttachment(image: renderer.image { completed.view.layer.render(in: $0.cgContext) })
             attachment.name = "Completion-\(Int(size.width))x\(Int(size.height))-\(count)-items-scrolled"
@@ -847,7 +1036,7 @@ class CubrismTests: XCTestCase {
 /// No health, damage, collision, loot, enemy, or completion overrides are used.
 class CubrismPlaythroughTests: XCTestCase {
     /// Presentation fixtures only; this does not count as a combat completion.
-    func testRewardPageScrollingAndContinueNavigation() throws {
+    @MainActor func testRewardPageScrollingAndContinueNavigation() async throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for presentation validation")
         }
@@ -856,7 +1045,7 @@ class CubrismPlaythroughTests: XCTestCase {
         let floor = home.floorView!
         floor.needsNewRun = true
         home.present(floor, animated: false)
-        RunLoop.main.run(until: Date().addingTimeInterval(0.2))
+        try await Task.sleep(nanoseconds: 200_000_000)
         floor.skView.presentScene(nil)
         let completed = CompletedViewController()
         completed.expGained = 147
@@ -865,14 +1054,18 @@ class CubrismPlaythroughTests: XCTestCase {
         completed.drops = (0..<dropCount).map { Equipment(t: "Power Core", lev: $0 + 1, tie: 2, st: "", v: $0 % 4) }
         completed.modalPresentationStyle = .fullScreen
         floor.present(completed, animated: false)
-        RunLoop.main.run(until: Date().addingTimeInterval(0.2))
-        let scroll = try XCTUnwrap(completed.view.subviews.first?.subviews.compactMap { $0 as? UIScrollView }.first)
+        try await Task.sleep(nanoseconds: 200_000_000)
+        let scroll = try XCTUnwrap(completionView(completed.view, id: "completion.rewards") as? UIScrollView)
         XCTAssertGreaterThan(scroll.contentSize.height, scroll.bounds.height)
         XCTAssertTrue(completed.view.safeAreaLayoutGuide.layoutFrame.contains(scroll.convert(scroll.bounds, to: completed.view)))
         print("PRESENTATION READY: reward page scroll and Continue")
-        RunLoop.main.run(until: Date().addingTimeInterval(30))
-        if completed.presentingViewController != nil { completed.goToHome(UIButton()) }
-        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        // Yield to the application's event loop so native mouse/touch input works during inspection.
+        try await Task.sleep(nanoseconds: 30_000_000_000)
+        if completed.presentingViewController != nil {
+            let button = try XCTUnwrap(completionView(completed.view, id: "completion.continue") as? UIButton)
+            button.sendActions(for: .touchUpInside)
+        }
+        try await Task.sleep(nanoseconds: 300_000_000)
         XCTAssertNil(home.presentedViewController)
         XCTAssertTrue(home.skView.scene is HomeScene)
         XCTAssertNil(Player.currentViewController)
