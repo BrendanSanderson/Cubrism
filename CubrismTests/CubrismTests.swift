@@ -139,42 +139,25 @@ class CubrismTests: XCTestCase {
     }
 
     func testEnemyDamagePreservesSilhouetteAndReadableFace() throws {
+        let atlas = try XCTUnwrap(UIImage(named: "StyleDamageFine")?.cgImage)
+        XCTAssertEqual(atlas.width, atlas.height * 3, "Each approved tier occupies one square cell")
         var previousCoverage = 0
-        for name in ["damaged75", "damaged50", "damaged25"] {
+        for (column, name) in ["damaged75", "damaged50", "damaged25"].enumerated() {
             let image = try XCTUnwrap(GameArt.image(name))
             let original = try XCTUnwrap(UIImage(named: name))
             XCTAssertEqual(image.size, original.size)
             XCTAssertNotEqual(image.pngData(), original.pngData())
             let cg = try XCTUnwrap(image.cgImage)
-            // Compare at the same resolution even when UIKit chooses a different asset scale.
-            let reference = GameArt.render(image.size, scale: image.scale) { original.draw(in: $0) }
-            let originalCG = try XCTUnwrap(reference.cgImage)
+            // Match the approved option A cell, including its intentional transparent margins.
+            // Trimming or recentering would shift the cracks over the enemy's symbol.
+            let crop = try XCTUnwrap(atlas.cropping(to: CGRect(x: column * atlas.height, y: 0,
+                                                               width: atlas.height, height: atlas.height)))
+            let expected = GameArt.render(image.size, scale: image.scale) { UIImage(cgImage: crop).draw(in: $0) }
+            XCTAssertEqual(image.pngData(), expected.pngData(), "Use the approved tier without shifting its layout")
             let pixels = rgbaPixels(cg)
-            let originalPixels = rgbaPixels(originalCG)
             let coverage = stride(from: 3, to: pixels.count, by: 4).filter { pixels[$0] > 24 }.count
             XCTAssertGreaterThan(coverage, previousCoverage, "Each tier adds visible fractures")
             XCTAssertLessThan(coverage, cg.width * cg.height / 3, "Most of the colored face must remain visible")
-            // Allow narrow bevels and smoothing within 1.5 points of the legacy path.
-            // Check both directions so a rim or an omitted interior branch cannot pass.
-            let radius = Int((1.5 * image.scale).rounded(.down))
-            func agreement(_ source: [UInt8], _ target: [UInt8]) -> Double {
-                var matched = 0
-                var visible = 0
-                for y in 0..<cg.height {
-                    for x in 0..<cg.width where source[(y * cg.width + x) * 4 + 3] > 24 {
-                        visible += 1
-                        let nearby = (max(0, y - radius)...min(cg.height - 1, y + radius)).contains { yy in
-                            (max(0, x - radius)...min(cg.width - 1, x + radius)).contains { xx in
-                                target[(yy * cg.width + xx) * 4 + 3] > 24
-                            }
-                        }
-                        if nearby { matched += 1 }
-                    }
-                }
-                return Double(matched) / Double(max(1, visible))
-            }
-            XCTAssertGreaterThan(agreement(pixels, originalPixels), 0.95, "New cracks must follow the original paths: \(name)")
-            XCTAssertGreaterThan(agreement(originalPixels, pixels), 0.95, "Retain the original network across the face: \(name)")
             previousCoverage = coverage
         }
         let scene = SKScene(size: CGSize(width: 240, height: 160))

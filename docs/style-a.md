@@ -212,3 +212,24 @@ short inward branch. `autoreview --mode local` returned no findings; none were
 accepted or rejected. The installed Mac build was refreshed, its signature
 verified, and its home screen checked. These are art and behavior fixtures,
 not a new combat playthrough.
+
+## Approved option A on 2026-10-12
+
+The final square damage choice is **option A: fine recessed cracks**. The exact
+approved three-cell atlas now lives in `StyleDamageFine`, ordered light, medium,
+heavy. Full transparent cells preserve the approved placement over each enemy.
+This supersedes the three separate original-layout repaint assets above, which
+have been removed. The dragon fireball retains its approved circular stages.
+The source prompt, asset hash and approval date are in
+`damage-option-a-source.json`; the approved all-enemies comparison is
+[saved here](art/damage-option-a.png).
+
+All 45 unit and rendering tests passed on both iPhone 16e/iOS 18.5 and Mac
+Catalyst. The two acceptance fixtures for level selection and reward-page
+scrolling/Continue navigation also passed on both platforms. Coverage verifies
+exact approved atlas cells, increasing crack coverage, preserved sizes and
+health thresholds, hit-flash reset, and fireball behavior. Rendered damage at
+gameplay size and the completion page at 568 by 320 points were visually
+inspected. These are presentation and behavior checks, not a new combat run.
+Result bundles, screenshots and logs are under
+`/Users/beep/codex-work/cubrism-validation/damage-option-a-2026-10-12/`.
