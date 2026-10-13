@@ -144,6 +144,7 @@ struct DelveFloorPlan: Codable, Equatable {
         }
         let mobs = enemies
         guard Set(mobs.map(\.id)).count == mobs.count,
+              Set(mobs.map(\.id)).isDisjoint(with: rooms.map(\.id)),
               mobs.allSatisfy({ $0.kind.minimumDifficulty <= difficulty
                   && $0.position.x.isFinite && (0.15...0.85).contains($0.position.x)
                   && $0.position.y.isFinite && (0.20...0.80).contains($0.position.y) }),

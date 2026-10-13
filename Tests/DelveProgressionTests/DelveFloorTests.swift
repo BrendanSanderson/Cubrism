@@ -93,13 +93,21 @@ final class DelveFloorTests: XCTestCase {
         let plan = try DelveFloorPlanner().generate(difficulty: 1, using: &random)
         let encoded = try JSONEncoder().encode(plan)
         let original = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
-        for corruption in 0..<4 {
+        for corruption in 0..<5 {
             var document = original
             var rooms = try XCTUnwrap(document["rooms"] as? [[String: Any]])
             switch corruption {
             case 0: rooms[1]["position"] = ["x": 999, "y": 999]
             case 1: rooms[1]["id"] = rooms[0]["id"]
             case 2: rooms[rooms.count - 1]["encounter"] = ["start": [:]]
+            case 3:
+                var encounter = try XCTUnwrap(rooms[1]["encounter"] as? [String: Any])
+                var combat = try XCTUnwrap(encounter["combat"] as? [String: Any])
+                var enemies = try XCTUnwrap(combat["_0"] as? [[String: Any]])
+                enemies[0]["id"] = rooms[rooms.count - 1]["id"]
+                combat["_0"] = enemies
+                encounter["combat"] = combat
+                rooms[1]["encounter"] = encounter
             default: document["budget"] = 1
             }
             document["rooms"] = rooms

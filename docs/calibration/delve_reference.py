@@ -122,13 +122,41 @@ def integrate_route(step=1, probabilities=(0.95, 0.90, 0.80), performance=0.6,
     return floors, times, experience, boosted
 
 
-def calculate(step=1):
+def calibration_data(step=1):
     floors, times, experience, boosted = integrate_route(step)
     levels = list(range(1, CHARACTER_CAP + 1))
     level_times = [0.0]
     for level in levels[:-1]:
         level_times.append(level_times[-1] + 2 + 2 * sqrt(level - 1))
     thresholds = [interpolate(t, times, experience) for t in level_times]
+    return floors, times, thresholds, boosted, level_times, levels
+
+
+def write_swift_calibration(destination):
+    """Export fixed costs and reference levels for the initial runtime tuning."""
+    from pathlib import Path
+
+    floors, _, thresholds, boosted, _, levels = calibration_data()
+    scores = [1] + list(range(100, DELVE_MILESTONE + 1, 100))
+    values = [interpolate(min(interpolate(f, floors, boosted), thresholds[-1]),
+                          thresholds, levels) for f in scores]
+    costs = [b - a for a, b in zip(thresholds, thresholds[1:])]
+    lines = ["import Foundation", "",
+             "// Generated from docs/calibration/delve_reference.py using the initial",
+             "// three-floor 50-hour scenario. Costs are fixed; bonuses do not rewrite them.",
+             "enum DelveCalibration {"]
+    for name, table in [("levelUpCosts", costs), ("referenceDelves", scores),
+                        ("referenceLevels", values)]:
+        lines.append(f"    static let {name}: [Double] = [")
+        for i in range(0, len(table), 5):
+            lines.append("        " + ", ".join(f"{v:.12g}" for v in table[i:i+5]) + ",")
+        lines.append("    ]")
+    lines.append("}")
+    Path(destination).write_text("\n".join(lines) + "\n")
+
+
+def calculate(step=1):
+    floors, times, thresholds, boosted, level_times, levels = calibration_data(step)
 
     xp_rows = []
     for level in [1, 10, 25, 50, 99]:
@@ -178,6 +206,13 @@ def calculate(step=1):
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--swift-output", help="Write the initial runtime calibration table to this path")
+    arguments = parser.parse_args()
+    if arguments.swift_output:
+        write_swift_calibration(arguments.swift_output)
     result = calculate()
     print("Unbonused XP calibration: character level | reference Delve | next-level XP | target minutes")
     for level, f, cost, minutes in result["xp"]:

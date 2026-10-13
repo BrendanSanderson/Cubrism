@@ -45,8 +45,10 @@ struct DelveRules: Codable, Equatable {
     // changing its settlement rules merely because the app was relaunched.
     var challengeExponent = 1.0
     var difficultySpread = 0.05
+    var balance = DelveBalance()
 
     func validate() throws {
+        try balance.validate()
         guard challengeExponent.isFinite, challengeExponent >= 0,
               difficultySpread.isFinite, difficultySpread > 0 else {
             throw DelveError.invalidValue("rules")

@@ -259,7 +259,10 @@ struct DelveProgression: Codable, Equatable {
         guard activeRun == nil else { throw DelveError.invalidTransition }
         let resources = try DelveResources(maxHealth: maxHealth, maxShield: maxShield)
         let difficulty = try rules.sampleDifficulty(rating: rating, using: &random)
-        let plan = try DelveFloorPlanner().generate(difficulty: difficulty, using: &random)
+        let planner = DelveFloorPlanner(baseBudget: rules.balance.baseEncounterBudget,
+                                        budgetExponent: rules.balance.encounterBudgetExponent,
+                                        groupingMultiplier: rules.balance.roomGroupingMultiplier)
+        let plan = try planner.generate(difficulty: difficulty, using: &random)
         let floor = DelveFloorAttempt(id: UUID(), entryRating: rating, difficulty: difficulty, plan: plan)
         activeRun = DelveActiveRun(id: UUID(), depth: 1, floor: floor, resources: resources,
                                   bankedLoadout: equipped)
@@ -307,7 +310,10 @@ struct DelveProgression: Codable, Equatable {
         guard var run = activeRun, run.floor.id == floorID else { throw DelveError.staleFloor }
         guard run.floor.phase == .checkpoint, run.depth < Int.max else { throw DelveError.invalidTransition }
         let difficulty = try rules.sampleDifficulty(rating: rating, using: &random)
-        let plan = try DelveFloorPlanner().generate(difficulty: difficulty, using: &random)
+        let planner = DelveFloorPlanner(baseBudget: rules.balance.baseEncounterBudget,
+                                        budgetExponent: rules.balance.encounterBudgetExponent,
+                                        groupingMultiplier: rules.balance.roomGroupingMultiplier)
+        let plan = try planner.generate(difficulty: difficulty, using: &random)
         run.floor = DelveFloorAttempt(id: UUID(), entryRating: rating, difficulty: difficulty, plan: plan)
         run.depth += 1
         run.resources.enterNextFloor()

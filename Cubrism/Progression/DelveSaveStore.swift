@@ -22,9 +22,9 @@ private struct DelveSaveDocument: Codable {
 @MainActor
 final class DelveSaveStore {
     private static let format = "cubrism.delve"
-    // Required stored encounters change the foundation-only v1 payload. Reject
-    // that schema explicitly; do not generate replacement encounters on load.
-    private static let version = 2
+    // v2 added stored encounters; v3 adds the balance used to generate them.
+    // Reject older schemas instead of substituting current tuning on load.
+    private static let version = 3
     private let fileURL: URL
     private(set) var progression: DelveProgression
 

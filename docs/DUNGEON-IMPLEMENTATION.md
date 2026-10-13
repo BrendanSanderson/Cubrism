@@ -363,6 +363,43 @@ bytecode was removed and its directory ignored. Temporary debug probes were
 removed. `git diff --check` passes. This completes this checkpoint. Continuous
 Delve combat/gear/XP scaling and full combat persistence remain outstanding.
 
+## Continuous balance module (October 13)
+
+The pure `DelveBalance` module now calculates fractional item stats, actual
+capped character stats, uncapped reference stats, enemy/boss health and damage,
+and content-based XP allocations. It uses the accepted reference rarity and
+kill-time/survival anchors. Boss raw damage ratios and ordinary enemy authored
+ratios remain inputs from their existing definitions. Whole-item rarity scales
+every nonzero stat; the reference loadout averages the four attachment types.
+
+The fixed 99 XP costs and reference character levels are generated into
+`DelveCalibration.swift`. Reproduce the table with:
+
+```sh
+python3 -B docs/calibration/delve_reference.py --swift-output build/DelveCalibration.swift
+diff -u Cubrism/Progression/DelveCalibration.swift build/DelveCalibration.swift
+```
+
+The generated table matches exactly. All 33 pure scenario methods passed,
+including the seven new balance scenarios, a corrupted mob/boss reward-ID
+collision, and explicit rejection of schemas 1/2 after adding required balance
+to schema 3. All 52 Catalyst app regressions also passed. Evidence:
+`build/delve-balance-tests.log`, `build/delve-balance-app-tests.log`, and
+`build/results/balance-app-tests-20261012-01.xcresult`. Structured local review
+returned clean with no findings: `build/delve-balance-review.txt/json`.
+
+This is the verified math portion, not a completed live-combat checkpoint.
+The existing game still uses its legacy Player/enemy stats. The next work is
+to connect the single account/run authority, apply these stats to real actors,
+and perform the corresponding normal-input combat and hands-on checks before
+calling that checkpoint complete. Full combat save/resume and cutover also
+remain outstanding.
+
+The user's request to prevent another idle lock is covered by the temporary
+display/system/user-activity keep-awake assertion. `pmset -g assertions` verified
+it at 23:53 on October 12 with about 9.8 hours remaining. Renew it if required
+by continued playtests; do not change password or authentication settings.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative
