@@ -18,6 +18,44 @@ private func completionView(_ root: UIView, id: String) -> UIView? {
 
 class CubrismTests: XCTestCase {
 
+    @MainActor func testApplicationLaunchConnectsHomeWindowToScene() throws {
+        let app = try XCTUnwrap(UIApplication.shared.delegate as? AppDelegate)
+        let window = try XCTUnwrap(app.window)
+        let scene = try XCTUnwrap(window.windowScene)
+        XCTAssertTrue(scene.delegate is SceneDelegate)
+        XCTAssertTrue(window.rootViewController is HomeViewController)
+        XCTAssertFalse(window.isHidden)
+    }
+
+    #if targetEnvironment(macCatalyst)
+    @MainActor func testSceneDeactivationClearsControlsWithoutRefillingResources() throws {
+        let app = try XCTUnwrap(UIApplication.shared.delegate as? AppDelegate)
+        let windowScene = try XCTUnwrap(app.window?.windowScene)
+        let delegate = try XCTUnwrap(windowScene.delegate as? SceneDelegate)
+        let previousScene = Player.currentScene
+        let previousHealth = Player.currentHealth
+        let previousShield = Player.currentShield
+        defer {
+            Player.currentScene = previousScene
+            Player.currentHealth = previousHealth
+            Player.currentShield = previousShield
+        }
+        let game = GameScene(size: GameScene.arenaSize)
+        Player.currentScene = game
+        Player.currentHealth = 30
+        Player.currentShield = 5
+        game.keyboardControls.press(.d)
+        game.keyboardControls.press(.right)
+        XCTAssertTrue(game.keyboardControls.isMoving)
+        XCTAssertTrue(game.keyboardControls.isShooting)
+        delegate.sceneWillResignActive(windowScene)
+        XCTAssertFalse(game.keyboardControls.isMoving)
+        XCTAssertFalse(game.keyboardControls.isShooting)
+        XCTAssertEqual(Player.currentHealth, 30)
+        XCTAssertEqual(Player.currentShield, 5)
+    }
+    #endif
+
     func testArenaBackgroundsFollowLevelAcrossWorldsAndRoomReentry() throws {
         var seen = Set<ObjectIdentifier>()
         let ranges: [(ClosedRange<Int>, String)] = [

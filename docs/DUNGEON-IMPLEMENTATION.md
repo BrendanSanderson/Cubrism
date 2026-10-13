@@ -1,0 +1,256 @@
+# Delve implementation and verification
+
+October 12, 2026. The complete implementation pass has resumed. Foundation and
+progression persistence are implemented locally; the existing game flow is
+still active. The user requires programmatic checks, actual game playtests,
+and review at every serious checkpoint. Do not advance past a checkpoint
+without reporting and resolving its missing verification.
+
+## Checkpoint
+
+The user requested a checkpoint before code changes. The default branch is
+`master`, and both local and origin heads were already at
+`578589eb731f5f74c01db0d36f58530dee254bff`. The annotated tag
+`checkpoint/pre-delve-refactor-2026-10-12` was created and pushed; its remote
+peeled commit was verified to match. No pending game changes existed in the
+main checkout. Local `.agents` skill files were left untouched.
+
+Implementation uses the existing `feat/dungeon-progression-design` worktree,
+fast-forwarded to that checkpoint. The default branch remains unchanged.
+
+## Foundation
+
+- `Cubrism/Progression/DelveRules.swift`: hidden Gaussian difficulty sampling,
+  decimal power input, accepted rarity curves, best-of-depth distribution,
+  item-count rolls, continuation bonuses, performance weights, and rating
+  gain/loss calculations. Challenge exponent remains a named tuning input.
+- `Cubrism/Progression/DelveRun.swift`: account/run state, ownership of banked
+  and at-risk items, checkpoint equipment, clear/continue/extract/death/abandon
+  transitions, XP retention/cap/lifetime accounting, resource carryover,
+  once-per-floor shield refill, and historical peak-capacity healing.
+- `Cubrism/Progression/DelveSaveStore.swift`: a versioned account/run document,
+  atomic file replacement, validation before load/write, and transactions
+  that publish state only after a successful write. The store currently owns
+  progression state on the main actor; background writing and a full combat
+  snapshot will be added before connecting high-frequency game events.
+- Stable floor IDs reject stale events. XP event IDs and floor phases prevent
+  repeated rewards after a model snapshot round trip. Extraction is idempotent
+  for the most recently settled run. Old events cannot settle a new run.
+- Each checkpoint records all current-floor reward IDs. Loaded rewards must
+  match the corresponding run-bag suffix and sampled power, including all
+  three drops at later floors. Corrupt, truncated, unsupported, and unreadable
+  saves fail without initializing or overwriting an account.
+- The same source files are included in the Xcode app target and the root
+  Swift package, so the pure model can be tested without SpriteKit or an iOS SDK.
+
+The model accepts normalized performance, generated item records, calculated
+capacity changes, and fixed level-up costs from its integration boundary.
+Runtime callers should use the provided reward roller to select quantity and
+rarity before creating item records, then submit the clear once. Boss XP is
+credited before clearing the floor. A production level-100 account supplies
+99 fixed level-up costs. The offline calibration remains the place to tune
+those costs; this milestone does not choose a new XP economy implicitly.
+
+## Verification
+
+Normal command: `swift test --jobs 2` from the repository root. The package
+explicitly selects the new tests, excluding the obsolete placeholder package
+and its unrelated tests. Cases cover accepted probability/rating anchors,
+Gaussian distribution, long-run quality, loss of all loot on floor-four death,
+safe extraction, duplicate/stale events, checkpoint equipment loss, save
+round trips, capacity-swap healing, shield refills, XP cap, and invalid inputs.
+
+Also validate the project file with `plutil -lint Cubrism.xcodeproj/project.pbxproj`.
+
+Verification completed on Beep:
+
+- `plutil -lint Cubrism.xcodeproj/project.pbxproj`: passed.
+- Swift type-check of both foundation files: passed using a build-local copy
+  of the Swift resource directory without the stale duplicate module map.
+- A native assertion executable compiled from those exact two source files
+  passed probability anchors/sums through Delve 100000, a 20000-draw Gaussian
+  distribution check, rating crossovers, floor-four death, loot ownership,
+  retained XP/rating gains, snapshot duplicate protection, equipment recovery,
+  capacity history, shield refills, extraction, bonus reset, and XP at cap.
+  This is targeted runtime evidence, not a successful XCTest suite run.
+- `/Users/beep/.codex/skills/autoreview/scripts/autoreview --mode local --no-web-search`:
+  clean, no actionable findings. The review covered the foundation source,
+  package tests, and Xcode source membership. No findings were rejected.
+- `git diff --check`: passed.
+
+Before Xcode installation, `swift test --jobs 2` was blocked by the mixed
+command-line toolchain: duplicate `SwiftBridging` definitions, then a manifest
+linker error after isolating resources. Native compilation worked without
+changing installed compiler/SDK files. That limitation is now resolved by
+the user's macOS upgrade and Xcode 27 installation; the full package suite
+passed using the installed Xcode toolchain. App verification follows below.
+
+Local evidence is under ignored `build/`: `delve-review.txt/json`,
+`DelveSmoke.swift`, `delve-smoke`, and compiler/test logs. The successful
+direct compile used:
+
+```sh
+swiftc -resource-dir "$PWD/build/isolated-toolchain/usr/lib/swift" \
+  Cubrism/Progression/DelveRules.swift Cubrism/Progression/DelveRun.swift \
+  build/DelveSmoke.swift -o build/delve-smoke
+./build/delve-smoke
+```
+
+The isolated resource directory is a local copy of the installed `usr/lib/swift`
+with its sibling `usr/lib/clang` linked to the installed Clang resources and
+only the current `bridging` header plus `bridging.modulemap` in the sibling
+`usr/include/swift`. This workaround is a local verification aid, not a game
+dependency or a committed toolchain.
+
+## First serious checkpoint: progression persistence
+
+The new persistence suite adds ten scenarios to the eleven foundation tests.
+Cases use real temporary files and cover a fresh account, combat reloads,
+checkpoint equipment, continuation without repeated shield refill, death on
+floor four, transactional boss-XP/clear rollback, deterministic I/O failure,
+extraction exactly once, invalid decoded values, unsupported/truncated files,
+and corruption of each of three checkpoint rewards.
+
+All 21 scenario methods passed natively on Beep. A build-local assertion
+adapter generates a standalone runner from the actual test source, removing
+only XCTest/module imports and supplying fatal assertion functions. This
+exercises the real production files and scenario bodies but is not XCTest
+execution or an app playtest. Source and binary: ignored
+`build/delve-native-tests.swift` and `build/delve-native-tests`.
+
+```sh
+swiftc -swift-version 5 \
+  -resource-dir "$PWD/build/isolated-toolchain/usr/lib/swift" \
+  Cubrism/Progression/DelveRules.swift \
+  Cubrism/Progression/DelveRun.swift \
+  Cubrism/Progression/DelveSaveStore.swift \
+  build/delve-native-tests.swift -o build/delve-native-tests
+./build/delve-native-tests
+```
+
+The persistence autoreview found one accepted issue: checking only the final
+two rewards permitted a bad power value on a three-item checkpoint. The
+per-floor reward IDs and all-three-items regression scenario fix it. A fresh
+review completed cleanly with no actionable findings. No findings were
+rejected. Command:
+`/Users/beep/.codex/skills/autoreview/scripts/autoreview --mode local --no-web-search`
+with checkpoint context and output paths under
+`build/delve-persistence-review-final.*`. `git diff --check` and project-file
+lint also passed. On resumption, the actual XCTest run passed all 21 tests
+with zero failures:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+  xcrun swift test --jobs 2 \
+  --scratch-path /Volumes/BBD-2/CodexBuilds/cubrism-delve/core
+```
+
+The Catalyst app build and 47 app-hosted regression tests subsequently passed,
+including two new scene-lifecycle checks. The actual SpriteKit playthrough
+also passed both floors through normal movement/shooting, rooms, doors, and
+bosses, including deaths/retries and completion reward checks. It took
+338 seconds and used no health, damage, collision, or reward overrides.
+
+The first app test attempt exposed a UIKit launch assertion: SDK 27 requires
+the scene-based life cycle. See
+[Apple's migration documentation](https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle).
+The scoped fix adds `SceneDelegate`, a single-scene manifest, window-connected
+startup via `AppDelegate.configureGame(in:)`, and control reset from
+`sceneWillResignActive`. Tests verify a visible, scene-connected home window
+and that deactivation clears controls without refilling health/shields.
+
+The lifecycle/progression autoreview completed cleanly with no actionable
+findings. Its output is under `build/delve-lifecycle-review.*`. App test and
+playthrough logs are `build/delve-catalyst-tests.log` and
+`build/delve-live-playthrough.log`. Result bundles are under
+`/Volumes/BBD-2/CodexBuilds/cubrism-delve/results/`:
+
+- `foundation-app-tests-20261012-01.xcresult`: initial launch failure.
+- `foundation-app-tests-20261012-02.xcresult`: 47 passing app regressions.
+- `foundation-live-playthrough-20261012-01.xcresult`: passing two-floor live
+  SpriteKit combat playthrough.
+
+The user unlocked the Mac and the hands-on visual/control check completed.
+The exact built Catalyst app launched with the expected home art and layout.
+Keyboard movement visibly moved and rotated the player; walking to the
+entrance opened level selection, selecting floor one opened its safe starting
+room with full resource bars, and pause/resume controls worked. No rendering
+or navigation issue was observed. Projectile/combat behavior is covered by
+the passing live two-floor playthrough above. The game was left paused.
+
+At the user's request, a 12-hour `caffeinate -disu -t 43200` assertion was
+started and verified with `pmset -g assertions`. It keeps the system/display
+awake and declares user activity during continued playtesting. Its process
+is PID 58591 (unified command session 66039); renew it only if the work outlasts
+it and stop that process when hands-on work ends. No password requirement was
+changed. This resolves the missing first-checkpoint verification.
+
+Initially Beep ran macOS 15.3.1 without Xcode. A proposed Xcode 16.4 download
+stopped at Apple ID sign-in and was cancelled without credentials or a
+download. The user then upgraded macOS to 27.0.1 and installed Xcode 27.0
+(27A266a) at `/Applications/Xcode.app`. Installation was verified from
+PackageKit logs, the installed executable, and `xcodebuild -version`.
+
+The user explicitly authorized accepting the displayed Xcode/Apple SDK
+agreement. The Agree action was followed by administrator authentication;
+computer control could not access SecurityAgent, so the user completed the
+prompt. Xcode's required system-component Install action and the official
+`xcodebuild -runFirstLaunch` completed successfully. SDK enumeration and
+Mac Catalyst destination discovery now work. Swift is Apple Swift 6.4.
+
+Build commands use a per-command `DEVELOPER_DIR`; no manual global toolchain
+selection is needed. Large build products go under
+`/Volumes/BBD-2/CodexBuilds/cubrism-delve`. The temporary five-minute heartbeat
+`resume-cubrism-after-xcode-setup` was paused after setup succeeded and work
+resumed, to avoid duplicate continuation. The Catalyst build succeeded; its
+log is ignored `build/delve-catalyst-build.log`. No legacy-save cutover has
+occurred; the existing acceptance test temporarily creates fresh progress
+and restores its saved preference values afterward. Do not label native
+assertions as a game playtest.
+
+## Authorized implementation pass
+
+1. Finish progression/persistence verification and establish one authoritative
+   account/run owner for the game's Player/UI adapters.
+2. Generate and store whole floor plans: safe starting room, connected combat
+   rooms, eligibility thresholds, grouping costs, and a guaranteed final boss.
+3. Connect continuous enemy/gear scaling and the tunable XP calibration. Keep
+   character cap 100, uncapped Delve/item power, and uncapped endgame reference
+   levels. Normalize XP across equivalent-budget encounter layouts.
+4. Route gameplay XP, clear, continue, extract, death, abandonment, equipment,
+   and performance counters through run transitions.
+5. Persist complete combat state: room progress, player/enemy/boss state,
+   projectiles, timers/cooldowns, summons, RNG state, and counters. Capture
+   consistent snapshots and serialize writes through one ordered owner. Resume
+   paused; no encounter redraw, free recovery, revived enemies, or duplicate
+   rewards. Replace only gameplay action callbacks that cannot be restored.
+6. Build dungeon entry and checkpoint screens, including run-bag risk,
+   equipment changes, continuation bonuses, Continue and Extract.
+7. Perform the one-time legacy progression reset and verify the complete route
+   in a development build before switching the default game entry.
+
+Currency rewards and merchant purchases are deferred from the first Delve
+playtest build. New abilities, distinctive rarity effects, extra enemy types,
+and visual redesign are outside this pass. Keep changes on the feature
+branch; merging and release are outside the active goal.
+
+At each serious checkpoint, run the relevant pure-model/app checks, review
+changed code, and play the game. Record the commands, results, observed
+behavior, defects/fixes, and remaining verification here. Final acceptance
+includes three-floor extraction; fourth-floor death; equipped run-loot loss;
+combat/boss/checkpoint/settlement reloads; no capacity-swap healing; one shield
+refill per floor; failed/invalid save behavior; no duplicate rewards; and
+continued enemy/gear scaling beyond Delve 10000 with character cap 100.
+
+## Following integration
+
+The progression document is not a complete resumable live combat snapshot.
+Add stored encounters, projectiles/timers, ordered background writing, and
+lifecycle integration before enabling the new loop. Versioned atomic
+progression persistence and validation are now implemented. No live saves
+have been reset or migrated.
+
+Next, connect floor planning, game events, equipment stat calculation, the
+one-time save reset, and checkpoint/dungeon-entry screens. Character/enemy/gear
+stat curves and performance normalization remain calibration work. Currency
+ownership and merchant generation remain separate unaccepted proposals.

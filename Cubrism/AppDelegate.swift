@@ -15,8 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        self.window = UIWindow(frame: UIScreen.main.bounds)
+        return true
+    }
+
+    // Window creation belongs to the connected scene. Keep this reference for
+    // the game's single-window controllers and app-hosted acceptance tests.
+    func configureGame(in window: UIWindow) {
+        self.window = window
         let view = HomeViewController()
         //let view = CompletedViewController()
         view.view.isMultipleTouchEnabled = true
@@ -103,7 +108,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.rootViewController = view;
         self.window?.makeKeyAndVisible()
         Constants.updateMerchantInventory()
-        return true
     }
 
     private func loadBundledConstants() -> [String: Any]? {
@@ -119,14 +123,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    func applicationWillResignActive(_ application: UIApplication) {
+    func resetGameControls() {
         Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.resetInput()
         Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.resetInput()
         #if targetEnvironment(macCatalyst)
         Player.currentScene?.resetKeyboardControls()
         #endif
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE1FE0000000000000000001 /* DelveRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000002 /* DelveRules.swift */; };
+		DE1FE0000000000000000003 /* DelveRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000004 /* DelveRun.swift */; };
+		DE1FE0000000000000000005 /* DelveSaveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000006 /* DelveSaveStore.swift */; };
+		DE1FE0000000000000000007 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000008 /* SceneDelegate.swift */; };
  AA0000000000000000000001 = {isa = PBXBuildFile; fileRef = AA0000000000000000000002; };
 		2745B2EE1EFDC459006EC1DA /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */; };
 		27562A581F05AC5D00915990 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27562A571F05AC5D00915990 /* Launch Screen.storyboard */; };
@@ -74,6 +78,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DE1FE0000000000000000002 /* DelveRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveRules.swift; path = Progression/DelveRules.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000004 /* DelveRun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveRun.swift; path = Progression/DelveRun.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000006 /* DelveSaveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveSaveStore.swift; path = Progression/DelveSaveStore.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000008 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
  AA0000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameArt.swift; sourceTree = "<group>"; };
 		2745B2ED1EFDC459006EC1DA /* AnalogJoystick.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		27562A571F05AC5D00915990 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
@@ -244,6 +252,7 @@
 				27562A571F05AC5D00915990 /* Launch Screen.storyboard */,
 				AA0000000000000000000002 /* GameArt.swift */,
  BA20C8CD1C889E0800EE234D /* AppDelegate.swift */,
+				DE1FE0000000000000000008 /* SceneDelegate.swift */,
 				BAD62F7F1C95F26800B9A5AD /* Constants.swift */,
 				27FC7A341F1699A200F7CE89 /* ViewControllers */,
 				27FC7A331F16999800F7CE89 /* Scenes */,
@@ -287,6 +296,9 @@
 				BADF41A21CA8A5ED00EF9C15 /* border 3.jpg */,
 				BA3CA69D1C97CA40004A9DA6 /* Nodes.swift */,
 				BADF2B851C97AE6100D573AC /* Player.swift */,
+				DE1FE0000000000000000002 /* DelveRules.swift */,
+				DE1FE0000000000000000004 /* DelveRun.swift */,
+				DE1FE0000000000000000006 /* DelveSaveStore.swift */,
 				BAA4351E1CA6011800AF3595 /* Equipment.swift */,
 				BAACCDF31CD55CCF001FEB25 /* Item.swift */,
 			);
@@ -437,6 +449,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				BADF2B861C97AE6100D573AC /* Player.swift in Sources */,
+				DE1FE0000000000000000001 /* DelveRules.swift in Sources */,
+				DE1FE0000000000000000003 /* DelveRun.swift in Sources */,
+				DE1FE0000000000000000005 /* DelveSaveStore.swift in Sources */,
+				DE1FE0000000000000000007 /* SceneDelegate.swift in Sources */,
 				BAC28FE61CA65AD5003E07ED /* LevelCell.swift in Sources */,
 				27FC7A311F16994A00F7CE89 /* PlayerComponents.swift in Sources */,
 				C0DE00012A00000000000002 /* KeyboardControlState.swift in Sources */,
