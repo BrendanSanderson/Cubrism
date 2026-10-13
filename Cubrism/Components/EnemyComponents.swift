@@ -602,7 +602,12 @@ class EnemyBombDroppingComponent: ActionComponent {
         let textures = [GameArt.texture( "bombLit1"), GameArt.texture( "bombLit2"), GameArt.texture( "bombLit3")]
         let changeSkin = SKAction.animate(with: textures, timePerFrame: 1)
         bomb.run(changeSkin)
-        let action = SKAction.sequence([SKAction.wait(forDuration: 4), SKAction.run({self.explode(bomb.position)}), SKAction.setTexture(GameArt.texture( "bossDragonShot1")), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.wait(forDuration: 0.33), SKAction.run({self.explode(bomb.position)}), SKAction.removeFromParent()])
+        let explode = SKAction.run { [weak self, weak bomb] in
+            if let bomb = bomb { self?.explode(bomb.position) }
+        }
+        let action = SKAction.sequence([.wait(forDuration: 4), explode,
+            .setTexture(GameArt.texture("bossDragonShot1")), .wait(forDuration: 0.33), explode,
+            .wait(forDuration: 0.33), explode, .wait(forDuration: 0.33), explode, .removeFromParent()])
         bomb.run(action)
     }
     
@@ -830,4 +835,3 @@ class EnemyDyingComponent: ActionComponent {
         }
     }
 }
-

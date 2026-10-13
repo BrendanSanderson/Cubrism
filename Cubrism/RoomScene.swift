@@ -52,12 +52,18 @@ class RoomScene: GameScene {
     }
     
     
-        override func willMove(from view: SKView) {
-        self.removeAllChildren()
-        for i in 0 ..< entites.count
-        {
-            entites[i].alive = false
+    override func willMove(from view: SKView) {
+        physicsWorld.contactDelegate = nil
+        func cancelActions(in node: SKNode) {
+            node.removeAllActions()
+            for child in node.children { cancelActions(in: child) }
         }
+        cancelActions(in: self)
+        self.removeAllChildren()
+        for entity in entites { entity.retire() }
+        entites.removeAll()
+        liveMotions.removeAll()
+        for door in doors { door.removeComponent(ofType: VisualComponent.self) }
         super.willMove(from: view)
     }
     

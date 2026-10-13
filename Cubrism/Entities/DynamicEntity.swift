@@ -16,4 +16,9 @@ class DynamicEntity: GKEntity {
         
     }
 
+    func retire() {
+        alive = false
+        for component in components { removeComponent(ofType: type(of: component)) }
+    }
+
 }

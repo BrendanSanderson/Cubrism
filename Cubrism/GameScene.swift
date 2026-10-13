@@ -155,6 +155,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func didBegin(_ contact: SKPhysicsContact) {
+        // Changing rooms can leave contacts queued by the departing physics
+        // world. Retired actors are no longer valid collision recipients.
+        if let room = self as? RoomScene, room.viewController?.scene !== room { return }
         var firstBody = contact.bodyB
         var secondBody = contact.bodyA
         

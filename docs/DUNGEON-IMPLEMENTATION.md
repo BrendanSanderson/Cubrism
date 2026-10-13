@@ -503,6 +503,43 @@ Structured local review is clean with no findings:
 `build/delve-combat-motion-review.txt/json`. `git diff --check` passes.
 The Mac remained awake and accessible throughout these checks.
 
+## Room lifetime checkpoint (October 13)
+
+A real ARC test initially failed for all three weak references: retired enemy,
+dragon boss and room. On departure the scene now cancels descendant actions,
+disables its contact delegate, retires components/action arrays/entity links,
+clears motion records and removes door visual backreferences. Contacts queued
+by an inactive room are ignored before accessing retired actors. This keeps
+completed rooms reusable while releasing their old combat objects.
+
+Dragon's fireball callback and bomber fuse callbacks weakly capture their
+owners. Bomber death cancels fuse actions before detaching nodes. Cancellation
+alone still left the removed bomber component alive in the test; weak captures
+of both component and bomb fixed that remaining retention. A real SpriteKit
+fuse test confirms that all four explosions still execute while alive.
+
+The full 56-test Catalyst suite passed, covering all ten enemy variants,
+all three bosses, and an already-dead bomber. The additional focused live-fuse
+test passed in 5.524 seconds. A normal-input iOS generated floor/dragon clear
+passed after retirement changes in 80.454 seconds, ending alive at 79.375
+health with 130 legacy XP/two rewards. These remain compatibility checks for
+the existing economy, not the completed Delve account loop.
+
+Evidence: `build/delve-room-lifetime-red.log` (three retained references),
+`build/delve-room-lifetime-green.log`,
+`build/delve-room-lifetime-app-tests-fixed.log`,
+`build/results/room-lifetime-app-tests-20261013-05.xcresult`,
+`build/results/room-lifetime-ios-playthrough-20261013-04.xcresult`, and
+`build/results/bomber-fuse-behavior-20261013-06.xcresult`.
+Final structured review including the added behavioral test is clean:
+`build/delve-room-lifetime-review-final.txt/json`. The earlier review identified
+the dead-bomber retention but inaccurately said death did not cancel actions;
+the source already did. Its underlying retention concern was addressed and
+verified rather than applying that inaccurate diagnosis literally.
+
+Full combat integration must capture a value snapshot before tearing down its
+scene. The current cleanup does not itself provide combat restoration.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative

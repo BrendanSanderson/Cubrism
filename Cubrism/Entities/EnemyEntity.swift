@@ -252,6 +252,13 @@ class EnemyEntity: DynamicEntity {
             sprite.position.y = scene.size.height * 0.1 + sprite.size.height/2
         }
     }
+
+    override func retire() {
+        component(ofType: EnemyBombDroppingComponent.self)?.nodes.forEach { $0.removeAllActions() }
+        actions.removeAll()
+        node.entity = nil
+        super.retire()
+    }
     
     func damageEnemy (_ damage: Int)
     {
@@ -314,6 +321,7 @@ class EnemyEntity: DynamicEntity {
                 let nodes = self.component(ofType: EnemySludgeDroppingComponent.self)?.nodes
                 for i in 0 ..< nodes!.count
                 {
+                    nodes![i].removeAllActions()
                     nodes![i].parent?.removeFromParent()
                 }
                 self.removeComponent(ofType: EnemyRandomMovementComponent.self)

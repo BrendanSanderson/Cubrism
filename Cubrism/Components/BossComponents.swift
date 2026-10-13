@@ -485,7 +485,7 @@ class BossDragonFireballComponent: ActionComponent {
         }
         super.init()
         let action1 = (SKAction.animate(with: dragonMouthOpen, timePerFrame: 0.125))
-        let action2 = SKAction.run({self.fire()})
+        let action2 = SKAction.run({ [weak self] in self?.fire() })
         let action3 = (SKAction.animate(with: dragonMouthClose, timePerFrame: 0.125))
         shootFireBall = SKAction.sequence([action1, action2, action3])
         

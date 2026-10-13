@@ -199,6 +199,79 @@ class CubrismTests: XCTestCase {
         XCTAssertNil(wrapper.parent)
     }
 
+    @MainActor func testRetiringCombatRoomsReleasesActorsAndComponents() throws {
+        let kinds = ["Range", "Melee", "Suicide", "Dash", "RangeTracking", "RangeTripple", "Sludge", "Bomber", "RangeRing", "DragonFireball"]
+        let bosses = [("dragon", "dragonBoss"), ("generator", "generatorBoss"), ("golem", "golemBoss")]
+        for (index, kind) in kinds.enumerated() {
+        weak var retiredRoom: RoomScene?
+        weak var retiredEnemy: EnemyEntity?
+        weak var retiredBoss: BossEntity?
+        autoreleasepool {
+            let controller = FloorViewController(min: 4, max: 5, level: 1, world: 1)
+            let room = RoomScene(size: GameScene.arenaSize)
+            room.viewController = controller
+            room.doors = [DoorEntity(scene: room, direction: 1, type: "challenge")]
+            let enemy = EnemyEntity(scene: room, eType: kind, lev: 1, elite: false,
+                                     position: CGPoint(x: 100, y: 100))
+            let bossType = bosses[index % bosses.count]
+            let boss = BossEntity(scene: room, properties: ["name": bossType.0, "image": bossType.1, "size": 100, "position": "center"])
+            room.entites = [enemy, boss]
+            retiredRoom = room
+            retiredEnemy = enemy
+            retiredBoss = boss
+            room.willMove(from: SKView())
+        }
+        XCTAssertNil(retiredEnemy, "Enemy owner/component cycles must be released")
+        XCTAssertNil(retiredBoss, "Boss callbacks cannot retain the retired room")
+        XCTAssertNil(retiredRoom, "Completed rooms must not accumulate across floors")
+        }
+    }
+
+    @MainActor func testDeadBomberReleasesItsCancelledFuseCallbacks() {
+        weak var removedComponent: EnemyBombDroppingComponent?
+        autoreleasepool {
+            let controller = FloorViewController(min: 4, max: 5, level: 1, world: 1)
+            let room = RoomScene(size: GameScene.arenaSize)
+            room.viewController = controller
+            let enemy = EnemyEntity(scene: room, eType: "Bomber", lev: 1, elite: false,
+                                     position: CGPoint(x: 100, y: 100))
+            room.entites = [enemy]
+            let bomber = enemy.component(ofType: EnemyBombDroppingComponent.self)!
+            removedComponent = bomber
+            bomber.drop()
+            enemy.damageEnemy(enemy.health)
+            room.willMove(from: SKView())
+        }
+        XCTAssertNil(removedComponent, "Cancelled fuses cannot retain their component through an orphan bomb")
+    }
+
+    @MainActor func testLiveBomberFuseStillFiresAllFourExplosions() throws {
+        let applicationWindow = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let window = UIWindow(windowScene: try XCTUnwrap(applicationWindow.windowScene))
+        window.frame = CGRect(origin: .zero, size: GameScene.arenaSize)
+        let controller = UIViewController()
+        window.rootViewController = controller
+        let view = SKView(frame: window.bounds)
+        controller.view.addSubview(view)
+        window.makeKeyAndVisible()
+        let scene = GameScene(size: GameScene.arenaSize)
+        view.presentScene(scene)
+        let enemy = EnemyEntity()
+        enemy.sprite.position = CGPoint(x: 100, y: 100)
+        let bomber = BombCallbackTestComponent(scene: scene, entity: enemy)
+        defer {
+            bomber.nodes.forEach { $0.removeAllActions(); $0.parent?.removeFromParent() }
+            view.presentScene(nil)
+            window.isHidden = true
+            applicationWindow.makeKeyAndVisible()
+        }
+        bomber.drop()
+        let finished = expectation(description: "All four fuse effects execute")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) { finished.fulfill() }
+        wait(for: [finished], timeout: 7)
+        XCTAssertEqual(bomber.explosions, Array(repeating: CGPoint(x: 100, y: 100), count: 4))
+    }
+
     func testRenderedArtPreservesFractionalRetinaLogicalSizes() {
         for size in [CGSize(width: 333.5, height: 333.5), CGSize(width: 100.0 / 3, height: 20.5), CGSize(width: 32, height: 32)] {
             let image = GameArt.render(size) { rect in UIColor.white.setFill(); UIRectFill(rect) }
@@ -1544,6 +1617,11 @@ class CubrismPlaythroughTests: XCTestCase {
             guard cleared else { return }
         }
     }
+}
+
+private class BombCallbackTestComponent: EnemyBombDroppingComponent {
+    var explosions = [CGPoint]()
+    override func explode(_ position: CGPoint) { explosions.append(position) }
 }
 
 private class RestorableMotionTestScene: GameScene {

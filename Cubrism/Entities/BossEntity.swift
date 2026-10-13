@@ -173,6 +173,14 @@ class BossEntity: DynamicEntity {
     }
     
     
+    override func retire() {
+        actions.removeAll()
+        constantActions.removeAll()
+        attack = nil
+        node.entity = nil
+        super.retire()
+    }
+
     func damageBoss (_ damage: Double)
     {
         guard currentHealth > 0 else { return }
