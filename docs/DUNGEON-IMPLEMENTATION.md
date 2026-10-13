@@ -459,6 +459,50 @@ do not change combat. Do not use opaque node archives as the authoritative
 combat save format. This keeps the existing AI/combat patterns while making
 their state and scheduled effects restorable.
 
+## Explicit motion checkpoint (October 13)
+
+The combat-state module provides validated Codable movement, travel/lifetime,
+delayed-event cursors, a saved SplitMix64 stream, projectile shot accounting,
+and performance counters. Movement continues from its saved elapsed time to
+the original destination; delayed explosions resume after the last fired
+event. In-flight shots are neutral at combat end, each resolved projectile
+counts once, and inactive time does not enter the speed metric.
+
+The SpriteKit adapter weakly references its nodes and advances explicit motion
+records. Player shots, wall-bound enemy shots, ring/bomb fragments, generator
+spray/field telegraphs and dragon breath use a shared movement entry point.
+The legacy path still uses SKActions; generated-floor fixtures opt into the
+explicit path until the live account/combat integration is ready. This flag is
+an implementation seam, not a product setting. Full world persistence and the
+remaining bomb/fireball callback conversions are still outstanding.
+
+All 47 pure methods passed. All 54 Catalyst app regressions passed, including
+real-node movement save/restore, paused movement, remaining lifetime, and
+cleanup after projectiles are removed. The iOS 27 generated floor with the
+explicit motion path cleared its generator boss on the first normal-input
+attempt, ending alive at 102 health, 130 legacy XP and two legacy rewards.
+Test duration was 74.666 seconds including the 20-second inspection window.
+This verifies movement/combat compatibility; the new account economy remains
+unconnected to that fixture and must not be credited as a Delve-loop test.
+
+Hands-on checks in Device Hub moved/aimed the player, entered the first combat
+room, observed locked doors and incoming green projectiles, paused through the
+UI, resumed, and observed shield depletion and eventual death. The second
+pause click came after death, so do not claim a manual depleted-resource pause
+or live-projectile freeze check from it. The real-node programmatic test does
+verify paused motion. The 180-second fixture completed normally and restored
+the prior game/preferences; no extra gestures were sent after it ended.
+
+Evidence: `build/delve-combat-state-tests.log`,
+`build/delve-combat-motion-app-tests.log`,
+`build/results/combat-motion-app-tests-20261013-01.xcresult`,
+`build/delve-restorable-motion-ios-playthrough.log`,
+`build/results/restorable-motion-ios-playthrough-20261013-01.xcresult`, and
+`build/results/restorable-motion-ios-hands-on-20261013-01.xcresult`.
+Structured local review is clean with no findings:
+`build/delve-combat-motion-review.txt/json`. `git diff --check` passes.
+The Mac remained awake and accessible throughout these checks.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative

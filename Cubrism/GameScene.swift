@@ -14,17 +14,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Keep speed constant as range changes; wall contacts remove the shot sooner.
         let distance = hypot(size.width, size.height)
         let wrapper = sprite.parent
-        sprite.run(.sequence([
-            .moveBy(x: cos(angle) * distance, y: sin(angle) * distance,
-                    duration: TimeInterval(distance / speed)),
-            .removeFromParent()
-        ]))
+        moveGameplayNode(sprite, to: CGPoint(x: sprite.position.x + cos(angle) * distance,
+                                             y: sprite.position.y + sin(angle) * distance),
+                         duration: TimeInterval(distance / speed))
         // Some patterns share a wrapper. Remove it only after every shot has expired.
-        wrapper?.run(.sequence([.wait(forDuration: TimeInterval(distance / speed) + 0.1),
-                                .removeFromParent()]))
+        if !usesRestorableCombat {
+            wrapper?.run(.sequence([.wait(forDuration: TimeInterval(distance / speed) + 0.1),
+                                    .removeFromParent()]))
+        }
     }
 
     var time = TimeInterval()
+    var usesRestorableCombat: Bool { false }
+    var liveMotions = [UUID: DelveLiveMotion]()
     var frameDuration: TimeInterval = 1.0 / 60.0
     // Authored enemy speeds are distances per 60-Hz frame. Use the same
     // elapsed-time conversion as player movement at every refresh rate.
@@ -68,6 +70,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(_ currentTime: TimeInterval) {
         frameDuration = time > 0 ? min(currentTime - time, 1.0 / 15.0) : 1.0 / 60.0
         time = currentTime
+        advanceGameplayMotions(seconds: frameDuration)
         #if targetEnvironment(macCatalyst)
         applyKeyboardControls()
         #else

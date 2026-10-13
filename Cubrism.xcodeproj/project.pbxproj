@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE1FE0000000000000000011 /* DelveGameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000012 /* DelveGameActions.swift */; };
+		DE1FE000000000000000000F /* DelveCombatState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000010 /* DelveCombatState.swift */; };
 		DE1FE000000000000000000D /* DelveCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000000E /* DelveCalibration.swift */; };
 		DE1FE000000000000000000B /* DelveBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000000C /* DelveBalance.swift */; };
 		DE1FE0000000000000000009 /* DelveFloorPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000000A /* DelveFloorPlan.swift */; };
@@ -81,6 +83,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DE1FE0000000000000000012 /* DelveGameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveGameActions.swift; path = DelveGameActions.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000010 /* DelveCombatState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveCombatState.swift; path = Progression/DelveCombatState.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000000E /* DelveCalibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveCalibration.swift; path = Progression/DelveCalibration.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000000C /* DelveBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveBalance.swift; path = Progression/DelveBalance.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000000A /* DelveFloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveFloorPlan.swift; path = Progression/DelveFloorPlan.swift; sourceTree = "<group>"; };
@@ -305,6 +309,8 @@
 				DE1FE000000000000000000A /* DelveFloorPlan.swift */,
 				DE1FE000000000000000000C /* DelveBalance.swift */,
 				DE1FE000000000000000000E /* DelveCalibration.swift */,
+				DE1FE0000000000000000012 /* DelveGameActions.swift */,
+				DE1FE0000000000000000010 /* DelveCombatState.swift */,
 				DE1FE0000000000000000002 /* DelveRules.swift */,
 				DE1FE0000000000000000004 /* DelveRun.swift */,
 				DE1FE0000000000000000006 /* DelveSaveStore.swift */,
@@ -461,6 +467,8 @@
 				DE1FE0000000000000000009 /* DelveFloorPlan.swift in Sources */,
 				DE1FE000000000000000000B /* DelveBalance.swift in Sources */,
 				DE1FE000000000000000000D /* DelveCalibration.swift in Sources */,
+				DE1FE0000000000000000011 /* DelveGameActions.swift in Sources */,
+				DE1FE000000000000000000F /* DelveCombatState.swift in Sources */,
 				DE1FE0000000000000000001 /* DelveRules.swift in Sources */,
 				DE1FE0000000000000000003 /* DelveRun.swift in Sources */,
 				DE1FE0000000000000000005 /* DelveSaveStore.swift in Sources */,

@@ -102,13 +102,10 @@ class PlayerShootComponent: GKComponent {
     }
 
     func followPath(_ velocity: CGPoint) {
-        var sequence = [SKAction]()
         let destination = CGPoint(x:Int(20.0*velocity.x), y:Int(20.0*velocity.y))
-        let action = SKAction.sequence([SKAction.moveBy(x: destination.x, y: destination.y, duration: 1.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        
-        sequence += [action]
-        
-        self.node.run(SKAction.sequence(sequence))
+        scene.moveGameplayNode(node, to: CGPoint(x: node.position.x + destination.x,
+                                                 y: node.position.y + destination.y),
+                               duration: 1.5, linger: 3.0/60.0)
     }
     
 }

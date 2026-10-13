@@ -37,6 +37,7 @@ class RoomScene: GameScene {
     var startTime: TimeInterval!
     weak var viewController: FloorViewController!
     override var arenaGlobalLevel: Int { viewController?.globalLevel ?? 1 }
+    override var usesRestorableCombat: Bool { viewController?.usesRestorableCombat ?? false }
     var enemyPoints = 4
     var plannedRoom: DelveRoomPlan?
     override func didMove(to view: SKView) {

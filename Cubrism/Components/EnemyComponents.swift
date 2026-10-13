@@ -623,8 +623,7 @@ class EnemyBombDroppingComponent: ActionComponent {
         scene.addChild(explodeNode)
         for i in 0 ..< explodeNode.children.count
         {
-            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: 0.5), SKAction.removeFromParent()])
-            explodeNode.children[i].run(action)
+            scene.moveGameplayNode(explodeNode.children[i], to: moveTos[i], duration: 0.5)
         }
     }
     func fire(_ start: CGPoint, node: ShotNode)
@@ -782,8 +781,7 @@ class EnemyRingShotComponent: ActionComponent {
         scene.addChild(ringNode)
         for i in 0 ..< ringNode.children.count
         {
-            let action = SKAction.sequence([SKAction.move(to: moveTos[i], duration: shotLength), SKAction.removeFromParent()])
-            ringNode.children[i].run(action)
+            scene.moveGameplayNode(ringNode.children[i], to: moveTos[i], duration: shotLength)
         }
     }
     func fire(_ node: ShotNode)
@@ -832,5 +830,4 @@ class EnemyDyingComponent: ActionComponent {
         }
     }
 }
-
 

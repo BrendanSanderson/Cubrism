@@ -116,9 +116,8 @@ class BossSprayComponent: ActionComponent {
         var moveTo = CGPoint()
         moveTo.x = CGFloat(cos(angle) * 500.0)
         moveTo.y = CGFloat(sin(angle) * 500.0)
-        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (sprite.position.x + moveTo.x), y: (sprite.position.y + moveTo.y)), duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        
-        sprite.run(action)
+        scene.moveGameplayNode(sprite, to: CGPoint(x: sprite.position.x + moveTo.x,
+                                                   y: sprite.position.y + moveTo.y), duration: 2, linger: 3.0/60.0)
         if (shots < 16)
         {
             angle += Double.pi/4.0 * 0.5
@@ -223,8 +222,7 @@ class BossElectricFieldComponent: ActionComponent {
     
     func followPath(_ sprite: SKSpriteNode, point: CGPoint)
     {
-        let action = SKAction.sequence([SKAction.move(to: point, duration: 2), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        sprite.run(action)
+        scene.moveGameplayNode(sprite, to: point, duration: 2, linger: 3.0/60.0)
         
     }
     func explode()
@@ -460,11 +458,10 @@ class BossDragonBreatheComponent: ActionComponent {
             }
             moveTo.y = (CGFloat(arc4random()).truncatingRemainder(dividingBy: scene.size.height) * 0.9) + scene.size.height * 0.05
         }
-        let action = SKAction.sequence([SKAction.move(to: moveTo, duration: 0.5), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        let action1 = SKAction.sequence([SKAction.wait(forDuration: 0.75), SKAction.removeFromParent()])
-        
-        sprite.run(action)
-        sprite.parent?.run(action1)
+        scene.moveGameplayNode(sprite, to: moveTo, duration: 0.5, linger: 3.0/60.0)
+        if !scene.usesRestorableCombat {
+            sprite.parent?.run(.sequence([.wait(forDuration: 0.75), .removeFromParent()]))
+        }
         shots += 1
     }
     

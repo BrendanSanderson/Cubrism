@@ -28,12 +28,14 @@ class FloorViewController: UIViewController {
     var enemyPoints = 4
     let arenaSize = GameScene.arenaSize
     private(set) var floorPlan: DelveFloorPlan?
+    private(set) var usesRestorableCombat = false
     private(set) var plannedRooms = [DelveRoomPosition: RoomScene]()
 
-    convenience init(plan: DelveFloorPlan) throws {
+    convenience init(plan: DelveFloorPlan, restorableCombat: Bool = false) throws {
         try plan.validate()
         self.init()
         floorPlan = plan
+        usesRestorableCombat = restorableCombat
     }
     
     convenience init(min: UInt32, max: UInt32, level:Int, world:Int)

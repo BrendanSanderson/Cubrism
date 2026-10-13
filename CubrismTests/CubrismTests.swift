@@ -157,6 +157,48 @@ class CubrismTests: XCTestCase {
         add(attachment)
     }
 
+    @MainActor func testRestorableGameplayMotionKeepsPositionPauseAndRemainingLifetime() throws {
+        let original = RestorableMotionTestScene(size: GameScene.arenaSize)
+        let node = SKNode()
+        node.position = CGPoint(x: 20, y: 100)
+        original.addChild(node)
+        original.moveGameplayNode(node, to: CGPoint(x: 220, y: 100), duration: 2, linger: 0.05)
+        original.advanceGameplayMotions(seconds: 0.7)
+        let state = try XCTUnwrap(original.gameplayMotionSnapshot.first)
+        XCTAssertEqual(node.position.x, 90, accuracy: 0.001)
+        let saved = try JSONDecoder().decode(DelveMotionState.self, from: JSONEncoder().encode(state))
+        let resumed = RestorableMotionTestScene(size: GameScene.arenaSize)
+        let restoredNode = SKNode()
+        resumed.addChild(restoredNode)
+        try resumed.restoreGameplayMotion(saved, on: restoredNode)
+        resumed.isPaused = true
+        resumed.advanceGameplayMotions(seconds: 10000)
+        XCTAssertEqual(resumed.gameplayMotionSnapshot, [saved])
+        resumed.isPaused = false
+        resumed.advanceGameplayMotions(seconds: 0.4)
+        XCTAssertEqual(restoredNode.position.x, 130, accuracy: 0.001)
+        resumed.advanceGameplayMotions(seconds: 0.9)
+        XCTAssertEqual(restoredNode.position.x, 220, accuracy: 0.001)
+        XCTAssertNotNil(restoredNode.parent)
+        resumed.advanceGameplayMotions(seconds: 0.05)
+        XCTAssertNil(restoredNode.parent)
+        XCTAssertTrue(resumed.gameplayMotionSnapshot.isEmpty)
+    }
+
+    @MainActor func testRemovedProjectileMotionsCannotKeepNodesOrEmptyWrappersAlive() throws {
+        let scene = RestorableMotionTestScene(size: GameScene.arenaSize)
+        let wrapper = ShotNode()
+        let sprite = SKSpriteNode()
+        scene.addChild(wrapper)
+        wrapper.addChild(sprite)
+        scene.moveGameplayNode(sprite, to: CGPoint(x: 200, y: 100), duration: 1)
+        XCTAssertEqual(scene.liveMotions.count, 1)
+        sprite.removeFromParent()
+        scene.advanceGameplayMotions(seconds: 0.01)
+        XCTAssertEqual(scene.liveMotions.count, 0)
+        XCTAssertNil(wrapper.parent)
+    }
+
     func testRenderedArtPreservesFractionalRetinaLogicalSizes() {
         for size in [CGSize(width: 333.5, height: 333.5), CGSize(width: 100.0 / 3, height: 20.5), CGSize(width: 32, height: 32)] {
             let image = GameArt.render(size) { rect in UIColor.white.setFill(); UIRectFill(rect) }
@@ -974,7 +1016,7 @@ class CubrismTests: XCTestCase {
         defer { Player.entity = oldEntity; Player.currentScene = oldScene }
         var random = SystemRandomNumberGenerator()
         let plan = try DelveFloorPlanner().generate(difficulty: 854, using: &random)
-        let controller = try FloorViewController(plan: plan)
+        let controller = try FloorViewController(plan: plan, restorableCombat: true)
         controller.buildMaze()
         XCTAssertEqual(controller.plannedRooms.count, plan.rooms.count)
         XCTAssertTrue(controller.maze.isEmpty, "Planned floors should not allocate a square of unused scenes")
@@ -1219,7 +1261,7 @@ class CubrismPlaythroughTests: XCTestCase {
         var random = SystemRandomNumberGenerator()
         let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
         let plan = try JSONDecoder().decode(DelveFloorPlan.self, from: JSONEncoder().encode(generated))
-        let controller = try FloorViewController(plan: plan)
+        let controller = try FloorViewController(plan: plan, restorableCombat: true)
         defer {
             controller.skView.presentScene(nil)
             window.rootViewController = original
@@ -1234,7 +1276,7 @@ class CubrismPlaythroughTests: XCTestCase {
         controller.view.layoutIfNeeded()
         if controller.needsNewRun { controller.startNewRun() }
         print("HANDS-ON READY: restored generated floor, \(plan.combatRooms.count) combat rooms, \(plan.enemies.count) enemies")
-        try await Task.sleep(nanoseconds: 90_000_000_000)
+        try await Task.sleep(nanoseconds: 180_000_000_000)
         XCTAssertEqual(controller.floorPlan, plan)
     }
 
@@ -1309,6 +1351,12 @@ class CubrismPlaythroughTests: XCTestCase {
         try playFloors(plan: plan)
     }
 
+    func testRestorableGeneratedFloorThroughCombatAndDoors() throws {
+        var random = SystemRandomNumberGenerator()
+        let plan = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
+        try playFloors(plan: plan, restorableCombat: true)
+    }
+
     func testGeneratedFloorAgainstGolem() throws {
         var random = SystemRandomNumberGenerator()
         let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
@@ -1319,7 +1367,7 @@ class CubrismPlaythroughTests: XCTestCase {
         try playFloors(plan: plan)
     }
 
-    private func playFloors(plan: DelveFloorPlan? = nil) throws {
+    private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false) throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
         }
@@ -1344,7 +1392,7 @@ class CubrismPlaythroughTests: XCTestCase {
             print("PLAYTHROUGH ATTEMPT floor=\(floor) attempt=\(attempt) playerLevel=\(Player.level)")
             let xpBeforeAttempt = Player.totalExp
             let controller: FloorViewController
-            if let plan = plan { controller = try FloorViewController(plan: plan) }
+            if let plan = plan { controller = try FloorViewController(plan: plan, restorableCombat: restorableCombat) }
             else { controller = FloorViewController(min: UInt32(floor + 3), max: UInt32(floor + 4), level: floor, world: 1) }
             window.rootViewController = controller
             window.makeKeyAndVisible()
@@ -1496,6 +1544,10 @@ class CubrismPlaythroughTests: XCTestCase {
             guard cleared else { return }
         }
     }
+}
+
+private class RestorableMotionTestScene: GameScene {
+    override var usesRestorableCombat: Bool { true }
 }
 
 private class WallShotTestScene: GameScene {
