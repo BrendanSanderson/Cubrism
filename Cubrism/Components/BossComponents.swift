@@ -840,15 +840,15 @@ class BossGolemRockShoot: ActionComponent {
         
         if (cos(angle[shotNum]) >= 0)
         {
-            sprite.zRotation += CGFloat(velocity[shotNum]/sprite.size.width/2)
+            sprite.zRotation += CGFloat(velocity[shotNum]/sprite.size.width/2) * scene.frameMovementScale
         }
         else
         {
-            sprite.zRotation -= CGFloat(velocity[shotNum]/sprite.size.width/2)
+            sprite.zRotation -= CGFloat(velocity[shotNum]/sprite.size.width/2) * scene.frameMovementScale
         }
         
-        moveTo.x = CGFloat(cos(angle[shotNum]) * velocity[shotNum])
-        moveTo.y = CGFloat(sin(angle[shotNum]) * velocity[shotNum])
+        moveTo.x = CGFloat(cos(angle[shotNum]) * velocity[shotNum]) * scene.frameMovementScale
+        moveTo.y = CGFloat(sin(angle[shotNum]) * velocity[shotNum]) * scene.frameMovementScale
         
         
         
@@ -899,8 +899,8 @@ class BossTrackingComponent: ActionComponent {
 //        {
         let playerSprite = Player.entity.sprite
         let angle = abs(Double(atan(Double(playerSprite.position.y - bossSprite.position.y)/Double(playerSprite.position.x - bossSprite.position.x))))
-        let moveX = abs(CGFloat(cos(angle) * moveSpeed))
-        let moveY = abs(CGFloat(sin(angle) * moveSpeed))
+        let moveX = abs(CGFloat(cos(angle) * moveSpeed)) * scene.frameMovementScale
+        let moveY = abs(CGFloat(sin(angle) * moveSpeed)) * scene.frameMovementScale
         
         if (bossSprite.position.x < playerSprite.position.x)
         {

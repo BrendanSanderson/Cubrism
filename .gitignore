@@ -6,3 +6,4 @@ DerivedData/
 xcuserdata/
 .build/
 .swiftpm/
+docs/calibration/__pycache__/

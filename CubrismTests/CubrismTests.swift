@@ -1057,6 +1057,94 @@ class CubrismTests: XCTestCase {
         }
     }
 
+    func testBossTrackingMovementIsIndependentOfRefreshRate() throws {
+        let oldEntity = Player.entity
+        let oldScene = Player.currentScene
+        defer { Player.entity = oldEntity; Player.currentScene = oldScene }
+        let path = try XCTUnwrap(Bundle.main.path(forResource: "bosses", ofType: "plist"))
+        let properties = try XCTUnwrap((NSArray(contentsOfFile: path) as? [NSDictionary])?.first { $0["name"] as? String == "golem" })
+        for fps in [30, 60, 120] {
+            let controller = FloorViewController()
+            let room = RoomScene(size: CGSize(width: 1200, height: 800))
+            room.viewController = controller
+            room.startPosition = CGPoint(x: 1050, y: 400)
+            room.addPlayer()
+            let boss = BossEntity(scene: room, properties: properties)
+            boss.sprite.position = CGPoint(x: 100, y: 400)
+            let tracking = try XCTUnwrap(boss.component(ofType: BossTrackingComponent.self))
+            room.frameDuration = 1 / Double(fps)
+            for frame in 0..<fps { tracking.action(Double(frame) / Double(fps)) }
+            XCTAssertEqual(boss.sprite.position.x, 190, accuracy: 0.001)
+        }
+    }
+
+    func testEnemyMovementAndHomingShotsKeepTheirSpeedAcrossRefreshRates() throws {
+        let oldEntity = Player.entity
+        let oldScene = Player.currentScene
+        defer { Player.entity = oldEntity; Player.currentScene = oldScene }
+        for fps in [30, 60, 120] {
+            let controller = FloorViewController()
+            let room = RoomScene(size: CGSize(width: 2000, height: 2000))
+            room.viewController = controller
+            room.startPosition = CGPoint(x: 1800, y: 1800)
+            room.addPlayer()
+            room.frameDuration = 1 / Double(fps)
+            for type in ["Range", "Melee", "Dash", "RangeTracking"] {
+                let enemy = EnemyEntity(scene: room, eType: type, lev: 1, elite: false,
+                                        position: CGPoint(x: 100, y: 100))
+                let node: SKNode
+                let speed: Double
+                let step: (Double) -> Void
+                switch type {
+                case "Range":
+                    let movement = try XCTUnwrap(enemy.component(ofType: EnemyRandomMovementComponent.self))
+                    movement.moving = true
+                    movement.moveTo = CGPoint(x: 1800, y: 1800)
+                    node = enemy.sprite; speed = movement.moveSpeed; step = movement.action
+                case "Melee":
+                    let movement = try XCTUnwrap(enemy.component(ofType: EnemyTrackingComponent.self))
+                    node = enemy.sprite; speed = movement.moveSpeed; step = movement.action
+                case "Dash":
+                    let movement = try XCTUnwrap(enemy.component(ofType: EnemyDashMovementComponent.self))
+                    movement.moving = true
+                    movement.moveTo = CGPoint(x: 1800, y: 1800)
+                    movement.finishedMove = -2
+                    node = enemy.sprite; speed = movement.moveSpeed; step = movement.action
+                default:
+                    let shooting = try XCTUnwrap(enemy.component(ofType: EnemyShotTrackingComponent.self))
+                    shooting.fire()
+                    node = shooting.bullet; speed = shooting.speed
+                    step = { _ in shooting.followPath() }
+                }
+                let origin = node.position
+                for frame in 0..<fps { step(Double(frame) / Double(fps)) }
+                let distance = Double(hypot(node.position.x - origin.x, node.position.y - origin.y))
+                XCTAssertEqual(distance, speed * 60, accuracy: 0.01,
+                               "\(type) at \(fps) Hz")
+            }
+        }
+    }
+
+    func testGolemRocksKeepTranslationAndRotationAcrossRefreshRates() throws {
+        let path = try XCTUnwrap(Bundle.main.path(forResource: "bosses", ofType: "plist"))
+        let properties = try XCTUnwrap((NSArray(contentsOfFile: path) as? [NSDictionary])?.first { $0["name"] as? String == "golem" })
+        for fps in [30, 60, 120] {
+            let controller = FloorViewController()
+            let room = RoomScene(size: CGSize(width: 2000, height: 2000))
+            room.viewController = controller
+            room.frameDuration = 1 / Double(fps)
+            let boss = BossEntity(scene: room, properties: properties)
+            let shooting = try XCTUnwrap(boss.component(ofType: BossGolemRockShoot.self))
+            shooting.angle = [.pi / 4]
+            shooting.velocity = [3]
+            let rock = SKSpriteNode(color: .white, size: CGSize(width: 32, height: 32))
+            rock.position = CGPoint(x: 200, y: 200)
+            for _ in 0..<fps { shooting.followPath(rock, shotNum: 0) }
+            XCTAssertEqual(hypot(rock.position.x - 200, rock.position.y - 200), 180, accuracy: 0.01)
+            XCTAssertEqual(rock.zRotation, 180.0 / 64, accuracy: 0.001)
+        }
+    }
+
     func testShootingStopsInJoystickDeadZoneAndAimsCardinally() {
         let oldEntity = Player.entity
         defer { Player.entity = oldEntity }
@@ -1218,6 +1306,16 @@ class CubrismPlaythroughTests: XCTestCase {
         try playFloors(plan: plan)
     }
 
+    func testGeneratedFloorAgainstGolem() throws {
+        var random = SystemRandomNumberGenerator()
+        let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
+        let last = try XCTUnwrap(generated.rooms.last)
+        let rooms = Array(generated.rooms.dropLast()) + [DelveRoomPlan(id: last.id, position: last.position, encounter: .boss(.golem))]
+        let plan = DelveFloorPlan(difficulty: generated.difficulty, budget: generated.budget,
+                                 groupingMultiplier: generated.groupingMultiplier, density: generated.density, rooms: rooms)
+        try playFloors(plan: plan)
+    }
+
     private func playFloors(plan: DelveFloorPlan? = nil) throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
@@ -1254,12 +1352,16 @@ class CubrismPlaythroughTests: XCTestCase {
             var visited = Set<ObjectIdentifier>()
             var lastRoom: RoomScene?
             var lastReport = Date.distantPast
+            var golemWaypoint = 0
+            var golemWaypointStarted = Date()
             while Date() < end && !controller.rewardsGranted && Player.alive {
                 RunLoop.main.run(until: Date().addingTimeInterval(1.0 / 60.0))
                 guard let room = controller.scene, room.view != nil else { continue }
                 if room !== lastRoom {
                     visited.insert(ObjectIdentifier(room))
                     lastRoom = room
+                    golemWaypoint = 0
+                    golemWaypointStarted = Date()
                     print("PLAYTHROUGH floor=\(floor) room=\(room.name ?? "?") visited=\(visited.count)")
                 }
                 let player = Player.entity.sprite.position
@@ -1308,6 +1410,30 @@ class CubrismPlaythroughTests: XCTestCase {
                             + min(150, enemyClearance) * 3 + min(100, shotClearance) * 3
                         if score > bestScore { bestScore = score; movement = step }
                     }}
+                    if room.entites.contains(where: { ($0 as? BossEntity)?.type == "golem" }) {
+                        // Kite the pursuing boss around the room rather than
+                        // backing into a corner to hold a perfect firing line.
+                        let corners = [CGPoint(x: room.size.width * 0.15, y: room.size.height * 0.20),
+                                       CGPoint(x: room.size.width * 0.85, y: room.size.height * 0.20),
+                                       CGPoint(x: room.size.width * 0.85, y: room.size.height * 0.80),
+                                       CGPoint(x: room.size.width * 0.15, y: room.size.height * 0.80)]
+                        let goal = corners[golemWaypoint]
+                        if hypot(goal.x - player.x, goal.y - player.y) < 30
+                            || Date().timeIntervalSince(golemWaypointStarted) > 3 {
+                            golemWaypoint = (golemWaypoint + 1) % corners.count
+                            golemWaypointStarted = Date()
+                        }
+                        let target = corners[golemWaypoint]
+                        let distance = max(1, hypot(target.x - player.x, target.y - player.y))
+                        movement = CGPoint(x: (target.x - player.x) / distance, y: (target.y - player.y) / distance)
+                        if let hazard = hazards.min(by: { hypot($0.x-player.x, $0.y-player.y) < hypot($1.x-player.x, $1.y-player.y) }) {
+                            let clearance = max(1, hypot(hazard.x - player.x, hazard.y - player.y))
+                            if clearance < 65 {
+                                movement.x += (player.x - hazard.x) / clearance
+                                movement.y += (player.y - hazard.y) / clearance
+                            }
+                        }
+                    }
                 } else {
                     let destination: CGPoint
                     if room.name == "bossRoom" && room.completed {
@@ -1348,7 +1474,7 @@ class CubrismPlaythroughTests: XCTestCase {
                 if Date().timeIntervalSince(lastReport) > 5 {
                     let bosses = room.entites.compactMap { ($0 as? BossEntity).map { "\($0.type ?? "?") \(Int($0.currentHealth))/\(Int($0.health))" } }
                     print("PLAYTHROUGH bosses=\(bosses)")
-                    print("PLAYTHROUGH floor=\(floor) hp=\(Int(Player.currentHealth)) shield=\(Int(Player.currentShield)) enemies=\(enemies.count) position=\(player) xp=\(controller.levelExp)")
+                    print("PLAYTHROUGH floor=\(floor) hp=\(Int(Player.currentHealth)) shield=\(Int(Player.currentShield)) enemies=\(enemies.count) position=\(player) xp=\(controller.levelExp) frameSeconds=\(room.frameDuration)")
                     lastReport = Date()
                 }
             }

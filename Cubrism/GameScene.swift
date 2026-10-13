@@ -26,6 +26,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     var time = TimeInterval()
     var frameDuration: TimeInterval = 1.0 / 60.0
+    // Authored enemy speeds are distances per 60-Hz frame. Use the same
+    // elapsed-time conversion as player movement at every refresh rate.
+    var frameMovementScale: CGFloat { CGFloat(frameDuration * 60) }
     var started = false
     var vending = false
     var vender: VendorPopUpNode!

@@ -68,8 +68,8 @@ class EnemyRandomMovementComponent: ActionComponent {
                 moving = true
             }
             let angle = abs(Double(atan(Double(moveTo.y - enemySprite.position.y)/Double(moveTo.x - enemySprite.position.x))))
-            let moveX = abs(CGFloat(cos(angle) * moveSpeed))
-            let moveY = abs(CGFloat(sin(angle) * moveSpeed))
+            let moveX = abs(CGFloat(cos(angle) * moveSpeed)) * scene.frameMovementScale
+            let moveY = abs(CGFloat(sin(angle) * moveSpeed)) * scene.frameMovementScale
             if (enemySprite.physicsBody?.allContactedBodies().count == 0)
             {
 
@@ -137,8 +137,8 @@ class EnemyTrackingComponent: ActionComponent {
         }
         let playerSprite = Player.entity.sprite
         let angle = abs(Double(atan(Double(playerSprite.position.y - enemySprite.position.y)/Double(playerSprite.position.x - enemySprite.position.x))))
-        let moveX = abs(CGFloat(cos(angle) * moveSpeed))
-        let moveY = abs(CGFloat(sin(angle) * moveSpeed))
+        let moveX = abs(CGFloat(cos(angle) * moveSpeed)) * scene.frameMovementScale
+        let moveY = abs(CGFloat(sin(angle) * moveSpeed)) * scene.frameMovementScale
         
         if (enemySprite.position.x < playerSprite.position.x)
         {
@@ -308,8 +308,8 @@ class EnemyShotTrackingComponent: ActionComponent {
     {
         let playerSprite = Player.entity.sprite
         let angle = abs(Double(atan(Double(playerSprite.position.y - bullet.position.y)/Double(playerSprite.position.x - bullet.position.x))))
-        let moveX = abs(CGFloat(cos(angle) * speed))
-        let moveY = abs(CGFloat(sin(angle) * speed))
+        let moveX = abs(CGFloat(cos(angle) * speed)) * scene.frameMovementScale
+        let moveY = abs(CGFloat(sin(angle) * speed)) * scene.frameMovementScale
         let rotateAngle = atan2(Double(playerSprite.position.y - bullet.position.y), Double(playerSprite.position.x - bullet.position.x))
         bullet.zRotation = CGFloat(rotateAngle)
 //        else if (playerSprite.position.y - bullet.position.y > 0)
@@ -404,8 +404,8 @@ class EnemyDashMovementComponent: ActionComponent {
         if (finishedMove + 0.5 <= currentTime && moving == true)
         {
             let angle = abs(Double(atan(Double(moveTo.y - enemySprite.position.y)/Double(moveTo.x - enemySprite.position.x))))
-            let moveX = abs(CGFloat(cos(angle) * moveSpeed))
-            let moveY = abs(CGFloat(sin(angle) * moveSpeed))
+            let moveX = abs(CGFloat(cos(angle) * moveSpeed)) * scene.frameMovementScale
+            let moveY = abs(CGFloat(sin(angle) * moveSpeed)) * scene.frameMovementScale
         
             if (Int(enemySprite.position.x) < Int(moveTo.x) - 3)
             {

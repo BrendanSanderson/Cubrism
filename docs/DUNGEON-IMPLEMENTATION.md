@@ -257,8 +257,21 @@ the generated floor on its first normal attempt, including all three combat
 rooms, the generator boss, and its exit. It retained 45.3 health, credited 130
 XP exactly once, and produced two legacy completion items. The test passed
 in 109.334 seconds, including its 20-second final inspection window. No
-health/damage/collision/loot/completion overrides were used. This completes
-the stored-floor checkpoint; the rewards are still the legacy adapter path,
+health/damage/collision/loot/completion overrides were used. XCTest reported the scenario and suite passed, but Xcode then stalled in
+XCResultKit finalization on the external drive (sample at
+`build/delve-test-finalization-sample.txt`). Its result bundle lacked the final
+Info.plist and listing that directory also blocked. The launcher was stopped
+after test completion; the same check is being retried with result output on
+the internal drive at `build/results/floor-plan-live-playthrough-20261012-02.xcresult`.
+The internal result path alone still blocked while reading external DerivedData,
+so builds now use `build/DerivedDataDelve` on the internal drive (242 MiB at
+this point). The internal repeat finished normally but failed ten attempts
+against a golem. The earlier generator clear remains valid evidence, but this
+new failure must be diagnosed before the checkpoint is accepted. Current
+hypotheses are bot corner kiting, boss collision dimensions, and frame-rate
+dependent enemy movement. A focused production movement regression is being
+run before changing behavior.
+The rewards are still the legacy adapter path,
 not the later Delve settlement UI.
 
 Review accepted the schema-version finding and fixed it. A later suggestion
@@ -283,6 +296,72 @@ Commands use the existing Xcode toolchain and external build directories:
 - Live combat: CubrismAcceptance scheme,
   `-only-testing:CubrismTests/CubrismPlaythroughTests/testGeneratedFloorThroughCombatAndDoors`;
   result `floor-plan-live-playthrough-20261012-01.xcresult`.
+
+## Movement timing and mobile verification
+
+The generated golem check exposed a desktop bot weakness: it prioritized
+lining up shots near the room edge until the pursuing boss caught it.
+Do not interpret those failed ten-attempt desktop runs as a successful
+playthrough. The touched production movement also had an independent,
+verified timing defect. The focused real `BossTrackingComponent` test went
+red: after one simulated second it moved 45, 90 and 180 units at 30, 60 and
+120 Hz. Its collision area was stable. This is not evidence that frame rate
+caused the desktop playback failure; the live playback ran near 60 Hz.
+
+`GameScene.frameMovementScale` now converts the authored per-60-Hz-frame
+speeds using elapsed frame time. Random/tracking/dash enemies, homing shots,
+boss tracking, and moving/rotating golem rocks use that conversion. Three
+new app tests cover 30/60/120 Hz movement across those actual production
+methods. All 52 app regressions passed with zero failures. The desktop bot
+uses test-only waypoints for the golem; the experimental global close-enemy
+penalty was removed, and waypoint state resets on each room entry. No
+production health, damage, collision or reward override was introduced.
+
+The actual generated golem floor passed on the iOS 27 iPhone 18 Pro simulator
+on its second normal attempt, retaining 44.3 health and crediting the expected
+XP/items. Test duration was 126.310 seconds, including the final 20-second
+inspection window. Command: CubrismAcceptance scheme with
+`-destination 'platform=iOS Simulator,id=A755ED47-4805-429A-9DC5-78323E355AF7'`
+and `-only-testing:CubrismTests/CubrismPlaythroughTests/testGeneratedFloorAgainstGolem`.
+Result: `build/results/generated-golem-ios-20261012-01.xcresult`; log
+`build/delve-golem-ios-playthrough.log`. The gameplay input path uses the
+normal continuous movement/aiming controls on iOS.
+
+Hands-on inspection used Xcode 27's Device Hub at
+`/Applications/Xcode.app/Contents/Applications/DeviceHub.app`. Apple documents
+this replacement simulator UI in [Device Hub](https://developer.apple.com/documentation/xcode/device-hub).
+The iPhone was rotated into landscape and the timed generated-floor fixture
+was brought to the foreground. Both joysticks and resource bars rendered
+correctly; touch dragging moved the player and changed its aim. The timed
+fixture later ended during a longer input sequence and returned to Home;
+remaining gestures opened the simulator's Maps app. Its location request
+was declined, and the device was returned Home. Do not count that sequence
+as a manual floor clear or a verified mobile pause interaction. Earlier
+native Catalyst checks verified generated-room entry, locked doors, incoming
+projectiles, resource depletion, death UI, and pause/resume. Automated mobile
+combat plus these hands-on checks satisfy this checkpoint's gameplay check.
+Future manual fixtures should check their remaining time and observe after
+short input sequences.
+
+Large build/test output is now stored internally because finalizing the first
+external XCResult bundle stalled. Use `build/DerivedDataDelve` for Catalyst,
+`build/DerivedDataDelveIOS` for iOS, and `build/results/` for test results.
+The internal drive still had 38 GiB free when switching; Catalyst output was
+242 MiB. Both iOS 18.5 and iOS 27 runtimes are installed. A second 12-hour
+`caffeinate -m -t 43200` disk-idle assertion is PID 92215 (command session
+85362); the original display/system/user-activity assertion remains PID
+58591. No authentication setting was changed, and the Mac remained accessible.
+
+Final structured movement review completed cleanly with exit 0 and no
+accepted/actionable findings: `build/delve-movement-review-verified.txt/json`.
+Earlier advice about mixed CGFloat/Double compilation was contradicted by
+real compilation; the assertion was still made explicit for clarity. Earlier
+advice about the homing test's branch order was also inaccurate (random
+movement was the final fallback); explicit mode selection now makes its
+coverage clear. A cache-artifact finding was accepted: generated Python
+bytecode was removed and its directory ignored. Temporary debug probes were
+removed. `git diff --check` passes. This completes this checkpoint. Continuous
+Delve combat/gear/XP scaling and full combat persistence remain outstanding.
 
 ## Authorized implementation pass
 
