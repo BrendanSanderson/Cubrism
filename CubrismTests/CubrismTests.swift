@@ -615,20 +615,23 @@ class CubrismTests: XCTestCase {
         }
     }
 
-    func testGreenShotsReachEveryWallAndCleanUp() {
+    @MainActor func testGreenShotsReachEveryWallAndCleanUp() throws {
         let scene = WallShotTestScene(size: GameScene.arenaSize)
         let controller = UIViewController()
-        let window = UIWindow(frame: CGRect(origin: .zero, size: GameScene.arenaSize))
+        let applicationWindow = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let window = UIWindow(windowScene: try XCTUnwrap(applicationWindow.windowScene))
+        window.frame = CGRect(origin: .zero, size: GameScene.arenaSize)
         window.rootViewController = controller
         let skView = SKView(frame: window.bounds)
         controller.view.addSubview(skView)
-        window.isHidden = false
+        window.makeKeyAndVisible()
         skView.presentScene(scene)
         let previousPosition = Player.entity.sprite.position
         defer {
             Player.entity.sprite.position = previousPosition
             skView.presentScene(nil)
             window.isHidden = true
+            applicationWindow.makeKeyAndVisible()
         }
         // Right/left shots travel over 600 points, reproducing the old 500-point expiry.
         let angles: [CGFloat] = [0, .pi, .pi / 2, -.pi / 2,

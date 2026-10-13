@@ -400,6 +400,65 @@ display/system/user-activity keep-awake assertion. `pmset -g assertions` verifie
 it at 23:53 on October 12 with about 9.8 hours remaining. Renew it if required
 by continued playtests; do not change password or authentication settings.
 
+## Derived ownership and ordered saves (October 13)
+
+`DelveProgression` now provides the gameplay-facing operations `enterDungeon`,
+`characterStats`, `awardKill`, `receiveHit`, `equipItem`, and `finishFloor`.
+They derive capacities/armour from owned equipped gear and actual XP level.
+Ordinary planned kills receive normalized XP once; summons and early boss IDs
+receive none. Boss XP, capacity growth, loot and rating commit together.
+The resource-level operations remain for isolated invariant tests.
+
+A fresh account owns seven Delve-1 Common items, including Health/AttackPower
+attachments. Its individual stats are 160 health, 140 shield, 40 attack; the
+accepted 150/150/37.5 benchmark is the average of all legal attachment pairs.
+This choice gives the starter a balanced capacity/offense tradeoff without
+changing the ensemble reference used for enemy calibration.
+
+The store stages live combat changes without writing every frame. One serial
+background writer orders snapshots and critical transactions by revision.
+`prepare` freezes one generated candidate; `commit` publishes only after an
+atomic write. Failed critical writes retain the same pending token for retry
+and block other mutations. Old tokens cannot undo newer commits. Synchronous
+transactions remain for existing foundation tests.
+
+All 42 pure scenario methods passed, including five asynchronous real-file
+save scenarios and four derived ownership scenarios. Fifty overlapping
+snapshots cannot overwrite a later abandonment. Deterministic write failure
+leaves checkpoint state unpublished, retains the prepared loot and permits an
+exact retry. Early boss XP is explicitly rejected; this was an accepted review
+finding and was fixed before the clean follow-up review.
+
+All 52 Catalyst regressions passed. The first run found zero wall contacts in
+the projectile fixture, which used an unattached UIWindow. The fixture now
+uses the app's connected UIWindowScene, makes its test window key/visible,
+and restores the original window. Its focused test and full suite both pass.
+Evidence: `build/delve-owner-tests.log`, `build/delve-owner-app-tests-fixed.log`,
+`build/results/owner-app-tests-20261013-03.xcresult`, and clean structured review
+`build/delve-owner-review-fixed.txt/json`. No findings were rejected.
+
+These operations are not yet connected to the live scene, and the stored
+snapshot still lacks full combat state. Do not label this as a completed
+playable-loop or combat-resume checkpoint.
+
+## Combat-resume investigation
+
+Apple's [SKNode documentation](https://developer.apple.com/documentation/spritekit/sknode)
+supports coding/decoding nodes, but does not promise preservation of elapsed
+action time. A native SpriteKit diagnostic archived a node partway through a
+two-second, 200-point movement. It restored the current position and active
+action, but the action restarted its duration/distance: after another 1.9
+seconds the restored node was near 280 with movement still active, instead of
+finishing at the original destination 220. Evidence is the ignored diagnostic
+`build/DelveActionArchiveProbe.swift` and its log. This is a diagnostic, not a
+gameplay clear or final resume verification.
+
+Use explicit gameplay motion/phase records with logical-clock deadlines and
+remaining movement/lifetime. Retain cosmetic SpriteKit animations where they
+do not change combat. Do not use opaque node archives as the authoritative
+combat save format. This keeps the existing AI/combat patterns while making
+their state and scheduled effects restorable.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative

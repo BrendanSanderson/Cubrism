@@ -164,6 +164,32 @@ struct DelveProgression: Codable, Equatable {
     private(set) var lastSettlement: DelveRunSettlement?
     let rules: DelveRules
 
+    var ownedItems: [DelveLoot] { bankedItems + (activeRun?.loot ?? []) }
+
+    func characterStats() throws -> DelveCharacterStats {
+        let items = ownedItems.filter { equipped.values.contains($0.id) }
+        return try rules.balance.characterStats(level: experience.level, equipped: items, cap: experience.cap)
+    }
+
+    static func freshAccount(rules: DelveRules = DelveRules()) throws -> Self {
+        var items = [DelveLoot]()
+        var slots = [DelveEquipmentSlot: UUID]()
+        for slot in DelveEquipmentSlot.allCases {
+            let kind: DelveItemKind
+            let stat: String?
+            switch slot {
+            case .attachmentOne: kind = .attachment; stat = "Health"
+            case .attachmentTwo: kind = .attachment; stat = "AttackPower"
+            default: kind = DelveItemKind(rawValue: slot.rawValue)!; stat = nil
+            }
+            let item = try DelveLoot(kind: kind, power: 1, rarity: .common, attachmentStat: stat)
+            items.append(item)
+            slots[slot] = item.id
+        }
+        return try Self(levelUpCosts: DelveCalibration.levelUpCosts, bankedItems: items,
+                        equipped: slots, rules: rules)
+    }
+
     init(rating: Double = 1, levelUpCosts: [Double], bankedItems: [DelveLoot] = [],
          equipped: [DelveEquipmentSlot: UUID] = [:], rules: DelveRules = DelveRules()) throws {
         try DelveRules.validateScore(rating)
@@ -251,6 +277,79 @@ struct DelveProgression: Codable, Equatable {
         guard let run = activeRun, run.floor.id == floorID else { throw DelveError.staleFloor }
         guard run.floor.phase == .combat else { throw DelveError.invalidTransition }
         return run
+    }
+
+    // Gameplay uses these derived-stat operations. The resource-level methods
+    // below remain useful for testing independent run/resource invariants.
+    @discardableResult
+    mutating func enterDungeon<R: RandomNumberGenerator>(using random: inout R) throws -> UUID {
+        let stats = try characterStats()
+        return try startRun(maxHealth: stats.maxHealth, maxShield: stats.maxShield, using: &random)
+    }
+
+    @discardableResult
+    mutating func awardKill(floorID: UUID, enemyID: UUID) throws -> Bool {
+        let run = try combatRun(floorID: floorID)
+        guard run.floor.plan.enemies.contains(where: { $0.id == enemyID }),
+              let reward = try rules.balance.xpAllocations(for: run.floor.plan)[enemyID] else { return false }
+        return try creditKill(floorID: floorID, enemyID: enemyID, reward: reward)
+    }
+
+    private mutating func creditKill(floorID: UUID, enemyID: UUID, reward: Double) throws -> Bool {
+        var next = self
+        let credited = try next.awardXP(floorID: floorID, eventID: enemyID, baseAmount: reward)
+        if credited, next.experience.level != experience.level {
+            let stats = try next.characterStats()
+            try next.changeCapacity(floorID: floorID, maxHealth: stats.maxHealth, maxShield: stats.maxShield)
+        }
+        self = next
+        return credited
+    }
+
+    mutating func receiveHit(floorID: UUID, rawDamage: Double) throws {
+        guard rawDamage.isFinite, rawDamage >= 0 else { throw DelveError.invalidValue("damage") }
+        try takeDamage(floorID: floorID, amount: max(0, rawDamage - characterStats().flatArmour))
+    }
+
+    mutating func equipItem(_ itemID: UUID?, in slot: DelveEquipmentSlot) throws {
+        if let run = activeRun, run.floor.phase != .checkpoint { throw DelveError.invalidTransition }
+        var next = self
+        next.equipped[slot] = itemID
+        try Self.validateLoadout(next.equipped, items: ownedItems)
+        if var run = next.activeRun {
+            let stats = try next.characterStats()
+            try run.resources.changeCapacity(health: stats.maxHealth, shield: stats.maxShield)
+            next.activeRun = run
+        }
+        self = next
+    }
+
+    @discardableResult
+    mutating func finishFloor<R: RandomNumberGenerator>(floorID: UUID, performance: DelvePerformance,
+                                                         using random: inout R) throws -> Bool {
+        guard let run = activeRun, run.floor.id == floorID else { throw DelveError.staleFloor }
+        guard run.floor.phase == .combat else { return false }
+        // The boss finishes an already completed route. Its XP, possible level
+        // up, loot and rating gain belong to the same save transaction.
+        guard run.floor.plan.enemies.allSatisfy({ run.floor.awardedXPEvents.contains($0.id) }),
+              let boss = run.floor.plan.rooms.last else { throw DelveError.invalidTransition }
+        var next = self
+        guard let bossXP = try rules.balance.xpAllocations(for: run.floor.plan)[boss.id] else {
+            throw DelveError.invalidTransition
+        }
+        try next.creditKill(floorID: floorID, enemyID: boss.id, reward: bossXP)
+        let rewards = try DelveRules.rollRewards(difficulty: run.floor.difficulty, depth: run.depth, using: &random)
+        let kinds: [DelveItemKind] = [.powerCore, .armorCore, .pulsar, .specialPulsar, .shield, .attachment]
+        let stats = ["AttackPower", "Health", "Shield", "Defence"]
+        let loot = try rewards.map { reward -> DelveLoot in
+            let kind = kinds[Int.random(in: kinds.indices, using: &random)]
+            let stat = kind == .attachment ? stats[Int.random(in: stats.indices, using: &random)] : nil
+            return try DelveLoot(kind: kind, power: reward.power, rarity: reward.rarity,
+                                 variant: Int.random(in: 0...3, using: &random), attachmentStat: stat)
+        }
+        try next.clearFloor(floorID: floorID, performance: performance, loot: loot)
+        self = next
+        return true
     }
 
     @discardableResult
