@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE1FE0000000000000000009 /* DelveFloorPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000000A /* DelveFloorPlan.swift */; };
 		DE1FE0000000000000000001 /* DelveRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000002 /* DelveRules.swift */; };
 		DE1FE0000000000000000003 /* DelveRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000004 /* DelveRun.swift */; };
 		DE1FE0000000000000000005 /* DelveSaveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000006 /* DelveSaveStore.swift */; };
@@ -78,6 +79,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DE1FE000000000000000000A /* DelveFloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveFloorPlan.swift; path = Progression/DelveFloorPlan.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000002 /* DelveRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveRules.swift; path = Progression/DelveRules.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000004 /* DelveRun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveRun.swift; path = Progression/DelveRun.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000006 /* DelveSaveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveSaveStore.swift; path = Progression/DelveSaveStore.swift; sourceTree = "<group>"; };
@@ -296,6 +298,7 @@
 				BADF41A21CA8A5ED00EF9C15 /* border 3.jpg */,
 				BA3CA69D1C97CA40004A9DA6 /* Nodes.swift */,
 				BADF2B851C97AE6100D573AC /* Player.swift */,
+				DE1FE000000000000000000A /* DelveFloorPlan.swift */,
 				DE1FE0000000000000000002 /* DelveRules.swift */,
 				DE1FE0000000000000000004 /* DelveRun.swift */,
 				DE1FE0000000000000000006 /* DelveSaveStore.swift */,
@@ -449,6 +452,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BADF2B861C97AE6100D573AC /* Player.swift in Sources */,
+				DE1FE0000000000000000009 /* DelveFloorPlan.swift in Sources */,
 				DE1FE0000000000000000001 /* DelveRules.swift in Sources */,
 				DE1FE0000000000000000003 /* DelveRun.swift in Sources */,
 				DE1FE0000000000000000005 /* DelveSaveStore.swift in Sources */,

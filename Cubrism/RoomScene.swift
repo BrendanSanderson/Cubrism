@@ -38,6 +38,7 @@ class RoomScene: GameScene {
     weak var viewController: FloorViewController!
     override var arenaGlobalLevel: Int { viewController?.globalLevel ?? 1 }
     var enemyPoints = 4
+    var plannedRoom: DelveRoomPlan?
     override func didMove(to view: SKView) {
         /* Setup your scene here */
         killedEnemies = 0
@@ -122,6 +123,16 @@ class RoomScene: GameScene {
     
     func addEnemies()
     {
+        if case .combat(let mobs) = plannedRoom?.encounter {
+            for mob in mobs {
+                let position = CGPoint(x: mob.position.x * Double(size.width), y: mob.position.y * Double(size.height))
+                entites.append(EnemyEntity(scene: self, eType: mob.kind.gameType,
+                                          lev: mob.kind.isElite ? 5 : 1, elite: mob.kind.isElite,
+                                          position: position, spawnID: mob.id))
+            }
+            enemies = entites.count
+            return
+        }
         guard let path = Bundle.main.path(forResource: "Enemies", ofType: "plist"),
               let definitions = NSArray(contentsOfFile: path) as? [[String: Any]] else {
             return
@@ -151,7 +162,12 @@ class RoomScene: GameScene {
     func addBoss()
     {
         if let path = Bundle.main.path(forResource: "bosses", ofType: "plist"), let dict = NSArray(contentsOfFile: path){
-            let boss = dict[Int(arc4random_uniform(UInt32(dict.count)))] as? NSDictionary
+            let boss: NSDictionary?
+            if case .boss(let kind) = plannedRoom?.encounter {
+                boss = (dict as? [NSDictionary])?.first { $0["name"] as? String == kind.rawValue }
+            } else {
+                boss = dict[Int(arc4random_uniform(UInt32(dict.count)))] as? NSDictionary
+            }
             //let boss = dict[2] as? NSDictionary
             entites.append(BossEntity(scene: self, properties: boss!))
         }

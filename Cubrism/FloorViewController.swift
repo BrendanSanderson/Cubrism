@@ -27,6 +27,14 @@ class FloorViewController: UIViewController {
     var homeView: HomeViewController!
     var enemyPoints = 4
     let arenaSize = GameScene.arenaSize
+    private(set) var floorPlan: DelveFloorPlan?
+    private(set) var plannedRooms = [DelveRoomPosition: RoomScene]()
+
+    convenience init(plan: DelveFloorPlan) throws {
+        try plan.validate()
+        self.init()
+        floorPlan = plan
+    }
     
     convenience init(min: UInt32, max: UInt32, level:Int, world:Int)
     {
@@ -88,7 +96,7 @@ class FloorViewController: UIViewController {
         view.layoutIfNeeded()
         skView.bounds = CGRect(origin: .zero, size: arenaSize)
         buildMaze()
-        scene = maze[Int(start.x)][Int(start.y)]
+        scene = room(at: start)
         scene.scaleMode = .aspectFit
         scene.startPosition = CGPoint (x: arenaSize.width/2, y: arenaSize.height/2)
         skView.presentScene(scene)
@@ -138,6 +146,10 @@ class FloorViewController: UIViewController {
     
     
     func buildMaze (){
+        if let plan = floorPlan {
+            buildPlannedFloor(plan)
+            return
+        }
         
         length = Int(max > min ? arc4random_uniform(max - min) + min : min)
         start = CGPoint(x: length + 1, y: length + 1)
@@ -200,6 +212,42 @@ class FloorViewController: UIViewController {
             
         }
     }
+
+    private func buildPlannedFloor(_ plan: DelveFloorPlan) {
+        plannedRooms.removeAll()
+        maze.removeAll()
+        length = plan.combatRooms.count
+        start = CGPoint(x: plan.rooms[0].position.x, y: plan.rooms[0].position.y)
+        for room in plan.rooms {
+            let scene = RoomScene(size: arenaSize)
+            scene.viewController = self
+            scene.plannedRoom = room
+            switch room.encounter {
+            case .start: scene.name = "startRoom"
+            case .combat: scene.name = "room"
+            case .boss: scene.name = "bossRoom"
+            }
+            for connection in plan.doors(for: room.id) {
+                let destination = plan.rooms.first { $0.position == connection.destination }!
+                let type: String
+                if case .boss = room.encounter { type = "bossChallenge" }
+                else if case .boss = destination.encounter { type = "bossChallenge" }
+                else if case .start = room.encounter { type = "regular" }
+                else { type = "challenge" }
+                let door = DoorEntity(scene: scene, direction: connection.direction.rawValue, type: type)
+                door.pointer = CGPoint(x: connection.destination.x, y: connection.destination.y)
+                scene.doors.append(door)
+            }
+            plannedRooms[room.position] = scene
+        }
+    }
+
+    func room(at position: CGPoint) -> RoomScene? {
+        if floorPlan != nil {
+            return plannedRooms[DelveRoomPosition(x: Int(position.x), y: Int(position.y))]
+        }
+        return maze[Int(position.x)][Int(position.y)]
+    }
     func oppositeDirection(_ direction: Int) -> Int
     {
         if direction == 0
@@ -221,45 +269,13 @@ class FloorViewController: UIViewController {
 
     }
     func goToRoomScene(_ notification: Notification){
-        // Perform a segue or present ViewController directly
-        //[self performSegueWithIdentifier:@"GameOverSegue" sender:self];
-        var loc = 0
-        var start = CGPoint(x: 100, y: 100)
-        for i in 0 ..< scene.doors.count
-        {
-            if (scene.doors[i].node.name == scene.doorAccessed)
-            {
-                loc = i
-                let door = scene.doors[i]
-                start = doorStart(door.direction, position: door.position)
-            }
-        }
-        let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
-        newScene.scaleMode = .aspectFit
-        newScene.startPosition = start
-        #if targetEnvironment(macCatalyst)
-        scene.resetKeyboardControls()
-        #endif
-        skView.presentScene(newScene)
-        scene = newScene
+        goToRoomScene()
     }
     func goToRoomScene(){
-        // Perform a segue or present ViewController directly
-        //[self performSegueWithIdentifier:@"GameOverSegue" sender:self];
-        var loc = 0
-        var start = CGPoint(x: 100, y: 100)
-        for i in 0 ..< scene.doors.count
-        {
-            if (scene.doors[i].node.name == scene.doorAccessed)
-            {
-                loc = i
-                let door = scene.doors[i]
-                start = doorStart(door.direction, position: door.position)
-            }
-        }
-        let newScene = maze[Int(scene.doors[loc].pointer.x)][Int(scene.doors[loc].pointer.y)]
+        guard let door = scene.doors.first(where: { $0.node.name == scene.doorAccessed }),
+              let newScene = room(at: door.pointer) else { return }
         newScene.scaleMode = .aspectFit
-        newScene.startPosition = start
+        newScene.startPosition = doorStart(door.direction, position: door.position)
         #if targetEnvironment(macCatalyst)
         scene.resetKeyboardControls()
         #endif

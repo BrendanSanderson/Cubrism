@@ -208,6 +208,82 @@ occurred; the existing acceptance test temporarily creates fresh progress
 and restores its saved preference values afterward. Do not label native
 assertions as a game playtest.
 
+## Stored floor generation checkpoint
+
+`DelveFloorPlan.swift` generates and stores the whole route, stable room and
+spawn IDs, normalized enemy spawn positions, room density, grouping cost,
+budget, and one final boss. Starting and continuing a run sample difficulty
+once and generate one corresponding plan, preserved by the atomic save.
+The required plan changes the foundation-only payload, so the save version
+is now 2. Version-1 files are rejected explicitly without overwriting them;
+no replacement encounters are silently generated while loading.
+
+The initial planner uses the candidate budget `12*(1+x)^0.1`, grouping
+multiplier 0.25, and one/two/three-mob target densities. New encounter variants
+become eligible at 1, 11, 21, ... through 101, covering the existing nine
+ordinary types and two elite variants. Eligibility does not guarantee a spawn.
+The guaranteed boss sits outside the ordinary budget. These are named initial
+tunings; no Delve, duration, room-count, or item-power cap was introduced.
+
+`FloorViewController(plan:)` validates and renders stored plans through a
+coordinate dictionary, avoiding a quadratic array of unused scenes.
+`RoomScene` consumes the exact stored enemy kinds, positions and boss. Normal
+and notification-driven navigation share the same door transition. Legacy
+selection remains the default until the later account/world/UI cutover.
+Continuous stats and XP for this adapter are still subsequent work.
+
+All 26 pure XCTest scenarios pass. Five new planner scenarios traverse 500
+floors from Delve 1 through 100000, check point spending/eligibility/one final
+boss, compare sparse/dense populations, verify non-guaranteed new enemies,
+reject invalid routes/encounters, and preserve plans through reload/continue.
+
+App-hosted verification passed 49 regressions. The exact-plan adapter check
+found that SpriteKit's float positions differ slightly from stored Doubles;
+it now uses a 0.001-pixel assertion tolerance, while the saved values remain
+exact. A direct SpriteKit probe measured 0.000015 pixels of rounding.
+Instantiating the existing generator boss also exposed a fractional Retina
+size bug: a 333.5-point source became 333.6667 points at 3x rendering.
+`GameArt.render` now selects an integer scale that preserves source logical
+sizes. A focused regression covers halves, thirds, and whole-point sizes.
+All temporary `[DEBUG-floor-art]` instrumentation was removed.
+
+The hands-on fixture loads a plan after an encode/decode round trip and
+restores legacy preference values on completion. Native keyboard input moved
+from the safe start through its north door into a three-enemy combat room;
+locked doors, green ranged projectiles, resource depletion and the death
+screen rendered correctly. This was a control/visual inspection, not a
+manual full-floor clear. The timed fixture passed. The separate live combat playthrough then cleared
+the generated floor on its first normal attempt, including all three combat
+rooms, the generator boss, and its exit. It retained 45.3 health, credited 130
+XP exactly once, and produced two legacy completion items. The test passed
+in 109.334 seconds, including its 20-second final inspection window. No
+health/damage/collision/loot/completion overrides were used. This completes
+the stored-floor checkpoint; the rewards are still the legacy adapter path,
+not the later Delve settlement UI.
+
+Review accepted the schema-version finding and fixed it. A later suggestion
+to impose a gameplay ceiling for local scores such as 1e100 was rejected as
+an unrealistic save-edit scenario contrary to the accepted uncapped design;
+its deliberate policy is recorded beside the shallow budget curve. The final
+structured autoreview completed cleanly (exit 0, no actionable findings).
+Output: `build/delve-floor-review-complete.txt/json`. `git diff --check` and
+project-file lint passed. No pending accepted review findings remain.
+
+Commands use the existing Xcode toolchain and external build directories:
+
+- Pure tests: the `xcrun swift test` command above; log
+  `build/delve-floor-tests.log`.
+- App regressions: Cubrism scheme, `-only-testing:CubrismTests` and
+  `-skip-testing:CubrismTests/CubrismPlaythroughTests`; passing result
+  `floor-plan-app-tests-20261012-03.xcresult` (earlier runs stopped at the
+  precision/art assertions while XCTest's symbolication stalled).
+- Hands-on fixture: CubrismAcceptance scheme,
+  `-only-testing:CubrismTests/CubrismPlaythroughTests/testGeneratedFloorHandsOnPreview`;
+  result `floor-plan-hands-on-20261012-01.xcresult`.
+- Live combat: CubrismAcceptance scheme,
+  `-only-testing:CubrismTests/CubrismPlaythroughTests/testGeneratedFloorThroughCombatAndDoors`;
+  result `floor-plan-live-playthrough-20261012-01.xcresult`.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative

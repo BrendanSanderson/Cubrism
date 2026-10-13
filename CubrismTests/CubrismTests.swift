@@ -157,6 +157,14 @@ class CubrismTests: XCTestCase {
         add(attachment)
     }
 
+    func testRenderedArtPreservesFractionalRetinaLogicalSizes() {
+        for size in [CGSize(width: 333.5, height: 333.5), CGSize(width: 100.0 / 3, height: 20.5), CGSize(width: 32, height: 32)] {
+            let image = GameArt.render(size) { rect in UIColor.white.setFill(); UIRectFill(rect) }
+            XCTAssertEqual(image.size.width, size.width, accuracy: 1e-9)
+            XCTAssertEqual(image.size.height, size.height, accuracy: 1e-9)
+        }
+    }
+
     func testStyleCatalogPreservesLogicalSizesAndHasTransparentSprites() throws {
         let animationNames = (1...4).map { "dragonMouth\($0)" } + (0...8).map { "golemJump\($0)" }
         let names = GameArt.enemies + GameArt.items + GameArt.bosses + ["playerIcon", "playerCannon"] + animationNames
@@ -957,6 +965,39 @@ class CubrismTests: XCTestCase {
         XCTAssertEqual(enemy.level, 12)
     }
 
+    func testStoredFloorAdapterUsesTheExactRouteAndSpawnRecords() throws {
+        let oldEntity = Player.entity
+        let oldScene = Player.currentScene
+        defer { Player.entity = oldEntity; Player.currentScene = oldScene }
+        var random = SystemRandomNumberGenerator()
+        let plan = try DelveFloorPlanner().generate(difficulty: 854, using: &random)
+        let controller = try FloorViewController(plan: plan)
+        controller.buildMaze()
+        XCTAssertEqual(controller.plannedRooms.count, plan.rooms.count)
+        XCTAssertTrue(controller.maze.isEmpty, "Planned floors should not allocate a square of unused scenes")
+        for roomPlan in plan.rooms {
+            let room = try XCTUnwrap(controller.plannedRooms[roomPlan.position])
+            XCTAssertEqual(room.plannedRoom, roomPlan)
+            XCTAssertEqual(room.doors.count, plan.doors(for: roomPlan.id).count)
+            if case .combat(let mobs) = roomPlan.encounter {
+                room.addPlayer()
+                room.addEnemies()
+                let enemies = room.entites.compactMap { $0 as? EnemyEntity }
+                XCTAssertEqual(enemies.count, mobs.count)
+                for (enemy, mob) in zip(enemies, mobs) {
+                    XCTAssertEqual(enemy.delveSpawnID, mob.id)
+                    XCTAssertEqual(enemy.type, mob.kind.gameType)
+                    // SpriteKit stores node positions with float precision.
+                    XCTAssertEqual(enemy.sprite.position.x, mob.position.x * Double(room.size.width), accuracy: 0.001)
+                    XCTAssertEqual(enemy.sprite.position.y, mob.position.y * Double(room.size.height), accuracy: 0.001)
+                }
+            } else if case .boss(let kind) = roomPlan.encounter {
+                room.addBoss()
+                XCTAssertEqual((room.entites.first as? BossEntity)?.type, kind.rawValue)
+            }
+        }
+    }
+
     func testShopTradesPersistBothInventoryAndFinalBalance() {
         let oldInventory = Player.inventory
         let oldStock = Constants.merchantInventory
@@ -1073,6 +1114,39 @@ class CubrismTests: XCTestCase {
 /// Runs the actual SpriteKit simulation with platform-appropriate control inputs.
 /// No health, damage, collision, loot, enemy, or completion overrides are used.
 class CubrismPlaythroughTests: XCTestCase {
+    /// A timed fixture for native visual/control inspection, not an automated
+    /// combat pass. Restore preferences even if hands-on combat earns rewards.
+    @MainActor func testGeneratedFloorHandsOnPreview() async throws {
+        guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
+            throw XCTSkip("Run the CubrismAcceptance scheme for hands-on inspection")
+        }
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let original = window.rootViewController
+        let defaults = UserDefaults.standard
+        let keys = ["Level", "Experience", "TotalExperience", "LevelCompleted", "Gear", "Inventory"]
+        let saved = keys.map { defaults.object(forKey: $0) }
+        var random = SystemRandomNumberGenerator()
+        let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
+        let plan = try JSONDecoder().decode(DelveFloorPlan.self, from: JSONEncoder().encode(generated))
+        let controller = try FloorViewController(plan: plan)
+        defer {
+            controller.skView.presentScene(nil)
+            window.rootViewController = original
+            for (key, value) in zip(keys, saved) {
+                if let value = value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.loadViewIfNeeded()
+        controller.view.layoutIfNeeded()
+        if controller.needsNewRun { controller.startNewRun() }
+        print("HANDS-ON READY: restored generated floor, \(plan.combatRooms.count) combat rooms, \(plan.enemies.count) enemies")
+        try await Task.sleep(nanoseconds: 90_000_000_000)
+        XCTAssertEqual(controller.floorPlan, plan)
+    }
+
     /// Presentation fixtures only; this does not count as a combat completion.
     @MainActor func testRewardPageScrollingAndContinueNavigation() async throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
@@ -1135,6 +1209,16 @@ class CubrismPlaythroughTests: XCTestCase {
     }
 
     func testFirstTwoFloorsThroughCombatAndDoors() throws {
+        try playFloors()
+    }
+
+    func testGeneratedFloorThroughCombatAndDoors() throws {
+        var random = SystemRandomNumberGenerator()
+        let plan = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
+        try playFloors(plan: plan)
+    }
+
+    private func playFloors(plan: DelveFloorPlan? = nil) throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
         }
@@ -1152,13 +1236,15 @@ class CubrismPlaythroughTests: XCTestCase {
             }
         }
         Player.resetProgress()
-        for floor in 1...2 {
+        for floor in 1...(plan == nil ? 2 : 1) {
             var cleared = false
             for attempt in 1...10 {
             guard Date() < acceptanceDeadline else { break }
             print("PLAYTHROUGH ATTEMPT floor=\(floor) attempt=\(attempt) playerLevel=\(Player.level)")
             let xpBeforeAttempt = Player.totalExp
-            let controller = FloorViewController(min: UInt32(floor + 3), max: UInt32(floor + 4), level: floor, world: 1)
+            let controller: FloorViewController
+            if let plan = plan { controller = try FloorViewController(plan: plan) }
+            else { controller = FloorViewController(min: UInt32(floor + 3), max: UInt32(floor + 4), level: floor, world: 1) }
             window.rootViewController = controller
             window.makeKeyAndVisible()
             controller.loadViewIfNeeded()
@@ -1227,7 +1313,8 @@ class CubrismPlaythroughTests: XCTestCase {
                     if room.name == "bossRoom" && room.completed {
                         destination = CGPoint(x: room.size.width/2, y: room.size.height/2)
                     } else if let door = room.doors.first(where: {
-                        !visited.contains(ObjectIdentifier(controller.maze[Int($0.pointer.x)][Int($0.pointer.y)]))
+                        guard let destination = controller.room(at: $0.pointer) else { return false }
+                        return !visited.contains(ObjectIdentifier(destination))
                     }) {
                         destination = door.position
                     } else { break }

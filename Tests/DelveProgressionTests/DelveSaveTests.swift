@@ -275,10 +275,14 @@ final class DelveSaveTests: XCTestCase {
             let directory = try saveTestDirectory()
             defer { try? FileManager.default.removeItem(at: directory) }
             let file = directory.appendingPathComponent("delve.json")
-            let future = Data("{\"format\":\"cubrism.delve\",\"version\":2,\"progression\":\"future schema\"}".utf8)
+            let future = Data("{\"format\":\"cubrism.delve\",\"version\":3,\"progression\":\"future schema\"}".utf8)
             try future.write(to: file)
-            XCTAssertThrowsError(try saveTestStore(file)) { XCTAssertEqual($0 as? DelveSaveError, .unsupportedVersion(2)) }
+            XCTAssertThrowsError(try saveTestStore(file)) { XCTAssertEqual($0 as? DelveSaveError, .unsupportedVersion(3)) }
             XCTAssertEqual(try Data(contentsOf: file), future)
+            let foundation = Data("{\"format\":\"cubrism.delve\",\"version\":1,\"progression\":{\"activeRun\":{\"floor\":{\"difficulty\":1}}}}".utf8)
+            try foundation.write(to: file)
+            XCTAssertThrowsError(try saveTestStore(file)) { XCTAssertEqual($0 as? DelveSaveError, .unsupportedVersion(1)) }
+            XCTAssertEqual(try Data(contentsOf: file), foundation)
             let unknown = Data("{\"format\":\"other\",\"version\":1}".utf8)
             try unknown.write(to: file)
             XCTAssertThrowsError(try saveTestStore(file)) { XCTAssertEqual($0 as? DelveSaveError, .unrecognizedFormat) }

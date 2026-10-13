@@ -167,7 +167,15 @@ enum GameArt {
     }
     static func render(_ size: CGSize, scale: CGFloat = 3, draw: (CGRect) -> Void) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
-        format.scale = scale
+        // Asset sizes can contain halves/thirds from their original Retina
+        // scale. Choose an integer render scale that represents those logical
+        // dimensions exactly, rather than rounding and changing collision size.
+        let minimumScale = Int(ceil(scale))
+        let exactScale = (minimumScale...minimumScale + 3).first { candidate in
+            let width = size.width * CGFloat(candidate), height = size.height * CGFloat(candidate)
+            return abs(width - width.rounded()) < 1e-8 && abs(height - height.rounded()) < 1e-8
+        }
+        format.scale = exactScale.map(CGFloat.init) ?? scale
         return UIGraphicsImageRenderer(size: size, format: format).image { _ in draw(CGRect(origin: .zero, size: size)) }
     }
     private static func drawArena(_ source: UIImage, opening: CGRect, target: CGRect) {

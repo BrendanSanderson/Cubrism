@@ -23,6 +23,7 @@ class EnemyEntity: DynamicEntity {
     var rangeAttackPower = 25
     var experience = 5.0
     var level = 1
+    var delveSpawnID: UUID?
     static var enemyDict = Constants.jsonDict?["enemy"] as? [String: Any]
     var componentDict: [String:Any]
     static func refreshEnemyDictionary() {
@@ -38,14 +39,17 @@ class EnemyEntity: DynamicEntity {
         super.init()
     }
     
-    convenience init(scene: GameScene, eType: String, lev: Int, elite: Bool)
+    convenience init(scene: GameScene, eType: String, lev: Int, elite: Bool,
+                     position: CGPoint? = nil, spawnID: UUID? = nil)
     {
         self.init()
         self.scene = scene
         self.type = eType
         node.entity = self
         level = (scene as! RoomScene).viewController.globalLevel + lev - 1
+        delveSpawnID = spawnID
         setUpType(eType, elite:elite)
+        if let position = position { sprite.position = position }
         if (self.sprite.position == CGPoint())
         {
             if (type == "RangeRing" || type == "RangeTripple")
