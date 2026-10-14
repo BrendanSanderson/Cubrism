@@ -18,9 +18,10 @@ class BossEntity: DynamicEntity {
     var health = 1000.0
     var currentHealth = 1000.0
     var statusNode = SKSpriteNode()
-    var rangeAttackPower = 50
-    var meleeAttackPower = 25
-    var effectAttackPower = 10
+    var rangeAttackPower = 50.0
+    var meleeAttackPower = 25.0
+    var effectAttackPower = 10.0
+    var combatID = UUID()
     var level = 1
     var attack: ActionComponent!
     var firstAttack = true
@@ -33,14 +34,22 @@ class BossEntity: DynamicEntity {
             super.init()
     }
     
-    init(scene: GameScene, properties: NSDictionary)
+    init(scene: GameScene, properties: NSDictionary, stats: DelveEnemyStats? = nil, combatID: UUID? = nil)
     {
         super.init()
         self.scene = scene
         node.entity = self
         level = (scene as! RoomScene).viewController.globalLevel
         type = properties.value(forKey: "name") as? String
+        if let combatID = combatID { self.combatID = combatID }
         setUpBoss(properties)
+        if let stats = stats {
+            health = stats.health
+            currentHealth = stats.health
+            rangeAttackPower = stats.rangeAttackPower
+            meleeAttackPower = stats.meleeAttackPower
+            effectAttackPower = stats.effectAttackPower
+        }
         node.addChild(sprite)
         addComponent(VisualComponent(scene: scene, sprite: sprite))
         sprite.zPosition = 10
@@ -136,9 +145,9 @@ class BossEntity: DynamicEntity {
         }
         health = Double(Double(healthBase) * Constants.bossHealthMultiplier(level))
         currentHealth = health
-        rangeAttackPower = Int(Double(rangeBase) * Constants.bossDamageMultiplier(level))
-        meleeAttackPower = Int(Double(meleeBase) * Constants.bossDamageMultiplier(level))
-        effectAttackPower = Int(Double(effectBase) * Constants.enemyMultiplier(level))
+        rangeAttackPower = Double(Int(Double(rangeBase) * Constants.bossDamageMultiplier(level)))
+        meleeAttackPower = Double(Int(Double(meleeBase) * Constants.bossDamageMultiplier(level)))
+        effectAttackPower = Double(Int(Double(effectBase) * Constants.enemyMultiplier(level)))
         exp = (exp * Constants.expMultiplier(level))
     }
     
@@ -148,13 +157,13 @@ class BossEntity: DynamicEntity {
         {
             if (firstAttack == true)
             {
-                attack = actions[Int(arc4random_uniform(UInt32(actions.count)))]
+                attack = actions[Int(scene.randomInteger(upperBound: UInt32(actions.count)))]
                 firstAttack = false
                 attack.action(currentTime)
             }
             else if (attack.acting == false && lastShot +  TimeInterval(3) <= currentTime)
             {
-                attack = actions[Int(arc4random_uniform(UInt32(actions.count)))]
+                attack = actions[Int(scene.randomInteger(upperBound: UInt32(actions.count)))]
                 attack.action(currentTime)
             }
             else if (attack.acting == true)

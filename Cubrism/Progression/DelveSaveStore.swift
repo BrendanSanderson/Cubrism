@@ -15,8 +15,8 @@ private struct DelveSaveHeader: Decodable {
 
 private struct DelveSaveDocument: Codable {
     static let identifier = "cubrism.delve"
-    // v2 stored encounters; v3 stores the balance that generated them.
-    static let currentVersion = 3
+    // v2 stored encounters; v3 stored balance; v4 adds combat simulation data.
+    static let currentVersion = 4
     let format: String
     let version: Int
     let progression: DelveProgression

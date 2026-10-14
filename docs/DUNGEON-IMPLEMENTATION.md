@@ -540,6 +540,66 @@ verified rather than applying that inaccurate diagnosis literally.
 Full combat integration must capture a value snapshot before tearing down its
 scene. The current cleanup does not itself provide combat restoration.
 
+## Combat snapshot checkpoint: October 14
+
+Typed schema-4 combat snapshots now capture and restore all eleven planned
+enemy variants, all three bosses, their attack phases and cooldowns, fractional
+health/damage, player pose and hit/shot timers, physics state, active projectile
+movement/lifetime, summons, and scene RNG. The scene uses a logical clock that
+stops while paused and does not absorb wall time on resume. Bomb fuses preserve
+their four-event cursor and frozen damage; retirement cancels their owner’s
+fuses. Actor order is preserved so random decisions consume draws in the same
+order. Restored shots carry damage without requiring the original shooter.
+
+The opt-in floor controller selects the saved room without spawning duplicate
+actors, resumes paused, and restores earlier cleared rooms with traversable
+doors. All remaining gameplay movement uses explicit timelines in this mode;
+cosmetic animations remain SpriteKit actions. Account resources remain outside
+the world DTO and are not refilled by controller restoration.
+
+Verification:
+
+- 53 pure scenarios passed: `build/delve-world-resume-pure-final-02.log`.
+- 62 Catalyst regression tests passed:
+  `build/results/world-resume-app-20261014-03.xcresult` and
+  `build/delve-world-resume-app-tests-03.log`. Coverage includes all enemy
+  variants; six boss attacks at 0.4, 2.4 and 4.4 seconds; continued boss-shot
+  movement/expiry; bomb cursor continuation; missing/malformed saved actors;
+  overdue partial rock cleanup; paused controller restore; and actual reentry
+  into an earlier cleared room.
+- The iOS normal-input playthrough captured/JSON-reloaded a damaged combat room
+  and a boss fight, verified equality after one paused second, then completed
+  the floor on its first attempt in 82.492 seconds. It retained 103 HP and
+  credited the existing 130 XP/two-item reward once. Evidence:
+  `build/results/world-reload-play-20261014-02.xcresult` and
+  `build/delve-world-reload-play-02.log`. This isolates combat restoration;
+  it is not evidence for the new economy or cross-floor loop.
+- A 180-second native hands-on fixture passed. Joystick movement entered a
+  locked combat room, aiming/firing worked, incoming shots depleted shields,
+  death/retry worked, and pause/resume froze and resumed combat. Evidence:
+  `build/results/world-resume-hands-on-20261014-01.xcresult` and
+  `build/delve-world-resume-hands-on.log`.
+- The autoreview helper failed before producing a review because its default
+  gpt-5.5 model is unsupported by the current account. The repository’s
+  code-review workflow supplied independent Standards and Spec reviews.
+  Accepted findings fixed: opaque basic boss-shot motion, cleared-room door
+  reconstruction, malformed/overdue golem rock phases, and an absent boss.
+  Focused continuation regressions were added; both axes rechecked cleanly.
+- Project-file lint and `git diff --check` passed.
+
+Default game flow/economy is still legacy. Remaining work: authoritative live
+account/player binding, performance/XP/damage event routing, atomic lifecycle
+capture and I/O retry UI, checkpoint/entry screens, and the one-time save reset.
+Do not label the complete Delve loop delivered at this checkpoint.
+
+The user’s keep-awake request is currently served by an owned renewing
+`caffeinate -disu -t 43200` loop, unified PTY session 9235, shell PID 96552
+(initial child 96559). `pmset -g assertions` verified display/system idle sleep
+prevention at 10:42 October 14. Current shell PID is in ignored
+`build/keep-awake.pid`; children change after each 12-hour renewal. Stop the
+owned shell and its current child on completion or explicit pause. No password
+settings were changed. Earlier assertions had exited between turns.
+
 ## Authorized implementation pass
 
 1. Finish progression/persistence verification and establish one authoritative

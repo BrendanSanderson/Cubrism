@@ -40,15 +40,28 @@ class RoomScene: GameScene {
     override var usesRestorableCombat: Bool { viewController?.usesRestorableCombat ?? false }
     var enemyPoints = 4
     var plannedRoom: DelveRoomPlan?
+    var pendingWorld: DelveWorldState?
+    private(set) var restoreError: Error?
     override func didMove(to view: SKView) {
         /* Setup your scene here */
         killedEnemies = 0
         entites.removeAll()
-        addEntities()
+        if pendingWorld != nil { addPlayer() }
+        else { addEntities() }
         addDoors()
+        if completed { unlockDoors() }
         world = viewController.world
         super.didMove(to: view)
-        Player.damagePlayer(0)
+        if let saved = pendingWorld, let plan = viewController.floorPlan {
+            pendingWorld = nil
+            do {
+                try DelveWorldBridge.restore(saved, plan: plan, room: self)
+                addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+            } catch {
+                isPaused = true
+                restoreError = error
+            }
+        } else { Player.damagePlayer(0) }
     }
     
     
@@ -63,6 +76,7 @@ class RoomScene: GameScene {
         for entity in entites { entity.retire() }
         entites.removeAll()
         liveMotions.removeAll()
+        liveFuses.removeAll()
         for door in doors { door.removeComponent(ofType: VisualComponent.self) }
         super.willMove(from: view)
     }
@@ -81,11 +95,12 @@ class RoomScene: GameScene {
 //        else if (startTime + 0.5 <= currentTime)
 //        {
         super.update(currentTime)
+        if usesRestorableCombat && isPaused { return }
         if (started == true)
         {
             for i in 0 ..< entites.count
             {
-                entites[i].act(currentTime)
+                entites[i].act(usesRestorableCombat ? time : currentTime)
             }
             Player.act()
         }
@@ -135,7 +150,7 @@ class RoomScene: GameScene {
                 let position = CGPoint(x: mob.position.x * Double(size.width), y: mob.position.y * Double(size.height))
                 entites.append(EnemyEntity(scene: self, eType: mob.kind.gameType,
                                           lev: mob.kind.isElite ? 5 : 1, elite: mob.kind.isElite,
-                                          position: position, spawnID: mob.id))
+                                          position: position, spawnID: mob.id, stats: combatStats?.enemies[mob.kind]))
             }
             enemies = entites.count
             return
@@ -176,7 +191,9 @@ class RoomScene: GameScene {
                 boss = dict[Int(arc4random_uniform(UInt32(dict.count)))] as? NSDictionary
             }
             //let boss = dict[2] as? NSDictionary
-            entites.append(BossEntity(scene: self, properties: boss!))
+            let kind = (boss?["name"] as? String).flatMap(DelveBossKind.init(rawValue:))
+            entites.append(BossEntity(scene: self, properties: boss!, stats: kind.flatMap { combatStats?.bosses[$0] },
+                                      combatID: plannedRoom?.id))
         }
         enemies = 1
     }

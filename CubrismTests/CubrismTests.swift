@@ -272,6 +272,257 @@ class CubrismTests: XCTestCase {
         XCTAssertEqual(bomber.explosions, Array(repeating: CGPoint(x: 100, y: 100), count: 4))
     }
 
+    @MainActor func testLiveEnemyWorldRoundTripPreservesAllVariantsAndBombRemainder() throws {
+        let previousScene = Player.currentScene, previousEntity = Player.entity
+        let previousController = Player.currentViewController
+        defer { Player.currentScene = previousScene; Player.entity = previousEntity; Player.currentViewController = previousController }
+        for kind in DelveEnemyKind.allCases {
+            let (plan, catalog) = combatBridgeFixture(enemy: kind)
+            let controller = try FloorViewController(plan: plan, restorableCombat: true)
+            controller.buildMaze()
+            let room = try XCTUnwrap(controller.room(at: CGPoint(x: 1, y: 0)))
+            controller.scene = room; Player.currentViewController = controller
+            room.startPosition = CGPoint(x: 120, y: 170)
+            room.addPlayer()
+            room.time = 100; room.started = true
+            guard case .combat(let spawns) = room.plannedRoom?.encounter else { throw DelveError.invalidTransition }
+            let enemy = EnemyEntity(scene: room, eType: kind.gameType, lev: kind.isElite ? 5 : 1, elite: kind.isElite,
+                                    position: CGPoint(x: 470, y: 210), spawnID: spawns[0].id, stats: catalog.enemies[kind])
+            room.entites = [enemy]
+            enemy.currentHealth *= 0.55
+            enemy.act(100)
+            room.advanceGameplayMotions(seconds: 0.3)
+            if kind == .bomber { room.advanceBombFuses(seconds: 4.4) }
+            let metrics = try DelveCombatMetrics(targetSeconds: 60, entryCapacity: 300)
+            let state = try DelveWorldBridge.capture(room: room, floorID: UUID(), completed: [plan.rooms[0].id], stats: catalog, metrics: metrics)
+            try state.validate(plan: plan)
+            let decoded = try JSONDecoder().decode(DelveWorldState.self, from: JSONEncoder().encode(state))
+            let restored = try restoreBridgeFixture(decoded, plan: plan)
+            defer { room.willMove(from: SKView()); restored.willMove(from: SKView()) }
+            let recaptured = try DelveWorldBridge.capture(room: restored, floorID: state.floorID,
+                completed: state.completedRoomIDs, stats: catalog, metrics: metrics)
+            XCTAssertEqual(recaptured, state, "Variant \(kind)")
+            var originalRandom = state.random
+            XCTAssertEqual(restored.combatRandom.next(), originalRandom.next())
+            restored.combatRandom = state.random
+            XCTAssertTrue(restored.isPaused)
+            restored.advanceBombFuses(seconds: 100)
+            XCTAssertEqual(restored.liveFuses.count, state.fuses.count)
+            if kind == .bomber {
+                XCTAssertEqual(state.fuses[0].events.nextIndex, 2)
+                restored.isPaused = false
+                let originalClock = restored.time
+                restored.update(9000)
+                XCTAssertEqual(restored.time, originalClock, "Wall time must not advance a just-resumed simulation")
+                let before = restored.children.compactMap { $0 as? ShotNode }.filter { $0.rangeDamage > 0 }.count
+                restored.advanceBombFuses(seconds: 0.3)
+                XCTAssertEqual(restored.liveFuses.values.first?.state.events.nextIndex, 3)
+                let after = restored.children.compactMap { $0 as? ShotNode }.filter { $0.rangeDamage > 0 }.count
+                XCTAssertEqual(after - before, 1, "Only the next burst may fire, with saved damage")
+                restored.advanceBombFuses(seconds: 0.4)
+                XCTAssertTrue(restored.liveFuses.isEmpty)
+            }
+        }
+    }
+
+    @MainActor func testLiveBossWorldRoundTripPreservesEveryAttackPhaseAndProjectileDamage() throws {
+        let previousScene = Player.currentScene, previousEntity = Player.entity
+        let previousController = Player.currentViewController
+        defer { Player.currentScene = previousScene; Player.entity = previousEntity; Player.currentViewController = previousController }
+        let phases: [(DelveBossKind, String)] = [(.dragon, "breathe"), (.dragon, "fireball"),
+            (.generator, "spray"), (.generator, "electric"), (.golem, "drop"), (.golem, "rocks")]
+        for (kind, attack, elapsed) in phases.flatMap({ phase in [0.4, 2.4, 4.4].map { (phase.0, phase.1, $0) } }) {
+            let (plan, catalog) = combatBridgeFixture(boss: kind)
+            let controller = try FloorViewController(plan: plan, restorableCombat: true)
+            controller.buildMaze()
+            let room = try XCTUnwrap(controller.room(at: CGPoint(x: 2, y: 0)))
+            controller.scene = room; Player.currentViewController = controller
+            room.startPosition = CGPoint(x: 450, y: 180); room.addPlayer()
+            room.time = 100; room.started = true; room.combatStats = catalog
+            let image = kind == .dragon ? "dragonBoss" : (kind == .generator ? "generatorBoss" : "golemBoss")
+            let boss = BossEntity(scene: room, properties: ["name": kind.rawValue, "image": image, "size": 100, "position": "center"],
+                                  stats: catalog.bosses[kind], combatID: plan.rooms.last!.id)
+            room.entites = [boss]; boss.currentHealth *= 0.6
+            boss.firstAttack = false; boss.lastShot = 100
+            boss.attack = try XCTUnwrap(boss.actions.first { DelveBehaviourBridge.capture($0)?.key == attack })
+            boss.attack.action(100)
+            for step in stride(from: 0.2, through: elapsed, by: 0.2) { boss.attack.action(100 + step) }
+            for action in boss.constantActions { action.action(100 + elapsed) }
+            if kind != .golem, !room.liveMotions.values.contains(where: { $0.state.movement.duration == 4 }) {
+                boss.component(ofType: BossShotTargetingComponent.self)?.fire()
+            }
+            room.time = 100 + elapsed
+            room.advanceGameplayMotions(seconds: 0.2)
+            let metrics = try DelveCombatMetrics(targetSeconds: 80, entryCapacity: 300)
+            let state = try DelveWorldBridge.capture(room: room, floorID: UUID(), completed: Set(plan.rooms.dropLast().map(\.id)), stats: catalog, metrics: metrics)
+            try state.validate(plan: plan)
+            let decoded = try JSONDecoder().decode(DelveWorldState.self, from: JSONEncoder().encode(state))
+            let restored = try restoreBridgeFixture(decoded, plan: plan)
+            defer { room.willMove(from: SKView()); restored.willMove(from: SKView()) }
+            let recaptured = try DelveWorldBridge.capture(room: restored, floorID: state.floorID,
+                completed: state.completedRoomIDs, stats: catalog, metrics: metrics)
+            XCTAssertEqual(recaptured, state, "Phase \(kind)/\(attack) at \(elapsed)s")
+            let restoredBoss = try XCTUnwrap(restored.entites.first as? BossEntity)
+            XCTAssertEqual(restoredBoss.currentHealth, 600)
+            XCTAssertEqual(DelveBehaviourBridge.capture(restoredBoss.attack)?.key, attack)
+            for saved in state.containers where saved.rangeDamage > 0 || saved.effectDamage > 0 {
+                let node = try XCTUnwrap(restored.children.compactMap { $0 as? ShotNode }.first { DelveSpriteBridge.id($0) == saved.id })
+                XCTAssertNil(node.bossShooter, "In-flight damage cannot require a living original boss")
+                XCTAssertEqual(node.rangeDamage, saved.rangeDamage)
+                XCTAssertEqual(node.effectDamage, saved.effectDamage)
+                XCTAssertEqual(node.removesContainerOnHit, saved.removesContainerOnHit)
+            }
+            if kind != .golem {
+                let savedShot = try XCTUnwrap(state.sprites.first { $0.movement?.movement.duration == 4 }, "Missing basic shot for \(kind)/\(attack)/\(elapsed)")
+                let managed = try XCTUnwrap(restored.liveMotions[savedShot.id])
+                let projectile = try XCTUnwrap(managed.node)
+                restored.isPaused = false
+                restored.advanceGameplayMotions(seconds: 0.1)
+                XCTAssertNotEqual(projectile.position, DelveSpriteBridge.cgPoint(savedShot.pose.position), "Basic boss shots must continue moving after reload")
+                XCTAssertEqual(managed.state.movement.elapsed, savedShot.movement!.movement.elapsed + 0.1, accuracy: 1e-10)
+                // Expiry is checked after attack-phase continuation below.
+            }
+            restored.isPaused = false
+            restored.time = state.clock + 0.25
+            restoredBoss.attack.action(restored.time)
+            if attack == "fireball" {
+                XCTAssertEqual(restored.entites.filter { ($0 as? EnemyEntity)?.type == "DragonFireball" }.count, 1)
+                restoredBoss.attack.action(restored.time + 0.15)
+                XCTAssertEqual(restored.entites.filter { ($0 as? EnemyEntity)?.type == "DragonFireball" }.count, 1)
+            }
+            if kind != .golem {
+                let id = try XCTUnwrap(state.sprites.first { $0.movement?.movement.duration == 4 }, "Missing basic shot for \(kind)/\(attack)/\(elapsed)").id
+                let projectile = try XCTUnwrap(restored.liveMotions[id]?.node)
+                restored.advanceGameplayMotions(seconds: 4)
+                XCTAssertNil(projectile.parent, "Basic boss shots must retain their remaining lifetime")
+            }
+        }
+    }
+
+    @MainActor func testFloorControllerResumesTheSavedRoomPausedWithoutDuplicateEnemiesOrRecovery() throws {
+        let previousScene = Player.currentScene, previousEntity = Player.entity
+        let previousController = Player.currentViewController
+        let previousHealth = Player.currentHealth, previousShield = Player.currentShield
+        let (plan, catalog) = combatBridgeFixture(enemy: .range)
+        let originalController = try FloorViewController(plan: plan, restorableCombat: true)
+        originalController.buildMaze()
+        let original = try XCTUnwrap(originalController.room(at: CGPoint(x: 1, y: 0)))
+        originalController.scene = original; Player.currentViewController = originalController
+        original.startPosition = CGPoint(x: 120, y: 170); original.addPlayer()
+        original.combatStats = catalog; original.addEnemies()
+        (original.entites[0] as? EnemyEntity)?.currentHealth = 550
+        original.time = 57; original.started = true
+        let metrics = try DelveCombatMetrics(targetSeconds: 60, entryCapacity: 300)
+        let saved = try DelveWorldBridge.capture(room: original, floorID: UUID(), completed: [plan.rooms[0].id], stats: catalog, metrics: metrics)
+        let resumed = try FloorViewController(plan: plan, restorableCombat: true, world: saved)
+        defer {
+            original.willMove(from: SKView()); resumed.skView.presentScene(nil)
+            Player.currentScene = previousScene; Player.entity = previousEntity; Player.currentViewController = previousController
+            Player.currentHealth = previousHealth; Player.currentShield = previousShield
+        }
+        Player.currentHealth = 61.25; Player.currentShield = 12.5
+        resumed.loadViewIfNeeded()
+        resumed.startNewRun()
+        let room = try XCTUnwrap(resumed.scene)
+        XCTAssertNil(room.restoreError)
+        XCTAssertEqual(room.plannedRoom?.id, saved.currentRoomID)
+        XCTAssertEqual(room.entites.count, 1)
+        XCTAssertEqual((room.entites[0] as? EnemyEntity)?.currentHealth, 550)
+        XCTAssertEqual(room.time, 57)
+        XCTAssertTrue(room.isPaused)
+        XCTAssertEqual(Player.currentHealth, 61.25)
+        XCTAssertEqual(Player.currentShield, 12.5)
+        XCTAssertEqual(room.gameplayMotionSnapshot.count, saved.sprites.compactMap(\.movement).count)
+        XCTAssertThrowsError(try DelveWorldBridge.restore(saved, plan: plan, room: room), "Restoring onto living actors must be rejected")
+    }
+
+    @MainActor func testDecodedOverduePartialRockAttackCleansUpWithoutIndexingMissingSprites() throws {
+        let previousScene = Player.currentScene, previousEntity = Player.entity
+        let previousController = Player.currentViewController
+        let (plan, catalog) = combatBridgeFixture(boss: .golem)
+        let controller = try FloorViewController(plan: plan, restorableCombat: true)
+        controller.buildMaze()
+        let room = try XCTUnwrap(controller.room(at: CGPoint(x: 2, y: 0)))
+        controller.scene = room; Player.currentViewController = controller
+        room.startPosition = CGPoint(x: 450, y: 180); room.addPlayer()
+        room.combatStats = catalog; room.addBoss()
+        let boss = try XCTUnwrap(room.entites[0] as? BossEntity)
+        boss.firstAttack = false
+        boss.attack = try XCTUnwrap(boss.component(ofType: BossGolemRockShoot.self))
+        boss.attack.action(100)
+        room.time = 106; room.started = true
+        let metrics = try DelveCombatMetrics(targetSeconds: 80, entryCapacity: 300)
+        let state = try DelveWorldBridge.capture(room: room, floorID: UUID(), completed: Set(plan.rooms.dropLast().map(\.id)), stats: catalog, metrics: metrics)
+        let decoded = try JSONDecoder().decode(DelveWorldState.self, from: JSONEncoder().encode(state))
+        let restored = try restoreBridgeFixture(decoded, plan: plan)
+        defer {
+            room.willMove(from: SKView()); restored.willMove(from: SKView())
+            Player.currentScene = previousScene; Player.entity = previousEntity; Player.currentViewController = previousController
+        }
+        let resumedBoss = try XCTUnwrap(restored.entites[0] as? BossEntity)
+        let rocks = try XCTUnwrap(resumedBoss.component(ofType: BossGolemRockShoot.self))
+        XCTAssertEqual(rocks.shots, 0)
+        XCTAssertTrue(rocks.sprites.isEmpty)
+        restored.isPaused = false
+        rocks.action(restored.time)
+        XCTAssertFalse(rocks.acting)
+        XCTAssertTrue(rocks.sprites.isEmpty)
+        XCTAssertTrue(rocks.angle.isEmpty)
+    }
+
+    @MainActor func testPreviouslyClearedRoomsRemainUnlockedWhenReenteredAfterReload() throws {
+        let previousScene = Player.currentScene, previousEntity = Player.entity
+        let previousController = Player.currentViewController
+        let (plan, catalog) = combatBridgeFixture(boss: .generator)
+        let originalController = try FloorViewController(plan: plan, restorableCombat: true)
+        originalController.buildMaze()
+        let original = try XCTUnwrap(originalController.room(at: CGPoint(x: 2, y: 0)))
+        originalController.scene = original; Player.currentViewController = originalController
+        original.startPosition = CGPoint(x: 120, y: 170); original.addPlayer()
+        original.combatStats = catalog; original.addBoss()
+        let metrics = try DelveCombatMetrics(targetSeconds: 80, entryCapacity: 300)
+        let state = try DelveWorldBridge.capture(room: original, floorID: UUID(), completed: Set(plan.rooms.dropLast().map(\.id)), stats: catalog, metrics: metrics)
+        let resumed = try FloorViewController(plan: plan, restorableCombat: true, world: state)
+        defer {
+            original.willMove(from: SKView()); resumed.skView.presentScene(nil)
+            Player.currentScene = previousScene; Player.entity = previousEntity; Player.currentViewController = previousController
+        }
+        resumed.loadViewIfNeeded(); resumed.startNewRun()
+        let cleared = try XCTUnwrap(resumed.room(at: CGPoint(x: 1, y: 0)))
+        resumed.scene.children.compactMap { $0 as? PopUpNode }.first?.play(nil)
+        resumed.scene = cleared
+        resumed.skView.presentScene(cleared)
+        XCTAssertTrue(cleared.completed)
+        XCTAssertTrue(cleared.entites.isEmpty)
+        XCTAssertEqual(cleared.doors.count, 2)
+        XCTAssertTrue(cleared.doors.allSatisfy { $0.sprite.physicsBody?.categoryBitMask == Constants.doorCategory }, "Both doors must remain traversable without another enemy kill")
+        XCTAssertTrue(cleared.doors.allSatisfy { $0.type == "completed" || $0.type == "bossCompleted" })
+    }
+
+    private func combatBridgeFixture(enemy: DelveEnemyKind = .range, boss: DelveBossKind = .dragon) -> (DelveFloorPlan, DelveFloorCombatStats) {
+        let spawn = DelveEnemySpawn(id: UUID(), kind: enemy, position: DelveSpawnPoint(x: 0.65, y: 0.6))
+        let plan = DelveFloorPlan(difficulty: 101, budget: enemy.points, groupingMultiplier: 0.25, density: .sparse,
+            rooms: [DelveRoomPlan(id: UUID(), position: DelveRoomPosition(x: 0, y: 0), encounter: .start),
+                    DelveRoomPlan(id: UUID(), position: DelveRoomPosition(x: 1, y: 0), encounter: .combat([spawn])),
+                    DelveRoomPlan(id: UUID(), position: DelveRoomPosition(x: 2, y: 0), encounter: .boss(boss))])
+        let stats = DelveEnemyStats(health: 1000, rangeAttackPower: 30.75, meleeAttackPower: 12.25, effectAttackPower: 0)
+        let bossStats = DelveEnemyStats(health: 1000, rangeAttackPower: 45.75, meleeAttackPower: 22.25, effectAttackPower: 10.5)
+        return (plan, DelveFloorCombatStats(enemies: Dictionary(uniqueKeysWithValues: DelveEnemyKind.allCases.map { ($0, stats) }),
+            bosses: Dictionary(uniqueKeysWithValues: DelveBossKind.allCases.map { ($0, bossStats) }), fireball: stats))
+    }
+
+    private func restoreBridgeFixture(_ state: DelveWorldState, plan: DelveFloorPlan) throws -> RoomScene {
+        let controller = try FloorViewController(plan: plan, restorableCombat: true)
+        controller.buildMaze()
+        let position = try XCTUnwrap(plan.rooms.first { $0.id == state.currentRoomID }).position
+        let room = try XCTUnwrap(controller.room(at: CGPoint(x: position.x, y: position.y)))
+        // The production controller owns its rooms. Keep that owner alive for this isolated fixture.
+        Player.currentViewController = controller; controller.scene = room
+        room.startPosition = CGPoint(x: 120, y: 170); room.addPlayer()
+        try DelveWorldBridge.restore(state, plan: plan, room: room)
+        return room
+    }
+
     func testRenderedArtPreservesFractionalRetinaLogicalSizes() {
         for size in [CGSize(width: 333.5, height: 333.5), CGSize(width: 100.0 / 3, height: 20.5), CGSize(width: 32, height: 32)] {
             let image = GameArt.render(size) { rect in UIColor.white.setFill(); UIRectFill(rect) }
@@ -363,7 +614,7 @@ class CubrismTests: XCTestCase {
         XCTAssertNotEqual(fireball.sprite.position, initialPosition, "The damaged projectile must still home toward the player")
         var previousCoverage = 0
         for remaining in [75, 50, 25] {
-            let targetHealth = fireball.health * remaining / 100
+            let targetHealth = fireball.health * Double(remaining) / 100
             fireball.damageEnemy(fireball.currentHealth - targetHealth)
             let name = "dragonDamaged\(remaining)"
             XCTAssertEqual(fireball.currentHealth, targetHealth)
@@ -1440,7 +1691,17 @@ class CubrismPlaythroughTests: XCTestCase {
         try playFloors(plan: plan)
     }
 
-    private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false) throws {
+    func testStoredWorldReloadThroughCombatAndDoors() throws {
+        var random = DelveRandom(seed: 854)
+        let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
+        let last = try XCTUnwrap(generated.rooms.last)
+        let rooms = Array(generated.rooms.dropLast()) + [DelveRoomPlan(id: last.id, position: last.position, encounter: .boss(.dragon))]
+        let plan = DelveFloorPlan(difficulty: generated.difficulty, budget: generated.budget,
+            groupingMultiplier: generated.groupingMultiplier, density: generated.density, rooms: rooms)
+        try playFloors(plan: plan, restorableCombat: true, reloadCombat: true)
+    }
+
+    private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false, reloadCombat: Bool = false) throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
         }
@@ -1464,7 +1725,7 @@ class CubrismPlaythroughTests: XCTestCase {
             guard Date() < acceptanceDeadline else { break }
             print("PLAYTHROUGH ATTEMPT floor=\(floor) attempt=\(attempt) playerLevel=\(Player.level)")
             let xpBeforeAttempt = Player.totalExp
-            let controller: FloorViewController
+            var controller: FloorViewController
             if let plan = plan { controller = try FloorViewController(plan: plan, restorableCombat: restorableCombat) }
             else { controller = FloorViewController(min: UInt32(floor + 3), max: UInt32(floor + 4), level: floor, world: 1) }
             window.rootViewController = controller
@@ -1473,6 +1734,7 @@ class CubrismPlaythroughTests: XCTestCase {
             controller.view.layoutIfNeeded()
             if controller.needsNewRun { controller.startNewRun() }
             let end = min(Date().addingTimeInterval(180), acceptanceDeadline)
+            var reloadedCombat = false, reloadedBoss = false
             var visited = Set<ObjectIdentifier>()
             var lastRoom: RoomScene?
             var lastReport = Date.distantPast
@@ -1487,6 +1749,49 @@ class CubrismPlaythroughTests: XCTestCase {
                     golemWaypoint = 0
                     golemWaypointStarted = Date()
                     print("PLAYTHROUGH floor=\(floor) room=\(room.name ?? "?") visited=\(visited.count)")
+                }
+                if reloadCombat, let plan = plan, !room.completed,
+                   (room.name == "room" && !reloadedCombat) || (room.name == "bossRoom" && !reloadedBoss) {
+                    let partialHealth = room.entites.contains {
+                        if let enemy = $0 as? EnemyEntity { return enemy.currentHealth > 0 && enemy.currentHealth < enemy.health }
+                        if let boss = $0 as? BossEntity { return boss.currentHealth > 0 && boss.currentHealth < boss.health * 0.7 }
+                        return false
+                    }
+                    if partialHealth && !room.gameplayMotionSnapshot.isEmpty {
+                        room.isPaused = true; Player.entity.stopControls()
+                        let catalog = legacyCombatCatalog(level: controller.globalLevel)
+                        let metrics = try DelveCombatMetrics(targetSeconds: 80, entryCapacity: Player.health + Player.shield)
+                        let completed = Set(controller.plannedRooms.values.filter(\.completed).compactMap { $0.plannedRoom?.id })
+                        let snapshot = try DelveWorldBridge.capture(room: room, floorID: UUID(), completed: completed, stats: catalog, metrics: metrics)
+                        try snapshot.validate(plan: plan)
+                        let data = try JSONEncoder().encode(snapshot)
+                        let restored = try JSONDecoder().decode(DelveWorldState.self, from: data)
+                        let hp = Player.currentHealth, shield = Player.currentShield
+                        let accumulatedXP = controller.levelExp
+                        let old = controller
+                        let next = try FloorViewController(plan: plan, restorableCombat: true, world: restored)
+                        old.skView.presentScene(nil)
+                        controller = next; window.rootViewController = next
+                        next.loadViewIfNeeded(); next.view.layoutIfNeeded()
+                        if next.needsNewRun { next.startNewRun() }
+                        next.levelExp = accumulatedXP
+                        let resumedRoom = try XCTUnwrap(next.scene)
+                        XCTAssertNil(resumedRoom.restoreError)
+                        RunLoop.main.run(until: Date().addingTimeInterval(1))
+                        XCTAssertTrue(resumedRoom.isPaused)
+                        XCTAssertEqual(Player.currentHealth, hp)
+                        XCTAssertEqual(Player.currentShield, shield)
+                        let check = try DelveWorldBridge.capture(room: resumedRoom, floorID: snapshot.floorID,
+                            completed: snapshot.completedRoomIDs, stats: catalog, metrics: metrics)
+                        XCTAssertEqual(check, snapshot, "A live SpriteKit floor must reload exactly before accepting input")
+                        print("PLAYTHROUGH RESTORED room=\(room.name ?? "?") hp=\(hp) shield=\(shield) actors=\(snapshot.actors.count) projectiles=\(snapshot.sprites.count)")
+                        let popup = try XCTUnwrap(resumedRoom.children.compactMap { $0 as? PopUpNode }.first)
+                        popup.play(nil)
+                        if room.name == "room" { reloadedCombat = true } else { reloadedBoss = true }
+                        visited = Set(next.plannedRooms.values.filter(\.completed).map(ObjectIdentifier.init))
+                        lastRoom = nil
+                        continue
+                    }
                 }
                 let player = Player.entity.sprite.position
                 let enemies: [CGPoint] = room.entites.compactMap {
@@ -1605,6 +1910,7 @@ class CubrismPlaythroughTests: XCTestCase {
             print("PLAYTHROUGH END floor=\(floor) alive=\(Player.alive) completed=\(controller.rewardsGranted) hp=\(Player.currentHealth)")
             guard controller.rewardsGranted else { continue }
             cleared = true
+            if reloadCombat { XCTAssertTrue(reloadedCombat); XCTAssertTrue(reloadedBoss) }
             XCTAssertEqual(Player.totalExp, xpBeforeAttempt + controller.levelExp, "Rewards must be credited exactly once")
             XCTAssertEqual(defaults.integer(forKey: "LevelCompleted"), floor)
             XCTAssertGreaterThan(controller.levelExp, 0)
@@ -1617,6 +1923,28 @@ class CubrismPlaythroughTests: XCTestCase {
             guard cleared else { return }
         }
     }
+    // This fixture isolates simulation persistence while the default economy is
+    // still legacy. It deliberately freezes the exact existing combat stats.
+    private func legacyCombatCatalog(level: Int) -> DelveFloorCombatStats {
+        func enemy(_ type: String, elite: Bool = false) -> DelveEnemyStats {
+            let key = type.prefix(1).lowercased() + String(type.dropFirst())
+            let values = EnemyEntity.enemyDict![key] as! [String: Any]
+            let scale = Constants.enemyMultiplier(level + (elite ? 4 : 0))
+            return DelveEnemyStats(health: Double(Int(Player.healthBase * (values["healthMult"] as! Double) * scale)),
+                rangeAttackPower: Double(Int(Player.attackPowerBase * (values["rangeAttackMult"] as! Double) * scale)),
+                meleeAttackPower: Double(Int(Player.attackPowerBase * (values["meleeAttackMult"] as! Double) * scale)), effectAttackPower: 0)
+        }
+        let enemies = Dictionary(uniqueKeysWithValues: DelveEnemyKind.allCases.map { ($0, enemy($0.gameType, elite: $0.isElite)) })
+        let bosses = Dictionary(uniqueKeysWithValues: DelveBossKind.allCases.map { kind -> (DelveBossKind, DelveEnemyStats) in
+            let values = BossEntity.bossDict![kind.rawValue] as! [String: Any]
+            return (kind, DelveEnemyStats(health: Double(values["healthBase"] as! Int) * Constants.bossHealthMultiplier(level),
+                rangeAttackPower: Double(Int(Double(values["rangeBase"] as! Int) * Constants.bossDamageMultiplier(level))),
+                meleeAttackPower: Double(Int(Double(values["meleeBase"] as! Int) * Constants.bossDamageMultiplier(level))),
+                effectAttackPower: Double(Int(Double(values["effectBase"] as! Int) * Constants.enemyMultiplier(level)))))
+        })
+        return DelveFloorCombatStats(enemies: enemies, bosses: bosses, fireball: enemy("DragonFireball"))
+    }
+
 }
 
 private class BombCallbackTestComponent: EnemyBombDroppingComponent {

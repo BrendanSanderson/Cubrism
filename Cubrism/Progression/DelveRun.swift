@@ -132,6 +132,7 @@ struct DelveFloorAttempt: Codable, Equatable {
     let entryRating: Double
     let difficulty: Double
     let plan: DelveFloorPlan
+    fileprivate(set) var world: DelveWorldState?
     fileprivate(set) var phase: DelveFloorPhase = .combat
     fileprivate(set) var awardedXPEvents: Set<UUID> = []
     fileprivate(set) var rewardIDs: [UUID] = []
@@ -236,6 +237,33 @@ struct DelveProgression: Codable, Equatable {
             throw DelveError.invalidValue("floor difficulty")
         }
         try run.resources.validateSnapshot()
+        if let world = run.floor.world {
+            guard run.floor.phase == .combat, world.floorID == run.floor.id else {
+                throw DelveError.invalidValue("combat world phase")
+            }
+            try world.validate(plan: run.floor.plan)
+            let stats = try characterStats()
+            guard run.resources.maxHealth == stats.maxHealth, run.resources.maxShield == stats.maxShield else {
+                throw DelveError.invalidValue("combat capacity")
+            }
+            var clearedKills = Set<UUID>(), eligibleKills = Set<UUID>()
+            for room in run.floor.plan.rooms {
+                guard case .combat(let spawns) = room.encounter else { continue }
+                let ids = Set(spawns.map(\.id))
+                if world.completedRoomIDs.contains(room.id) {
+                    clearedKills.formUnion(ids)
+                    eligibleKills.formUnion(ids)
+                } else if room.id == world.currentRoomID { eligibleKills.formUnion(ids) }
+            }
+            guard clearedKills.isSubset(of: run.floor.awardedXPEvents),
+                  run.floor.awardedXPEvents.isSubset(of: eligibleKills) else {
+                throw DelveError.invalidValue("combat room progress")
+            }
+            if case .combat(let spawns) = run.floor.plan.rooms.first(where: { $0.id == world.currentRoomID })?.encounter {
+                let remaining = Set(spawns.map(\.id)).subtracting(run.floor.awardedXPEvents)
+                guard Set(world.actors.map(\.id)) == remaining else { throw DelveError.invalidValue("combat kill state") }
+            }
+        }
         try Self.validateLoadout(run.bankedLoadout, items: bankedItems)
 
         // Each completed floor must still own its unbanked rewards. Use Double
@@ -277,6 +305,14 @@ struct DelveProgression: Codable, Equatable {
         guard let run = activeRun, run.floor.id == floorID else { throw DelveError.staleFloor }
         guard run.floor.phase == .combat else { throw DelveError.invalidTransition }
         return run
+    }
+
+    mutating func updateWorld(_ world: DelveWorldState, floorID: UUID) throws {
+        var run = try combatRun(floorID: floorID)
+        guard world.floorID == floorID else { throw DelveError.staleFloor }
+        try world.validate(plan: run.floor.plan)
+        run.floor.world = world
+        activeRun = run
     }
 
     // Gameplay uses these derived-stat operations. The resource-level methods
@@ -398,6 +434,7 @@ struct DelveProgression: Codable, Equatable {
         run.loot += loot
         run.floor.rewardIDs = loot.map(\.id)
         run.floor.phase = .checkpoint
+        run.floor.world = nil
         rating += gain
         activeRun = run
         return true

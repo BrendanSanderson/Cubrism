@@ -25,8 +25,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     var time = TimeInterval()
+    private var previousFrameTime: TimeInterval?
+    override var isPaused: Bool { didSet { previousFrameTime = nil } }
     var usesRestorableCombat: Bool { false }
     var liveMotions = [UUID: DelveLiveMotion]()
+    var liveFuses = [UUID: DelveLiveFuse]()
+    var combatRandom = DelveRandom(seed: UInt64.random(in: UInt64.min...UInt64.max))
+    var combatStats: DelveFloorCombatStats?
     var frameDuration: TimeInterval = 1.0 / 60.0
     // Authored enemy speeds are distances per 60-Hz frame. Use the same
     // elapsed-time conversion as player movement at every refresh rate.
@@ -68,9 +73,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         super.willMove(from: view)
     }
     override func update(_ currentTime: TimeInterval) {
-        frameDuration = time > 0 ? min(currentTime - time, 1.0 / 15.0) : 1.0 / 60.0
-        time = currentTime
+        if usesRestorableCombat {
+            guard !isPaused else { previousFrameTime = nil; frameDuration = 0; return }
+            frameDuration = previousFrameTime.map { min(max(0, currentTime - $0), 1.0 / 15.0) } ?? 0
+            previousFrameTime = currentTime
+            time += frameDuration
+        } else {
+            frameDuration = time > 0 ? min(currentTime - time, 1.0 / 15.0) : 1.0 / 60.0
+            time = currentTime
+        }
         advanceGameplayMotions(seconds: frameDuration)
+        advanceBombFuses(seconds: frameDuration)
         #if targetEnvironment(macCatalyst)
         applyKeyboardControls()
         #else
@@ -217,58 +230,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             (Player.currentScene as? RoomScene)?.viewController.goToRoomScene()
            // NSNotificationCenter.defaultCenter().postNotificationName("GoToRoomScene", object: self)
         }
-        else if (mask1 == Constants.playerCategory && (mask2 == Constants.enemyShotCategory || mask2 == Constants.enemyStatusShotCategory))
-        {
-            
-            if (secondBody.node?.parent != nil)
-            {
-                let node = secondBody.node?.parent as! ShotNode
-                if (node.shooter != nil)
-                {
-                
-                Player.damagePlayer(Double(node.shooter.rangeAttackPower))
+        else if mask1 == Constants.playerCategory &&
+                    [Constants.enemyShotCategory, Constants.enemyStatusShotCategory, Constants.enemyTrackingShotCategory].contains(mask2) {
+            if let sprite = secondBody.node, let shot = sprite.parent as? ShotNode {
+                // Bomb/sludge fields are handled by their timed components.
+                // Ordinary shots retain their damage after their shooter dies or a reload.
+                let damage = shot.type == "DragonBreathe" ? shot.effectDamage : shot.rangeDamage
+                if damage > 0 {
+                    Player.damagePlayer(damage)
                     Player.entity.lastHit = time
-                    secondBody.node?.removeFromParent()
+                    if shot.removesContainerOnHit { shot.removeFromParent() }
+                    else { sprite.removeFromParent() }
                 }
-        
-                else if (node.bossShooter != nil)
-                {
-                    if (node.type == "DragonBreathe")
-                    {
-                        Player.damagePlayer(Double(node.bossShooter.effectAttackPower))
-                        Player.entity.lastHit = time
-                        secondBody.node?.parent!.removeFromParent()
-                    }
-                    else
-                    {
-                        Player.damagePlayer(Double(node.bossShooter.rangeAttackPower))
-                        Player.entity.lastHit = time
-                        secondBody.node?.parent!.removeFromParent()
-                    }
-                }
-            
-            
-            }
-            NSLog("Shot Deleted")
-        }
-        else if (mask1 == Constants.playerCategory && mask2 == Constants.enemyTrackingShotCategory)
-        {
-            
-            let node = secondBody.node?.parent as! ShotNode
-            if (node.shooter != nil)
-            {
-                Player.damagePlayer(Double(node.shooter.rangeAttackPower))
-                Player.entity.lastHit = time
-                secondBody.node?.removeFromParent()
-            }
-            else if (node.bossShooter != nil)
-            {
-                Player.damagePlayer(Double(node.bossShooter.rangeAttackPower))
-                Player.entity.lastHit = time
-                secondBody.node?.removeFromParent()
             }
         }
-       
         else if (mask1 == Constants.playerCategory && mask2 == Constants.enemyCategory)
         {
             if secondBody.node != nil && secondBody.node?.parent != nil
@@ -322,7 +297,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if firstBody.node != nil && firstBody.node?.parent != nil
             {
                 let node = firstBody.node?.parent as! EnemyNode
-                node.Entity.damageEnemy(Int(Player.attackPower))
+                node.Entity.damageEnemy(usesRestorableCombat ? Player.attackPower : Double(Int(Player.attackPower)))
                 
             }
             secondBody.node?.parent!.removeFromParent()

@@ -36,14 +36,14 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 
 
 /// Prefer a distant attack point, with a bounded fallback for compact arenas.
-func bossAttackPosition(in size: CGSize, awayFrom origin: CGPoint, padding: CGSize) -> CGPoint {
+func bossAttackPosition(in size: CGSize, awayFrom origin: CGPoint, padding: CGSize, scene: GameScene? = nil) -> CGPoint {
     let width = max(0, size.width * 0.9 - padding.width * 2)
     let height = max(0, size.height * 0.8 - padding.height * 2)
     var best = CGPoint(x: size.width / 2, y: size.height / 2)
     var bestDistance: CGFloat = -1
     for _ in 0..<64 {
-        let candidate = CGPoint(x: size.width / 2 + CGFloat.random(in: -width/2...width/2),
-                                y: size.height / 2 + CGFloat.random(in: -height/2...height/2))
+        let candidate = CGPoint(x: size.width / 2 + (scene?.randomCoordinate(in: -width/2...width/2) ?? CGFloat.random(in: -width/2...width/2)),
+                                y: size.height / 2 + (scene?.randomCoordinate(in: -height/2...height/2) ?? CGFloat.random(in: -height/2...height/2)))
         let distance = hypot(candidate.x - origin.x, candidate.y - origin.y)
         if distance > 100 { return candidate }
         if distance > bestDistance { best = candidate; bestDistance = distance }
@@ -73,7 +73,7 @@ class BossSprayComponent: ActionComponent {
         {
             acting = true
             shots = 0
-            angle =  2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)
+            angle =  2.0 * Double.pi * (scene.randomUnit())
         }
         else if (lastShot + 0.1 <= currentTime && shots < 32)
         {
@@ -156,7 +156,7 @@ class BossElectricFieldComponent: ActionComponent {
             exploded = false
             for _ in 0 ..< 36
             {
-                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size))
+                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size, scene: scene))
 
             }
             lastShot = currentTime
@@ -320,22 +320,13 @@ class BossShotTargetingComponent: ActionComponent {
     func followPath(_ sprite: SKSpriteNode)
     {
         playerSprite = Player.entity.sprite
-        var sequence = [SKAction]()
-        let angle = Double(atan((playerSprite.position.y - enemySprite.position.y)/(playerSprite.position.x - enemySprite.position.x)))
+        let angle = Double(atan2(playerSprite.position.y - enemySprite.position.y, playerSprite.position.x - enemySprite.position.x))
         var moveTo = CGPoint()
         moveTo.x = CGFloat(cos(angle) * 1000.0)
         moveTo.y = CGFloat(sin(angle) * 1000.0)
-        if (playerSprite.position.x - enemySprite.position.x < 0)
-        {
-            moveTo.x = 0 - CGFloat(cos(angle) * 1000.0)
-            moveTo.y = 0 - CGFloat(sin(angle) * 1000.0)
-        }
-        //let distance = Double(hypotf(abs(Float(playerSprite.position.x) - Float(enemySprite.position.x)), abs(Float(playerSprite.position.y) - Float(enemySprite.position.y))))
-        let action = SKAction.sequence([SKAction.move(to: CGPoint(x: (enemySprite.position.x + moveTo.x), y: (enemySprite.position.y + moveTo.y)), duration: 4), SKAction.wait(forDuration: 3.0/60.0), SKAction.removeFromParent()])
-        
-        sequence += [action]
-        
-        sprite.run(SKAction.sequence(sequence))
+        scene.moveGameplayNode(sprite, to: CGPoint(x: enemySprite.position.x + moveTo.x,
+                                                   y: enemySprite.position.y + moveTo.y),
+                               duration: 4, linger: 3.0/60.0)
     }
     
 }
@@ -405,7 +396,7 @@ class BossDragonBreatheComponent: ActionComponent {
         let node = ShotNode()
         node.bossShooter = shooter
         node.type = "DragonBreathe"
-        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(scene.randomInteger(upperBound: UInt32(4)))))
         node.addChild(sprite)
         node.zPosition = shooter.node.zPosition - 1
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
@@ -444,7 +435,7 @@ class BossDragonBreatheComponent: ActionComponent {
             {
                 moveTo.x = scene.size.width * 0.30
             }
-            moveTo.y = (CGFloat(arc4random()).truncatingRemainder(dividingBy: scene.size.height) * 0.1) + scene.size.height * 0.45
+            moveTo.y = (CGFloat(scene.randomInteger(upperBound: UInt32.max)).truncatingRemainder(dividingBy: scene.size.height) * 0.1) + scene.size.height * 0.45
         }
         else
         {
@@ -456,7 +447,7 @@ class BossDragonBreatheComponent: ActionComponent {
             {
                 moveTo.x = scene.size.width * 0.95
             }
-            moveTo.y = (CGFloat(arc4random()).truncatingRemainder(dividingBy: scene.size.height) * 0.9) + scene.size.height * 0.05
+            moveTo.y = (CGFloat(scene.randomInteger(upperBound: UInt32.max)).truncatingRemainder(dividingBy: scene.size.height) * 0.9) + scene.size.height * 0.05
         }
         scene.moveGameplayNode(sprite, to: moveTo, duration: 0.5, linger: 3.0/60.0)
         if !scene.usesRestorableCombat {
@@ -471,6 +462,7 @@ class BossDragonFireballComponent: ActionComponent {
     var bossSprite: SKSpriteNode!
     var shooter: BossEntity!
     var lastShot: TimeInterval = 0
+    var fired = false
     var dragonMouthOpen = [SKTexture]()
     var dragonMouthClose = [SKTexture]()
     var shootFireBall: SKAction!
@@ -485,7 +477,10 @@ class BossDragonFireballComponent: ActionComponent {
         }
         super.init()
         let action1 = (SKAction.animate(with: dragonMouthOpen, timePerFrame: 0.125))
-        let action2 = SKAction.run({ [weak self] in self?.fire() })
+        let action2 = SKAction.run { [weak self] in
+            guard let self = self, !self.scene.usesRestorableCombat else { return }
+            self.fire()
+        }
         let action3 = (SKAction.animate(with: dragonMouthClose, timePerFrame: 0.125))
         shootFireBall = SKAction.sequence([action1, action2, action3])
         
@@ -498,10 +493,14 @@ class BossDragonFireballComponent: ActionComponent {
         if (acting == false)
         {
             acting = true
+            fired = false
             lastShot = currentTime
             bossSprite.run(shootFireBall)
         }
-        else if (lastShot + 5 <= currentTime)
+        else if scene.usesRestorableCombat && !fired && lastShot + 0.5 <= currentTime {
+            fire()
+        }
+        if lastShot + 5 <= currentTime && acting
         {
             acting = false
         }
@@ -509,7 +508,8 @@ class BossDragonFireballComponent: ActionComponent {
     }
     func fire()
     {
-        let shot = EnemyEntity(scene: scene, eType: "DragonFireball", lev: 1, elite: false)
+        fired = true
+        let shot = EnemyEntity(scene: scene, eType: "DragonFireball", lev: 1, elite: false, stats: scene.combatStats?.fireball)
         shot.node.zPosition = shooter.node.zPosition - 1
         (scene as! RoomScene).entites.append(shot)
         
@@ -689,18 +689,18 @@ class BossGolemRockShoot: ActionComponent {
             acting = true
             shots = 0
             startTime = currentTime
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.angle.append(CGFloat(2.0 * Double.pi * (Double(arc4random()) / 0xFFFFFFFF)))
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
-            self.velocity.append((CGFloat(arc4random_uniform(UInt32(16))) + 8.0)/4)
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.angle.append(CGFloat(2.0 * Double.pi * (scene.randomUnit())))
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
+            self.velocity.append((CGFloat(scene.randomInteger(upperBound: UInt32(16))) + 8.0)/4)
         }
         else if (lastShot + 0.2 <= currentTime && shots < 6)
         {
@@ -764,12 +764,7 @@ class BossGolemRockShoot: ActionComponent {
         }
         if (startTime + 5 <= currentTime)
         {
-            sprites[0].parent?.removeFromParent()
-            sprites[1].parent?.removeFromParent()
-            sprites[2].parent?.removeFromParent()
-            sprites[3].parent?.removeFromParent()
-            sprites[4].parent?.removeFromParent()
-            sprites[5].parent?.removeFromParent()
+            for sprite in sprites { sprite.parent?.removeFromParent() }
             self.angle.removeAll()
             self.velocity.removeAll()
             self.sprites.removeAll()
@@ -782,6 +777,7 @@ class BossGolemRockShoot: ActionComponent {
         let node = ShotNode()
         node.bossShooter = shooter
         let sprite = SKSpriteNode(texture: GameArt.texture( "bossGolemRock"), size: Player.entity.sprite.size)
+        sprite.userData = ["delveArtName": "bossGolemRock"]
         node.addChild(sprite)
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.allowsRotation = false
@@ -948,7 +944,7 @@ class GolemDropComponent: ActionComponent {
             landed = false
             for _ in 0 ..< 36
             {
-                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size))
+                points.append(bossAttackPosition(in: scene.size, awayFrom: bossSprite.position, padding: Player.entity.sprite.size, scene: scene))
                 
             }
             lastShot = currentTime

@@ -30,12 +30,18 @@ class FloorViewController: UIViewController {
     private(set) var floorPlan: DelveFloorPlan?
     private(set) var usesRestorableCombat = false
     private(set) var plannedRooms = [DelveRoomPosition: RoomScene]()
+    private(set) var initialWorld: DelveWorldState?
 
-    convenience init(plan: DelveFloorPlan, restorableCombat: Bool = false) throws {
+    convenience init(plan: DelveFloorPlan, restorableCombat: Bool = false, world: DelveWorldState? = nil) throws {
         try plan.validate()
+        if let world = world {
+            guard restorableCombat else { throw DelveError.invalidTransition }
+            try world.validate(plan: plan)
+        }
         self.init()
         floorPlan = plan
         usesRestorableCombat = restorableCombat
+        initialWorld = world
     }
     
     convenience init(min: UInt32, max: UInt32, level:Int, world:Int)
@@ -92,13 +98,17 @@ class FloorViewController: UIViewController {
         levelExp = 0
         rewardsGranted = false
         Player.currentViewController = self
-        Player.updatePlayer()
+        if initialWorld == nil { Player.updatePlayer() }
         
         view.setNeedsLayout()
         view.layoutIfNeeded()
         skView.bounds = CGRect(origin: .zero, size: arenaSize)
         buildMaze()
+        if let world = initialWorld, let room = floorPlan?.rooms.first(where: { $0.id == world.currentRoomID }) {
+            start = CGPoint(x: room.position.x, y: room.position.y)
+        }
         scene = room(at: start)
+        scene.pendingWorld = initialWorld
         scene.scaleMode = .aspectFit
         scene.startPosition = CGPoint (x: arenaSize.width/2, y: arenaSize.height/2)
         skView.presentScene(scene)
@@ -224,6 +234,8 @@ class FloorViewController: UIViewController {
             let scene = RoomScene(size: arenaSize)
             scene.viewController = self
             scene.plannedRoom = room
+            scene.combatStats = initialWorld?.stats
+            scene.completed = initialWorld?.completedRoomIDs.contains(room.id) ?? (room.encounter == .start)
             switch room.encounter {
             case .start: scene.name = "startRoom"
             case .combat: scene.name = "room"
@@ -278,6 +290,11 @@ class FloorViewController: UIViewController {
               let newScene = room(at: door.pointer) else { return }
         newScene.scaleMode = .aspectFit
         newScene.startPosition = doorStart(door.direction, position: door.position)
+        if usesRestorableCombat {
+            newScene.time = scene.time
+            newScene.combatRandom = scene.combatRandom
+            newScene.combatStats = scene.combatStats
+        }
         #if targetEnvironment(macCatalyst)
         scene.resetKeyboardControls()
         #endif

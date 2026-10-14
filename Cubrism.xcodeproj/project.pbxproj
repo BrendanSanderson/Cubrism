@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE1FE000000000000000001B /* DelveWorldBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000001C /* DelveWorldBridge.swift */; };
+		DE1FE0000000000000000019 /* DelveActorBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000001A /* DelveActorBridge.swift */; };
+		DE1FE0000000000000000017 /* DelveBehaviourBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000018 /* DelveBehaviourBridge.swift */; };
+		DE1FE0000000000000000015 /* DelveSpriteBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000016 /* DelveSpriteBridge.swift */; };
+		DE1FE0000000000000000013 /* DelveWorldState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000014 /* DelveWorldState.swift */; };
 		DE1FE0000000000000000011 /* DelveGameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000012 /* DelveGameActions.swift */; };
 		DE1FE000000000000000000F /* DelveCombatState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000010 /* DelveCombatState.swift */; };
 		DE1FE000000000000000000D /* DelveCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000000E /* DelveCalibration.swift */; };
@@ -83,6 +88,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DE1FE000000000000000001C /* DelveWorldBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveWorldBridge.swift; path = DelveWorldBridge.swift; sourceTree = "<group>"; };
+		DE1FE000000000000000001A /* DelveActorBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveActorBridge.swift; path = DelveActorBridge.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000018 /* DelveBehaviourBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveBehaviourBridge.swift; path = DelveBehaviourBridge.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000016 /* DelveSpriteBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveSpriteBridge.swift; path = DelveSpriteBridge.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000014 /* DelveWorldState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveWorldState.swift; path = Progression/DelveWorldState.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000012 /* DelveGameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveGameActions.swift; path = DelveGameActions.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000010 /* DelveCombatState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveCombatState.swift; path = Progression/DelveCombatState.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000000E /* DelveCalibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveCalibration.swift; path = Progression/DelveCalibration.swift; sourceTree = "<group>"; };
@@ -309,6 +319,11 @@
 				DE1FE000000000000000000A /* DelveFloorPlan.swift */,
 				DE1FE000000000000000000C /* DelveBalance.swift */,
 				DE1FE000000000000000000E /* DelveCalibration.swift */,
+				DE1FE000000000000000001C /* DelveWorldBridge.swift */,
+				DE1FE000000000000000001A /* DelveActorBridge.swift */,
+				DE1FE0000000000000000018 /* DelveBehaviourBridge.swift */,
+				DE1FE0000000000000000016 /* DelveSpriteBridge.swift */,
+				DE1FE0000000000000000014 /* DelveWorldState.swift */,
 				DE1FE0000000000000000012 /* DelveGameActions.swift */,
 				DE1FE0000000000000000010 /* DelveCombatState.swift */,
 				DE1FE0000000000000000002 /* DelveRules.swift */,
@@ -467,6 +482,11 @@
 				DE1FE0000000000000000009 /* DelveFloorPlan.swift in Sources */,
 				DE1FE000000000000000000B /* DelveBalance.swift in Sources */,
 				DE1FE000000000000000000D /* DelveCalibration.swift in Sources */,
+				DE1FE000000000000000001B /* DelveWorldBridge.swift in Sources */,
+				DE1FE0000000000000000019 /* DelveActorBridge.swift in Sources */,
+				DE1FE0000000000000000017 /* DelveBehaviourBridge.swift in Sources */,
+				DE1FE0000000000000000015 /* DelveSpriteBridge.swift in Sources */,
+				DE1FE0000000000000000013 /* DelveWorldState.swift in Sources */,
 				DE1FE0000000000000000011 /* DelveGameActions.swift in Sources */,
 				DE1FE000000000000000000F /* DelveCombatState.swift in Sources */,
 				DE1FE0000000000000000001 /* DelveRules.swift in Sources */,

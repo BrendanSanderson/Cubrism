@@ -63,8 +63,8 @@ class EnemyRandomMovementComponent: ActionComponent {
     {
             if (moving == false)
             {
-                moveTo.x = CGFloat(arc4random_uniform(UInt32((distanceMultiplier * scene.size.width * 0.9) - enemySprite.frame.width))) + ((1.0 -  (distanceMultiplier * 0.9))/2.0  * scene.size.width) + enemySprite.frame.width/2.0
-            moveTo.y = CGFloat(arc4random_uniform(UInt32((distanceMultiplier * scene.size.height * 0.8) - enemySprite.frame.height))) + ((1.0 - (distanceMultiplier * 0.8))/2.0 * scene.size.height) + enemySprite.frame.height/2.0
+                moveTo.x = CGFloat(scene.randomInteger(upperBound: UInt32((distanceMultiplier * scene.size.width * 0.9) - enemySprite.frame.width))) + ((1.0 -  (distanceMultiplier * 0.9))/2.0  * scene.size.width) + enemySprite.frame.width/2.0
+            moveTo.y = CGFloat(scene.randomInteger(upperBound: UInt32((distanceMultiplier * scene.size.height * 0.8) - enemySprite.frame.height))) + ((1.0 - (distanceMultiplier * 0.8))/2.0 * scene.size.height) + enemySprite.frame.height/2.0
                 moving = true
             }
             let angle = abs(Double(atan(Double(moveTo.y - enemySprite.position.y)/Double(moveTo.x - enemySprite.position.x))))
@@ -248,7 +248,7 @@ class EnemyShotTrackingComponent: ActionComponent {
     var shooter = EnemyEntity()
     var bullet: SKSpriteNode!
     var shotLength: TimeInterval = 5
-    let node = ShotNode()
+    var node = ShotNode()
     var lastShotTime: TimeInterval = 0
     var shotCooldownSeconds = 6.0
     var playerSprite: SKSpriteNode!
@@ -266,6 +266,7 @@ class EnemyShotTrackingComponent: ActionComponent {
         shotCooldownSeconds = (componentDict["shotCooldown"] as? TimeInterval)!
         shotLength = (componentDict["shotLength"] as? TimeInterval)!
         speed = (componentDict["speed"] as? Double)!
+        if scene.usesRestorableCombat { lastShotTime = scene.time - shotCooldownSeconds - 0.000001 }
         scene.addChild(node)
         
         
@@ -281,17 +282,19 @@ class EnemyShotTrackingComponent: ActionComponent {
             self.fire()
             lastShotTime = currentTime
         }
-        else if (lastShotTime + shotLength >= currentTime)
+        else if lastShotTime + shotLength >= currentTime && bullet != nil
         {
             self.followPath()
         }
-        else if (bullet.parent != nil)
+        else if bullet?.parent != nil
         {
             bullet.removeFromParent()
         }
     }
     func fire()
     {
+        if node.parent == nil { scene.addChild(node) }
+        if bullet == nil { bullet = GameArt.sprite("enemyTrackingShot") }
         node.addChild(bullet)
         bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
         bullet.physicsBody?.allowsRotation = false
@@ -370,7 +373,7 @@ class EnemyDashMovementComponent: ActionComponent {
         {
             if (Player.entity.sprite.position.x <= scene.size.width * 0.2 || Player.entity.sprite.position.x >= scene.size.width * 0.8 || Player.entity.sprite.position.y <= scene.size.height * 0.2 || Player.entity.sprite.position.y >= scene.size.height * 0.8)
             {
-                let go = Int(arc4random_uniform(UInt32(4)))
+                let go = Int(scene.randomInteger(upperBound: UInt32(4)))
                 if (go == 0)
                 {
                     moveTo = Player.entity.sprite.position
@@ -380,8 +383,8 @@ class EnemyDashMovementComponent: ActionComponent {
             
             while (moving == false)
             {
-                moveTo.x = CGFloat(arc4random_uniform(UInt32(scene.size.width * 0.8 - enemySprite.frame.width))) + scene.size.width * 0.1 + enemySprite.frame.width
-                moveTo.y = CGFloat(arc4random_uniform(UInt32(scene.size.height * 0.9 - enemySprite.frame.height))) + scene.size.height * 0.05 + enemySprite.frame.height
+                moveTo.x = CGFloat(scene.randomInteger(upperBound: UInt32(scene.size.width * 0.8 - enemySprite.frame.width))) + scene.size.width * 0.1 + enemySprite.frame.width
+                moveTo.y = CGFloat(scene.randomInteger(upperBound: UInt32(scene.size.height * 0.9 - enemySprite.frame.height))) + scene.size.height * 0.05 + enemySprite.frame.height
                 let distance = hypotf(abs(Float(moveTo.x) - Float(enemySprite.position.x)), abs(Float(moveTo.y) - Float(enemySprite.position.y)))
                 if (distance > 300)
                 {
@@ -470,7 +473,7 @@ class EnemyShotTrippleComponent: ActionComponent {
     {
         if (shots == 0 && lastShotTime + shotCooldownSeconds <= currentTime) {
             lastShotTime = currentTime
-            direction = Int(arc4random_uniform(UInt32(4)))
+            direction = Int(scene.randomInteger(upperBound: UInt32(4)))
             self.fire()
             shots += 1
         }
@@ -599,6 +602,10 @@ class EnemyBombDroppingComponent: ActionComponent {
         bomb.physicsBody?.collisionBitMask = Constants.wallCategory
         bomb.position = enemySprite.position
         nodes.append(bomb)
+        if scene.usesRestorableCombat {
+            scene.armBomb(bomb, owner: shooter)
+            return
+        }
         let textures = [GameArt.texture( "bombLit1"), GameArt.texture( "bombLit2"), GameArt.texture( "bombLit3")]
         let changeSkin = SKAction.animate(with: textures, timePerFrame: 1)
         bomb.run(changeSkin)
@@ -634,7 +641,7 @@ class EnemyBombDroppingComponent: ActionComponent {
     func fire(_ start: CGPoint, node: ShotNode)
     {
         
-        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "bossDragonShot%i", Int(scene.randomInteger(upperBound: UInt32(4)))))
         node.addChild(sprite)
         sprite.position = start
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
@@ -774,7 +781,7 @@ class EnemyRingShotComponent: ActionComponent {
         let ringNode = ShotNode()
         ringNode.shooter = shooter
         var moveTos = [CGPoint]()
-        let startAngle = Float(Float(arc4random()) / Float(UINT32_MAX)) * Float(2*Double.pi/Double(shotNumber))
+        let startAngle = Float(Float(scene.randomUnit())) * Float(2*Double.pi/Double(shotNumber))
         for i in 0 ..< shotNumber
         {
             let angle = Float(Double(i) * 2*Double.pi/Double(shotNumber)) + startAngle
@@ -792,7 +799,7 @@ class EnemyRingShotComponent: ActionComponent {
     func fire(_ node: ShotNode)
     {
         
-        let sprite = GameArt.sprite(String(format: "enemyRingShot", Int(arc4random_uniform(UInt32(4)))))
+        let sprite = GameArt.sprite(String(format: "enemyRingShot", Int(scene.randomInteger(upperBound: UInt32(4)))))
         node.addChild(sprite)
         sprite.position = enemySprite.position
         sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)

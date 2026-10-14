@@ -16,14 +16,16 @@ class EnemyEntity: DynamicEntity {
     var sprite = SKSpriteNode()
     var actions = [ActionComponent]()
     var type = String()
-    var health = 50
-    var currentHealth = 50
+    var health = 50.0
+    var currentHealth = 50.0
     var statusNode = SKSpriteNode()
-    var meleeAttackPower = 25
-    var rangeAttackPower = 25
+    var meleeAttackPower = 25.0
+    var rangeAttackPower = 25.0
     var experience = 5.0
     var level = 1
     var delveSpawnID: UUID?
+    var combatID = UUID()
+    var isElite = false
     static var enemyDict = Constants.jsonDict?["enemy"] as? [String: Any]
     var componentDict: [String:Any]
     static func refreshEnemyDictionary() {
@@ -40,7 +42,7 @@ class EnemyEntity: DynamicEntity {
     }
     
     convenience init(scene: GameScene, eType: String, lev: Int, elite: Bool,
-                     position: CGPoint? = nil, spawnID: UUID? = nil)
+                     position: CGPoint? = nil, spawnID: UUID? = nil, stats: DelveEnemyStats? = nil)
     {
         self.init()
         self.scene = scene
@@ -48,9 +50,17 @@ class EnemyEntity: DynamicEntity {
         node.entity = self
         level = (scene as! RoomScene).viewController.globalLevel + lev - 1
         delveSpawnID = spawnID
+        combatID = spawnID ?? combatID
+        isElite = elite
         setUpType(eType, elite:elite)
+        if let stats = stats {
+            health = stats.health
+            currentHealth = stats.health
+            rangeAttackPower = stats.rangeAttackPower
+            meleeAttackPower = stats.meleeAttackPower
+        }
         if let position = position { sprite.position = position }
-        if (self.sprite.position == CGPoint())
+        if position == nil && self.sprite.position == CGPoint()
         {
             if (type == "RangeRing" || type == "RangeTripple")
             {
@@ -190,10 +200,10 @@ class EnemyEntity: DynamicEntity {
         {
             self.sprite.size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
         }
-        health = Int(Player.healthBase * healthMultiplier * Constants.enemyMultiplier(level))
+        health = Double(Int(Player.healthBase * healthMultiplier * Constants.enemyMultiplier(level)))
         currentHealth = health
-        rangeAttackPower = Int(Player.attackPowerBase * rangeAttackMultiplier * Constants.enemyMultiplier(level))
-        meleeAttackPower = Int(Player.attackPowerBase * meleeAttackMultiplier * Constants.enemyMultiplier(level))
+        rangeAttackPower = Double(Int(Player.attackPowerBase * rangeAttackMultiplier * Constants.enemyMultiplier(level)))
+        meleeAttackPower = Double(Int(Player.attackPowerBase * meleeAttackMultiplier * Constants.enemyMultiplier(level)))
         experience = (experience * Constants.expMultiplier(level))
     }
     
@@ -217,8 +227,8 @@ class EnemyEntity: DynamicEntity {
         var best = center
         var bestDistance: CGFloat = -1
         for _ in 0..<64 {
-            let candidate = CGPoint(x: center.x + CGFloat.random(in: -width/2...width/2),
-                                    y: center.y + CGFloat.random(in: -height/2...height/2))
+            let candidate = CGPoint(x: center.x + scene.randomCoordinate(in: -width/2...width/2),
+                                    y: center.y + scene.randomCoordinate(in: -height/2...height/2))
             let distance = hypot(candidate.x - position.x, candidate.y - position.y)
             if distance > minimumDistance { return candidate }
             if distance > bestDistance { best = candidate; bestDistance = distance }
@@ -254,13 +264,14 @@ class EnemyEntity: DynamicEntity {
     }
 
     override func retire() {
+        scene.cancelBombs(ownerID: combatID)
         component(ofType: EnemyBombDroppingComponent.self)?.nodes.forEach { $0.removeAllActions() }
         actions.removeAll()
         node.entity = nil
         super.retire()
     }
     
-    func damageEnemy (_ damage: Int)
+    func damageEnemy (_ damage: Double)
     {
         guard currentHealth > 0 else { return }
         node.Entity.currentHealth -= damage
@@ -290,6 +301,7 @@ class EnemyEntity: DynamicEntity {
         }
         else if (node.Entity.currentHealth <= 0)
         {
+            scene.cancelBombs(ownerID: combatID)
             sprite.physicsBody = nil
             self.removeComponent(ofType: VisualComponent.self)
             if (type == "Melee" || type == "Suicide" || type == "DragonFireball")
@@ -312,7 +324,7 @@ class EnemyEntity: DynamicEntity {
             }
             else if (type == "RangeTracking")
             {
-                self.component(ofType: EnemyShotTrackingComponent.self)?.bullet.removeFromParent()
+                self.component(ofType: EnemyShotTrackingComponent.self)?.bullet?.removeFromParent()
                 self.removeComponent(ofType: EnemyRandomMovementComponent.self)
                 self.removeComponent(ofType: EnemyShotTrackingComponent.self)
             }

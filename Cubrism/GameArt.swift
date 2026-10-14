@@ -63,7 +63,9 @@ enum GameArt {
         return result
     }
     static func sprite(_ name: String) -> SKSpriteNode {
-        SKSpriteNode(texture: texture(name))
+        let sprite = SKSpriteNode(texture: texture(name))
+        sprite.userData = ["delveArtName": name]
+        return sprite
     }
     static func image(_ name: String) -> UIImage? {
         if let cached = images[name] { return cached }

@@ -38,6 +38,12 @@ class ShotNode: SKNode {
     var type = String()
     var shooter: EnemyEntity!
     var bossShooter: BossEntity!
+    var savedRangeDamage: Double?
+    var savedRemovesContainerOnHit: Bool?
+    var removesContainerOnHit: Bool { savedRemovesContainerOnHit ?? (bossShooter != nil || type == "DragonBreathe") }
+    var savedEffectDamage: Double?
+    var rangeDamage: Double { savedRangeDamage ?? shooter?.rangeAttackPower ?? bossShooter?.rangeAttackPower ?? 0 }
+    var effectDamage: Double { savedEffectDamage ?? bossShooter?.effectAttackPower ?? shooter?.rangeAttackPower ?? 0 }
     override init() {
         super.init()
     }
