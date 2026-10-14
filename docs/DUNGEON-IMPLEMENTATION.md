@@ -1,10 +1,11 @@
 # Delve implementation and verification
 
-October 12, 2026. The complete implementation pass has resumed. Foundation and
-progression persistence are implemented locally; the existing game flow is
-still active. The user requires programmatic checks, actual game playtests,
-and review at every serious checkpoint. Do not advance past a checkpoint
-without reporting and resolving its missing verification.
+October 14, 2026. The default app flow now uses Delve progression, stored
+floors and full combat snapshots, checkpoint equipment and Continue/Extract,
+XP/loot settlements, exact save retry, and one-time legacy reset. The final
+UI-bound live climb and acceptance checks have passed. The sections
+below retain the implementation/checkpoint history; the latest acceptance
+record is at the end. The default branch has not been changed.
 
 ## Checkpoint
 
@@ -742,3 +743,42 @@ bootstrap scenarios passed in `build/results/delve-entry-bootstrap-20261014-03.x
 Both review axes rechecked the input, HUD, presentation and retry fixes clean.
 The full UI-bound live combat chain and final acceptance remain the next pass.
 No merge or release has been performed.
+
+## Final acceptance: October 14
+
+The complete authorized implementation pass is delivered on
+`feat/dungeon-progression-design`. The production app uses the new Delve loop;
+`master` and its pre-refactor checkpoint remain unchanged. No merge, branch
+push, PR, or release was performed during implementation.
+
+| Acceptance boundary | Verified result |
+| --- | --- |
+| Pure progression, probability, pacing and save rules | 53 tests passed, `build/delve-final-core-tests-01.log` |
+| SpriteKit, owner, bootstrap, transitions and failures | 78 tests passed, `build/results/delve-final-regressions-20261014-02.xcresult` |
+| Live account UI climb | Three consecutive clears and seven-item extraction; disk reload equals settled account, `build/results/delve-ui-live-play-20261014-03.xcresult` |
+| Fourth-floor death with worn run loot | XP/prior gains kept, bag and its worn item lost, entry banked loadout restored, UI returned to entry and reload matched, `build/results/delve-final-fourth-floor-20261014-01.xcresult` |
+| Native checkpoint equipment and extraction | Legendary run item equipped, six items extracted, banked count seven to thirteen, checkpoint hands-on result |
+| Native entry write failure | Retry committed the same prepared floor and opened the pause menu, retry hands-on result |
+| Native lifecycle | Damaged resources, actor/projectile state, clock, timers, metrics and RNG retained through background/foreground and process relaunch |
+| Combat/boss resume | Stored live combat and boss-phase checkpoint tests and earlier normal-input restored-boss completion passed |
+| Capacity/shield rules | Peak-capacity swap tests, derived equipment changes, continued shield refill and reload without extra refill passed |
+| Character cap and uncapped Delve | Lifetime-only XP at cap, continued gear/enemy scaling through virtual reference levels beyond Delve 10000 passed |
+| Review | Whole-goal Standards and Spec reviews clean; test-only acceptance changes rechecked clean |
+
+The successful live UI chain reached Delve 73.2801234897, character level 3,
+and lifetime XP 587.4185120801. The final checkpoint held HP 79.8813898863 and
+shield 158.9249461489 before extraction. Earlier deaths retained XP and lost
+the bag, and the next attempts started through the account UI. No health,
+damage, collision, enemy, loot, or completion overrides were used in this
+live climb. Equipment choices used owned items through the normal session.
+
+Two earlier UI-driver runs exposed fixture timing errors: Extract was queried
+before combat dismissal completed, and Enter before the death settlement
+screen appeared. The driver now waits for enabled account actions and finished
+modal transitions; timeouts still fail. It does not weaken the three-floor or
+persistence assertions. Prepared checkpoint/fatal-hit fixtures remain separate
+from the live combat claim.
+
+The accepted numerical curves are initial tuning. The calibration study and
+short playtests verify implementation and provide a starting point; longer
+human play feedback will determine later balance adjustments.
