@@ -39,6 +39,7 @@ class RoomScene: GameScene {
     override var arenaGlobalLevel: Int { viewController?.globalLevel ?? 1 }
     override var usesRestorableCombat: Bool { viewController?.usesRestorableCombat ?? false }
     var enemyPoints = 4
+    var delveSession: DelveGameSession? { viewController?.delveSession }
     var plannedRoom: DelveRoomPlan?
     var pendingWorld: DelveWorldState?
     private(set) var restoreError: Error?
@@ -96,6 +97,7 @@ class RoomScene: GameScene {
 //        {
         super.update(currentTime)
         if usesRestorableCombat && isPaused { return }
+        if let session = delveSession { MainActor.assumeIsolated { session.recordFrame(self) } }
         if (started == true)
         {
             for i in 0 ..< entites.count
@@ -106,6 +108,11 @@ class RoomScene: GameScene {
         }
     }
     
+    override func didFinishUpdate() {
+        super.didFinishUpdate()
+        if let session = delveSession { MainActor.assumeIsolated { session.flush(self) } }
+    }
+
     func addEntities()
     {
         addPlayer()
@@ -210,6 +217,10 @@ class RoomScene: GameScene {
     override func killEnemy(_ exp: Double) {
         guard !completed else { return }
         killedEnemies += 1
+        if delveSession != nil {
+            if killedEnemies == enemies { unlockDoors() }
+            return
+        }
         viewController.levelExp += Int(exp)
         if (killedEnemies == enemies)
         {

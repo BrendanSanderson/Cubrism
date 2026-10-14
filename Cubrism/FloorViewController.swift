@@ -24,6 +24,7 @@ class FloorViewController: UIViewController {
     var globalLevel: Int { return (world - 1) * 10 + level }
     var max = UInt32(6)
     var min = UInt32(4)
+    weak var delveSession: DelveGameSession?
     var homeView: HomeViewController!
     var enemyPoints = 4
     let arenaSize = GameScene.arenaSize
@@ -286,6 +287,10 @@ class FloorViewController: UIViewController {
         goToRoomScene()
     }
     func goToRoomScene(){
+        if let session = delveSession {
+            session.flush(scene)
+            guard !session.busy, session.error == nil else { return }
+        }
         guard let door = scene.doors.first(where: { $0.node.name == scene.doorAccessed }),
               let newScene = room(at: door.pointer) else { return }
         newScene.scaleMode = .aspectFit
@@ -295,11 +300,19 @@ class FloorViewController: UIViewController {
             newScene.combatRandom = scene.combatRandom
             newScene.combatStats = scene.combatStats
         }
+        let lastHit = Player.entity.lastHit
+        let lastShot = Player.entity.component(ofType: PlayerShootComponent.self)?.lastShotTime
+        let cannonRotation = Player.entity.cannonSprite.zRotation
         #if targetEnvironment(macCatalyst)
         scene.resetKeyboardControls()
         #endif
         skView.presentScene(newScene)
         scene = newScene
+        if delveSession != nil {
+            Player.entity.lastHit = lastHit
+            Player.entity.component(ofType: PlayerShootComponent.self)?.lastShotTime = lastShot ?? newScene.time
+            Player.entity.cannonSprite.zRotation = cannonRotation
+        }
     }
     
     

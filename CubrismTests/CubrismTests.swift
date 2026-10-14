@@ -157,6 +157,27 @@ class CubrismTests: XCTestCase {
         add(attachment)
     }
 
+    @MainActor func testContinuousDelveShotCadenceMatchesCooldownAcrossRefreshRatesWithoutIdleBursts() {
+        let previousEntity = Player.entity
+        let previousDelay = Player.shotCoolDownSeconds
+        defer { Player.entity = previousEntity; Player.shotCoolDownSeconds = previousDelay }
+        Player.shotCoolDownSeconds = 0.05
+        for fps in [30, 60, 120] {
+            let scene = RestorableMotionTestScene(size: GameScene.arenaSize)
+            Player.entity = PlayerEntity(scene: scene, position: CGPoint(x: 200, y: 150))
+            let shooting = Player.entity.component(ofType: PlayerShootComponent.self)!
+            for frame in 0...(fps * 2) {
+                shooting.shoot(with: CGPoint(x: 50, y: 0), currentTime: Double(frame) / Double(fps))
+            }
+            func shots() -> Int { scene.children.filter { $0.children.contains { $0.physicsBody?.categoryBitMask == Constants.playerShotCategory } }.count }
+            XCTAssertEqual(shots(), 40, "The calibrated 20 shots/second must hold at \(fps) Hz")
+            shooting.stopShooting()
+            let before = shots()
+            shooting.shoot(with: CGPoint(x: 50, y: 0), currentTime: 100)
+            XCTAssertEqual(shots() - before, 1, "Time spent idle cannot produce a burst of missed shots")
+        }
+    }
+
     @MainActor func testRestorableGameplayMotionKeepsPositionPauseAndRemainingLifetime() throws {
         let original = RestorableMotionTestScene(size: GameScene.arenaSize)
         let node = SKNode()
@@ -1604,6 +1625,40 @@ class CubrismPlaythroughTests: XCTestCase {
         XCTAssertEqual(controller.floorPlan, plan)
     }
 
+    @MainActor func testDelveHandsOnPreview() async throws {
+        guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
+            throw XCTSkip("Run the acceptance scheme for native gameplay inspection")
+        }
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let root = window.rootViewController
+        let previousSession = Player.delveSession
+        let previousEntity = Player.entity, previousScene = Player.currentScene
+        let previousController = Player.currentViewController
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let saved = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json")) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: saved)
+        try await session.enter()
+        Player.delveSession = session
+        let controller = try session.makeController()
+        defer {
+            controller.skView.presentScene(nil)
+            Player.delveSession = previousSession; Player.entity = previousEntity
+            Player.currentScene = previousScene; Player.currentViewController = previousController
+            window.rootViewController = root
+            try? FileManager.default.removeItem(at: directory)
+        }
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.loadViewIfNeeded(); controller.view.layoutIfNeeded()
+        if controller.needsNewRun { controller.startNewRun() }
+        controller.scene.children.compactMap { $0 as? PopUpNode }.first?.play(nil)
+        print("DELVE HANDS-ON READY: owned account, HP=\(session.health), shield=\(session.shield)")
+        try await Task.sleep(nanoseconds: 180_000_000_000)
+        session.suspend()
+        try await session.retrySave()
+        XCTAssertNil(session.error)
+        XCTAssertEqual(try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json")) { throw DelveError.invalidTransition }.progression, session.progression)
+    }
+
     /// Presentation fixtures only; this does not count as a combat completion.
     @MainActor func testRewardPageScrollingAndContinueNavigation() async throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
@@ -1665,53 +1720,64 @@ class CubrismPlaythroughTests: XCTestCase {
         XCTAssertNotNil(home.floorView.scene)
     }
 
-    func testFirstTwoFloorsThroughCombatAndDoors() throws {
-        try playFloors()
+    @MainActor func testFirstTwoFloorsThroughCombatAndDoors() async throws {
+        try await playFloors()
     }
 
-    func testGeneratedFloorThroughCombatAndDoors() throws {
+    @MainActor func testGeneratedFloorThroughCombatAndDoors() async throws {
         var random = SystemRandomNumberGenerator()
         let plan = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
-        try playFloors(plan: plan)
+        try await playFloors(plan: plan)
     }
 
-    func testRestorableGeneratedFloorThroughCombatAndDoors() throws {
+    @MainActor func testRestorableGeneratedFloorThroughCombatAndDoors() async throws {
         var random = SystemRandomNumberGenerator()
         let plan = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
-        try playFloors(plan: plan, restorableCombat: true)
+        try await playFloors(plan: plan, restorableCombat: true)
     }
 
-    func testGeneratedFloorAgainstGolem() throws {
+    @MainActor func testGeneratedFloorAgainstGolem() async throws {
         var random = SystemRandomNumberGenerator()
         let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
         let last = try XCTUnwrap(generated.rooms.last)
         let rooms = Array(generated.rooms.dropLast()) + [DelveRoomPlan(id: last.id, position: last.position, encounter: .boss(.golem))]
         let plan = DelveFloorPlan(difficulty: generated.difficulty, budget: generated.budget,
                                  groupingMultiplier: generated.groupingMultiplier, density: generated.density, rooms: rooms)
-        try playFloors(plan: plan)
+        try await playFloors(plan: plan)
     }
 
-    func testStoredWorldReloadThroughCombatAndDoors() throws {
+    @MainActor func testStoredWorldReloadThroughCombatAndDoors() async throws {
         var random = DelveRandom(seed: 854)
         let generated = try DelveFloorPlanner().generate(difficulty: 1, density: .dense, using: &random)
         let last = try XCTUnwrap(generated.rooms.last)
         let rooms = Array(generated.rooms.dropLast()) + [DelveRoomPlan(id: last.id, position: last.position, encounter: .boss(.dragon))]
         let plan = DelveFloorPlan(difficulty: generated.difficulty, budget: generated.budget,
             groupingMultiplier: generated.groupingMultiplier, density: generated.density, rooms: rooms)
-        try playFloors(plan: plan, restorableCombat: true, reloadCombat: true)
+        try await playFloors(plan: plan, restorableCombat: true, reloadCombat: true)
     }
 
-    private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false, reloadCombat: Bool = false) throws {
+    @MainActor func testThreeDelveFloorsAndExtractionThroughLiveCombat() async throws {
+        try await playFloors(restorableCombat: true, useDelve: true)
+    }
+
+    @MainActor private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false, reloadCombat: Bool = false, useDelve: Bool = false) async throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
         }
         let acceptanceDeadline = Date().addingTimeInterval(15 * 60)
+        let previousSession = Player.delveSession
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let file = directory.appendingPathComponent("delve.json")
+        let session = useDelve ? try DelveGameSession(store: DelveSaveStore(fileURL: file) { try DelveProgression.freshAccount() }) : nil
         let defaults = UserDefaults.standard
         let keys = ["Level", "Experience", "TotalExperience", "LevelCompleted", "Gear", "Inventory"]
         let saved = keys.map { defaults.object(forKey: $0) }
         let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
         let original = window.rootViewController
         defer {
+            Player.currentViewController?.skView.presentScene(nil)
+            Player.delveSession = previousSession
+            try? FileManager.default.removeItem(at: directory)
             window.rootViewController = original
             for (key, value) in zip(keys, saved) {
                 if let value = value { defaults.set(value, forKey: key) }
@@ -1719,20 +1785,34 @@ class CubrismPlaythroughTests: XCTestCase {
             }
         }
         Player.resetProgress()
-        for floor in 1...(plan == nil ? 2 : 1) {
+        let goalFloor = useDelve ? 3 : (plan == nil ? 2 : 1)
+        var floor = 1
+        while floor <= goalFloor {
             var cleared = false
             for attempt in 1...10 {
             guard Date() < acceptanceDeadline else { break }
             print("PLAYTHROUGH ATTEMPT floor=\(floor) attempt=\(attempt) playerLevel=\(Player.level)")
             let xpBeforeAttempt = Player.totalExp
             var controller: FloorViewController
-            if let plan = plan { controller = try FloorViewController(plan: plan, restorableCombat: restorableCombat) }
+            if let session = session {
+                if session.progression.activeRun?.floor.phase == .checkpoint { try await session.continueFloor() }
+                else {
+                    if session.progression.activeRun != nil { try await session.abandon() }
+                    try await session.enter()
+                }
+                Player.delveSession = session
+                controller = try session.makeController()
+            }
+            else if let plan = plan { controller = try FloorViewController(plan: plan, restorableCombat: restorableCombat) }
             else { controller = FloorViewController(min: UInt32(floor + 3), max: UInt32(floor + 4), level: floor, world: 1) }
             window.rootViewController = controller
             window.makeKeyAndVisible()
             controller.loadViewIfNeeded()
             controller.view.layoutIfNeeded()
             if controller.needsNewRun { controller.startNewRun() }
+            if useDelve { controller.scene.children.compactMap { $0 as? PopUpNode }.first?.play(nil) }
+            let xpBeforeDelve = session?.progression.experience.lifetime ?? 0
+            let ratingBeforeDelve = session?.progression.rating ?? 1
             let end = min(Date().addingTimeInterval(180), acceptanceDeadline)
             var reloadedCombat = false, reloadedBoss = false
             var visited = Set<ObjectIdentifier>()
@@ -1740,8 +1820,8 @@ class CubrismPlaythroughTests: XCTestCase {
             var lastReport = Date.distantPast
             var golemWaypoint = 0
             var golemWaypointStarted = Date()
-            while Date() < end && !controller.rewardsGranted && Player.alive {
-                RunLoop.main.run(until: Date().addingTimeInterval(1.0 / 60.0))
+            while Date() < end && !controller.rewardsGranted && session?.progression.activeRun?.floor.phase != .checkpoint && Player.alive {
+                try await Task.sleep(nanoseconds: 16_666_667)
                 guard let room = controller.scene, room.view != nil else { continue }
                 if room !== lastRoom {
                     visited.insert(ObjectIdentifier(room))
@@ -1777,7 +1857,7 @@ class CubrismPlaythroughTests: XCTestCase {
                         next.levelExp = accumulatedXP
                         let resumedRoom = try XCTUnwrap(next.scene)
                         XCTAssertNil(resumedRoom.restoreError)
-                        RunLoop.main.run(until: Date().addingTimeInterval(1))
+                        try await Task.sleep(nanoseconds: 1_000_000_000)
                         XCTAssertTrue(resumedRoom.isPaused)
                         XCTAssertEqual(Player.currentHealth, hp)
                         XCTAssertEqual(Player.currentShield, shield)
@@ -1907,20 +1987,67 @@ class CubrismPlaythroughTests: XCTestCase {
                     lastReport = Date()
                 }
             }
+            if let session = session {
+                let savingDeadline = Date().addingTimeInterval(5)
+                while session.busy && session.error == nil && Date() < savingDeadline { try await Task.sleep(nanoseconds: 10_000_000) }
+                XCTAssertNil(session.error)
+                controller.rewardsGranted = session.progression.activeRun?.floor.phase == .checkpoint
+            }
             print("PLAYTHROUGH END floor=\(floor) alive=\(Player.alive) completed=\(controller.rewardsGranted) hp=\(Player.currentHealth)")
-            guard controller.rewardsGranted else { continue }
+            guard controller.rewardsGranted else {
+                if useDelve { floor = 1 }
+                controller.skView.presentScene(nil)
+                continue
+            }
             cleared = true
             if reloadCombat { XCTAssertTrue(reloadedCombat); XCTAssertTrue(reloadedBoss) }
+            if let session = session {
+                let run = try XCTUnwrap(session.progression.activeRun)
+                XCTAssertEqual(run.depth, floor)
+                XCTAssertGreaterThan(session.progression.experience.lifetime, xpBeforeDelve)
+                XCTAssertGreaterThan(session.progression.rating, ratingBeforeDelve)
+                XCTAssertGreaterThanOrEqual(run.loot.count, floor * 2)
+                print("DELVE CHECKPOINT depth=\(run.depth) rating=\(session.progression.rating) XP=\(session.progression.experience.lifetime) loot=\(run.loot.count) HP=\(run.resources.health) shield=\(run.resources.shield)")
+                controller.skView.presentScene(nil)
+                if floor < 3 { try await equipBetterDelveLoot(session) }
+                if floor == 3 {
+                    let lootCount = run.loot.count
+                    try await session.extract()
+                    XCTAssertEqual(session.progression.bankedItems.count, 7 + lootCount)
+                    let loaded = try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }
+                    XCTAssertEqual(loaded.progression, session.progression)
+                    print("DELVE EXTRACTED items=\(lootCount) lifetimeXP=\(session.progression.experience.lifetime)")
+                }
+            } else {
             XCTAssertEqual(Player.totalExp, xpBeforeAttempt + controller.levelExp, "Rewards must be credited exactly once")
             XCTAssertEqual(defaults.integer(forKey: "LevelCompleted"), floor)
             XCTAssertGreaterThan(controller.levelExp, 0)
             XCTAssertFalse(Player.inventory.isEmpty)
             print("PLAYTHROUGH COMPLETED floor=\(floor) totalXP=\(Player.totalExp) inventory=\(Player.inventory.count)")
-            RunLoop.main.run(until: Date().addingTimeInterval(20))
+            try await Task.sleep(nanoseconds: 20_000_000_000)
+            }
             break
             }
             XCTAssertTrue(cleared, "Floor \(floor) did not complete through its exit after ten normal attempts")
             guard cleared else { return }
+            floor += 1
+        }
+    }
+    @MainActor private func equipBetterDelveLoot(_ session: DelveGameSession) async throws {
+        func score(_ stats: DelveCharacterStats) -> Double {
+            stats.damagePerSecond * 4 + stats.maxHealth + stats.maxShield + stats.flatArmour * 20 + stats.shieldRegen * 10
+        }
+        for slot in DelveEquipmentSlot.allCases {
+            var best = session.progression.equipped[slot]
+            var bestScore = score(session.stats)
+            for item in session.progression.ownedItems where slot.accepts(item.kind) {
+                guard !session.progression.equipped.contains(where: { $0.key != slot && $0.value == item.id }) else { continue }
+                var candidate = session.progression
+                try candidate.equipItem(item.id, in: slot)
+                let candidateScore = score(try candidate.characterStats())
+                if candidateScore > bestScore { best = item.id; bestScore = candidateScore }
+            }
+            if best != session.progression.equipped[slot] { try await session.equip(best, in: slot) }
         }
     }
     // This fixture isolates simulation persistence while the default economy is
@@ -1966,5 +2093,256 @@ private class WallShotTestScene: GameScene {
             }
         }
         super.didBegin(contact)
+    }
+}
+
+@MainActor
+final class DelveSessionTests: XCTestCase {
+    private func store(in directory: URL) throws -> DelveSaveStore {
+        try DelveSaveStore(fileURL: directory.appendingPathComponent("save/delve.json")) { try DelveProgression.freshAccount() }
+    }
+
+    private func mount(_ session: DelveGameSession) throws -> FloorViewController {
+        Player.delveSession = session
+        let controller = try session.makeController()
+        controller.loadViewIfNeeded()
+        controller.startNewRun()
+        XCTAssertNil(controller.scene.restoreError)
+        return controller
+    }
+
+    private func reachNextRoom(_ controller: FloorViewController) throws {
+        let current = try XCTUnwrap(controller.scene.plannedRoom?.id)
+        let plan = try XCTUnwrap(controller.floorPlan)
+        let index = try XCTUnwrap(plan.rooms.firstIndex { $0.id == current })
+        let next = plan.rooms[index + 1].position
+        let door = try XCTUnwrap(controller.scene.doors.first { $0.pointer == CGPoint(x: next.x, y: next.y) })
+        controller.scene.doorAccessed = try XCTUnwrap(door.node.name)
+        controller.goToRoomScene()
+    }
+
+    private func clear(_ session: DelveGameSession, controller: FloorViewController) async throws {
+        let completed = expectation(description: "Atomic floor checkpoint")
+        session.onCommit = { action in if case .clear = action { completed.fulfill() } }
+        while controller.scene.name != "bossRoom" {
+            if controller.scene.name == "room" {
+                for enemy in controller.scene.entites.compactMap({ $0 as? EnemyEntity }) { enemy.damageEnemy(enemy.health) }
+                session.flush(controller.scene)
+            }
+            try reachNextRoom(controller)
+        }
+        let boss = try XCTUnwrap(controller.scene.entites.first as? BossEntity)
+        boss.damageBoss(boss.health)
+        session.flush(controller.scene)
+        await fulfillment(of: [completed], timeout: 5)
+        XCTAssertNil(session.error)
+        XCTAssertEqual(session.progression.activeRun?.floor.phase, .checkpoint)
+    }
+
+    func testLivePlayerFacadeReadsOwnedStatsAndDamageWorldSavesTogether() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        let initial = try XCTUnwrap(session.progression.activeRun?.resources)
+        XCTAssertEqual(Player.health, session.stats.maxHealth)
+        XCTAssertEqual(Player.attackPower, session.stats.attackPower)
+        Player.currentHealth = 999999
+        XCTAssertEqual(Player.currentHealth, initial.health, "Mutable legacy fields cannot override Delve ownership")
+        Player.damagePlayer(40)
+        session.flush(controller.scene)
+        XCTAssertEqual(Player.currentHealth, initial.health)
+        XCTAssertEqual(Player.currentShield, initial.shield - max(0, 40 - session.stats.flatArmour), accuracy: 1e-9)
+        XCTAssertGreaterThan(try XCTUnwrap(session.metrics?.damageTaken), 0)
+        try await session.retrySave()
+        let reloaded = try store(in: directory)
+        XCTAssertEqual(reloaded.progression, session.progression)
+        XCTAssertNotNil(reloaded.progression.activeRun?.floor.world?.player.body)
+        XCTAssertEqual(reloaded.progression.activeRun?.floor.world?.metrics, session.metrics)
+    }
+
+    func testLiveClearContinueCarriesHPAndRefillsShieldOnceThenDeathLosesBag() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        var controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        session.receiveHit(session.health + session.shield - 40)
+        session.flush(controller.scene)
+        XCTAssertEqual(session.health, 40 + session.stats.flatArmour, accuracy: 1e-8)
+        try await clear(session, controller: controller)
+        let checkpoint = try XCTUnwrap(session.progression.activeRun)
+        let xp = session.progression.experience.lifetime
+        XCTAssertEqual(checkpoint.loot.count, 2)
+        XCTAssertGreaterThan(session.progression.rating, checkpoint.floor.entryRating)
+        XCTAssertGreaterThan(xp, 0)
+        controller.skView.presentScene(nil)
+        try await session.continueFloor()
+        controller = try mount(session)
+        let continued = try XCTUnwrap(session.progression.activeRun)
+        XCTAssertEqual(continued.depth, 2)
+        XCTAssertEqual(continued.resources.health, checkpoint.resources.health)
+        XCTAssertEqual(continued.resources.shield, continued.resources.maxShield)
+        session.receiveHit(20)
+        session.flush(controller.scene)
+        try await session.retrySave()
+        let savedShield = session.shield
+        let loaded = try DelveGameSession(store: store(in: directory))
+        controller.skView.presentScene(nil)
+        controller = try mount(loaded)
+        XCTAssertEqual(loaded.shield, savedShield, "Loading a continued floor cannot refill the shield again")
+        let died = expectation(description: "Atomic death settlement")
+        loaded.onCommit = { action in if case .death = action { died.fulfill() } }
+        loaded.receiveHit(loaded.health + loaded.shield + loaded.stats.flatArmour + 1)
+        loaded.flush(controller.scene)
+        await fulfillment(of: [died], timeout: 5)
+        XCTAssertNil(loaded.progression.activeRun)
+        XCTAssertEqual(loaded.progression.experience.lifetime, xp)
+        XCTAssertEqual(loaded.progression.bankedItems.count, 7)
+        XCTAssertEqual(loaded.progression.lastSettlement?.outcome, .died)
+        XCTAssertEqual(try store(in: directory).progression, loaded.progression)
+    }
+
+    func testLiveExtractionBanksRewardsExactlyOnce() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        try await clear(session, controller: controller)
+        let loot = try XCTUnwrap(session.progression.activeRun?.loot)
+        try await session.extract()
+        XCTAssertNil(session.progression.activeRun)
+        XCTAssertEqual(session.progression.bankedItems.suffix(loot.count), loot[...])
+        XCTAssertEqual(session.progression.lastSettlement?.outcome, .extracted)
+        XCTAssertEqual(try store(in: directory).progression, session.progression)
+        do { try await session.extract(); XCTFail("A second UI extraction must not create items") } catch {}
+        XCTAssertEqual(session.progression.bankedItems.count, 9)
+    }
+
+    func testFailedEntryCommitRetriesTheSameFloorAndPublishesOnce() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let session = try DelveGameSession(store: store(in: directory))
+        let original = session.progression
+        let parent = directory.appendingPathComponent("save"), backup = directory.appendingPathComponent("backup")
+        try FileManager.default.moveItem(at: parent, to: backup)
+        try Data("blocking file".utf8).write(to: parent)
+        do { try await session.enter(); XCTFail("Entry must not publish after write failure") } catch {}
+        XCTAssertEqual(session.progression, original)
+        XCTAssertTrue(session.busy)
+        XCTAssertTrue(session.store.hasPendingCommit)
+        try FileManager.default.removeItem(at: parent)
+        try FileManager.default.moveItem(at: backup, to: parent)
+        var commits = 0
+        session.onCommit = { _ in commits += 1 }
+        async let first: Void = session.retrySave()
+        async let duplicate: Void = session.retrySave()
+        try await first; try await duplicate
+        XCTAssertEqual(commits, 1)
+        XCTAssertFalse(session.busy)
+        let generated = try XCTUnwrap(session.progression.activeRun)
+        XCTAssertNotNil(generated.floor.world)
+        XCTAssertEqual(try store(in: directory).progression, session.progression)
+        try await session.retrySave()
+        XCTAssertEqual(session.progression.activeRun?.floor.id, generated.floor.id)
+        XCTAssertEqual(commits, 1)
+    }
+
+    func testSuspensionDrainsTheLatestWorldWhenAnEarlierSaveIsInFlight() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let began = expectation(description: "Old snapshot captured and writing")
+        let finished = expectation(description: "Suspension snapshot written")
+        let release = DispatchSemaphore(value: 0)
+        var writes = 0
+        let file = directory.appendingPathComponent("delve.json")
+        let saved = try DelveSaveStore(fileURL: file, writeDocument: { data, url in
+            writes += 1
+            if writes == 3 { began.fulfill(); _ = release.wait(timeout: .now() + 5) }
+            try data.write(to: url, options: .atomic)
+            if writes == 4 { finished.fulfill() }
+        }) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: saved)
+        try await session.enter()
+        let controller = try mount(session)
+        defer { release.signal(); controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        session.receiveHit(10); session.flush(controller.scene)
+        session.saveSnapshot()
+        await fulfillment(of: [began], timeout: 5)
+        session.receiveHit(40)
+        controller.scene.time = 0.75
+        session.suspend()
+        let latest = session.progression
+        release.signal()
+        await fulfillment(of: [finished], timeout: 5)
+        let loaded = try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }
+        XCTAssertEqual(loaded.progression, latest)
+        XCTAssertTrue(controller.scene.isPaused)
+        XCTAssertFalse(saved.hasUnsavedCombat)
+    }
+
+    func testLethalSameFrameHitKeepsTheDefeatedPlannedEnemyXP() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        try reachNextRoom(controller)
+        let enemy = try XCTUnwrap(controller.scene.entites.first as? EnemyEntity)
+        let plan = try XCTUnwrap(controller.floorPlan)
+        let reward = try XCTUnwrap(session.progression.rules.balance.xpAllocations(for: plan)[enemy.combatID])
+        let died = expectation(description: "Atomic fatal contact with kill")
+        session.onCommit = { action in if case .death = action { died.fulfill() } }
+        // The contact delegate uses exactly this order for suicide collisions.
+        Player.damagePlayer(session.health + session.shield + session.stats.flatArmour + 1)
+        enemy.damageEnemy(enemy.health)
+        session.flush(controller.scene)
+        await fulfillment(of: [died], timeout: 5)
+        XCTAssertNil(session.progression.activeRun)
+        XCTAssertEqual(session.progression.experience.lifetime, reward, accuracy: 1e-10)
+        XCTAssertEqual(try store(in: directory).progression, session.progression)
+    }
+
+    func testDoorCannotLeaveTheRoomWhileDeathIsBeingCommitted() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        let room = try XCTUnwrap(controller.scene)
+        let died = expectation(description: "Door-frame death committed")
+        session.onCommit = { action in if case .death = action { died.fulfill() } }
+        session.receiveHit(session.health + session.shield + session.stats.flatArmour + 1)
+        try reachNextRoom(controller)
+        XCTAssertTrue(controller.scene === room)
+        XCTAssertTrue(room.isPaused)
+        XCTAssertTrue(session.busy)
+        await fulfillment(of: [died], timeout: 5)
+        XCTAssertNil(session.progression.activeRun)
+    }
+
+    func testFrozenCombatStatsAndPerformanceTargetIgnoreChosenGear() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.equip(nil, in: .pulsar)
+        try await session.enter()
+        let run = try XCTUnwrap(session.progression.activeRun)
+        let world = try XCTUnwrap(run.floor.world)
+        let catalog = try DelveWorldFactory.stats(difficulty: run.floor.difficulty, balance: session.progression.rules.balance)
+        XCTAssertEqual(world.stats, catalog)
+        let reference = try session.progression.rules.balance.referenceStats(difficulty: run.floor.difficulty)
+        let hp = run.floor.plan.enemies.reduce(0) { $0 + catalog.enemies[$1.kind]!.health }
+        guard case .boss(let boss) = run.floor.plan.rooms.last!.encounter else { throw DelveError.invalidTransition }
+        let expected = (hp + catalog.bosses[boss]!.health) / reference.damagePerSecond + 2 * Double(run.floor.plan.combatRooms.count)
+        XCTAssertEqual(world.metrics.targetSeconds, expected)
+        XCTAssertLessThan(session.stats.damagePerSecond, reference.damagePerSecond)
     }
 }

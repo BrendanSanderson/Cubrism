@@ -228,6 +228,7 @@ class BossEntity: DynamicEntity {
             actions.append(EnemyDyingComponent(scene: scene, sprite: sprite))
             attack = actions[0]
             self.addComponent(actions[0])
+            if let session = (scene as? RoomScene)?.delveSession { MainActor.assumeIsolated { session.killedBoss() } }
             scene.killEnemy(exp)
             alive = false
             for i in scene.children

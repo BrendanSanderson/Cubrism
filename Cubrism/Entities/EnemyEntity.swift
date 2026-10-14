@@ -363,6 +363,9 @@ class EnemyEntity: DynamicEntity {
             }
             if (type != "DragonFireball")
             {
+                if let id = delveSpawnID, let session = (scene as? RoomScene)?.delveSession {
+                    MainActor.assumeIsolated { session.killed(id) }
+                }
                 scene.killEnemy(experience)
             }
         }

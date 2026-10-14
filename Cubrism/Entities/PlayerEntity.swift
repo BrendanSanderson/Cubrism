@@ -53,15 +53,23 @@ class PlayerEntity: DynamicEntity {
         {
             addComponent(HealthBarComponent(scene: scene, playerNode: node, sprite: sprite))
         }
-        sprite.physicsBody?.isDynamic = true
-        
-        sprite.physicsBody?.categoryBitMask = Constants.playerCategory
-        sprite.physicsBody?.collisionBitMask = Constants.doorCategory | Constants.wallCategory | Constants.enemyCategory | Constants.bossCategory | Constants.enemyShotCategory
-        
-        sprite.physicsBody?.contactTestBitMask = Constants.doorCategory | Constants.enemyShotCategory | Constants.enemyCategory | Constants.bossCategory | Constants.wallCategory | Constants.enemyStatusShotCategory
+        sprite.physicsBody = Self.makePhysicsBody(size: sprite.size)
         scene.addChild(node)
         lastHit = scene.time
     }
+    static func makePhysicsBody(size: CGSize) -> SKPhysicsBody {
+        let body = SKPhysicsBody(rectangleOf: size)
+        body.isDynamic = true
+        body.allowsRotation = false
+        body.affectedByGravity = false
+        body.friction = 0
+        body.usesPreciseCollisionDetection = true
+        body.categoryBitMask = Constants.playerCategory
+        body.collisionBitMask = Constants.doorCategory | Constants.wallCategory | Constants.enemyCategory | Constants.bossCategory | Constants.enemyShotCategory
+        body.contactTestBitMask = Constants.doorCategory | Constants.enemyShotCategory | Constants.enemyCategory | Constants.bossCategory | Constants.wallCategory | Constants.enemyStatusShotCategory
+        return body
+    }
+
     override init()
     {
         super.init()

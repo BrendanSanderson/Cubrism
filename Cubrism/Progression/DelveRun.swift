@@ -342,9 +342,24 @@ struct DelveProgression: Codable, Equatable {
         return credited
     }
 
-    mutating func receiveHit(floorID: UUID, rawDamage: Double) throws {
+    mutating func receiveHit(floorID: UUID, rawDamage: Double, defeatedInFrame: [UUID] = []) throws {
         guard rawDamage.isFinite, rawDamage >= 0 else { throw DelveError.invalidValue("damage") }
-        try takeDamage(floorID: floorID, amount: max(0, rawDamage - characterStats().flatArmour))
+        let run = try combatRun(floorID: floorID)
+        var next = self
+        try next.takeDamage(floorID: floorID, amount: max(0, rawDamage - characterStats().flatArmour))
+        if next.activeRun == nil {
+            // Contacts can kill both participants in one physics frame. Keep
+            // those defeated actors' XP without granting posthumous capacity
+            // growth or restoring the settled run's resources/loot.
+            let rewards = try rules.balance.xpAllocations(for: run.floor.plan)
+            var credited = run.floor.awardedXPEvents
+            for id in defeatedInFrame where credited.insert(id).inserted {
+                if let reward = rewards[id] {
+                    try next.experience.award(reward * (1 + DelveRules.continuationBonus(depth: run.depth)))
+                }
+            }
+        }
+        self = next
     }
 
     mutating func equipItem(_ itemID: UUID?, in slot: DelveEquipmentSlot) throws {

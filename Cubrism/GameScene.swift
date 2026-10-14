@@ -297,6 +297,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if firstBody.node != nil && firstBody.node?.parent != nil
             {
                 let node = firstBody.node?.parent as! EnemyNode
+                resolvePlayerShot(secondBody.node, hit: node.Entity.currentHealth > 0)
                 node.Entity.damageEnemy(usesRestorableCombat ? Player.attackPower : Double(Int(Player.attackPower)))
                 
             }
@@ -308,6 +309,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         else if (mask1 == Constants.bossCategory && mask2 == Constants.playerShotCategory)
         {
             let node = firstBody.node?.parent as! BossNode
+            resolvePlayerShot(secondBody.node, hit: node.Entity.currentHealth > 0)
             node.Entity.damageBoss(Player.attackPower)
             secondBody.node?.parent!.removeFromParent()
             NSLog("Shot Deleted")
@@ -316,6 +318,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         else if (mask1 == Constants.playerShotCategory && mask2 == Constants.wallCategory)
         {
+            resolvePlayerShot(firstBody.node, hit: false)
             firstBody.node?.parent!.removeFromParent()
             NSLog("Shot Deleted")
         }
@@ -335,6 +338,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
+    func resolvePlayerShot(_ sprite: SKNode?, hit: Bool) {
+        guard let root = sprite?.parent, let session = (self as? RoomScene)?.delveSession else { return }
+        MainActor.assumeIsolated { session.resolved(DelveSpriteBridge.id(root), hit: hit) }
+    }
+
     func killEnemy(_ exp: Double)
     {
         

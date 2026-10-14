@@ -57,6 +57,10 @@ extension GameScene {
             try! live.state.advance(seconds: seconds)
             node.position = live.state.movement.position.cgPoint
             if live.state.expired {
+                if node.children.contains(where: { $0.physicsBody?.categoryBitMask == Constants.playerShotCategory }),
+                   let session = (self as? RoomScene)?.delveSession {
+                    MainActor.assumeIsolated { session.resolved(id, hit: false) }
+                }
                 node.removeFromParent()
                 liveMotions[id] = nil
             }

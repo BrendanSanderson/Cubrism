@@ -10,11 +10,18 @@ import SpriteKit
 import GameplayKit
 
 class Player: NSObject {
-    static var health = 100.0
-    static var shield = 100.0
-    static var currentShield = 100.0
-    static var currentHealth = 100.0
-    static var attackPower = 25.0
+    static weak var delveSession: DelveGameSession?
+    static func readDelve<Value>(_ body: @MainActor (DelveGameSession) -> Value) -> Value? {
+        guard let session = delveSession else { return nil }
+        return MainActor.assumeIsolated { body(session) }
+    }
+    private static var legacyHealth = 100.0, legacyShield = 100.0
+    private static var legacyCurrentHealth = 100.0, legacyCurrentShield = 100.0, legacyAttack = 25.0
+    static var health: Double { get { readDelve { $0.stats.maxHealth } ?? legacyHealth } set { legacyHealth = newValue } }
+    static var shield: Double { get { readDelve { $0.stats.maxShield } ?? legacyShield } set { legacyShield = newValue } }
+    static var currentHealth: Double { get { readDelve { $0.health } ?? legacyCurrentHealth } set { legacyCurrentHealth = newValue } }
+    static var currentShield: Double { get { readDelve { $0.shield } ?? legacyCurrentShield } set { legacyCurrentShield = newValue } }
+    static var attackPower: Double { get { readDelve { $0.stats.attackPower } ?? legacyAttack } set { legacyAttack = newValue } }
     static var attackPowerBase = 25.0
     static var attackPowerExp = 1.1
     static var shieldBase = 100.0
@@ -22,14 +29,19 @@ class Player: NSObject {
     static var healthBase = 100.0
     static var healthExp = 1.2
     static var attackSpeed = 25.0
-    static var shieldRegen = 0.3
+    private static var legacyShieldRegen = 0.3
+    static var shieldRegen: Double { get { readDelve { $0.stats.shieldRegen } ?? legacyShieldRegen } set { legacyShieldRegen = newValue } }
     static var shieldRegenExp = 1.0
     static var shieldRegenBase = 0.3
-    static var level = max(1, UserDefaults.standard.integer(forKey: "Level"))
+    private static var legacyLevel = max(1, UserDefaults.standard.integer(forKey: "Level"))
+    static var level: Int { get { readDelve { $0.progression.experience.level } ?? legacyLevel } set { legacyLevel = newValue } }
     static var entity = PlayerEntity()
-    static var defence = 0.0
-    static var exp = UserDefaults.standard.integer(forKey: "Experience")
-    static var totalExp = UserDefaults.standard.integer(forKey: "TotalExperience")
+    private static var legacyDefence = 0.0
+    static var defence: Double { get { readDelve { $0.stats.flatArmour * 10 } ?? legacyDefence } set { legacyDefence = newValue } }
+    private static var legacyExp = UserDefaults.standard.integer(forKey: "Experience")
+    static var exp: Int { get { readDelve { Int(min($0.progression.experience.progress, Double(Int.max / 2))) } ?? legacyExp } set { legacyExp = newValue } }
+    private static var legacyTotalExp = UserDefaults.standard.integer(forKey: "TotalExperience")
+    static var totalExp: Int { get { readDelve { Int(min($0.progression.experience.lifetime, Double(Int.max / 2))) } ?? legacyTotalExp } set { legacyTotalExp = newValue } }
     static var currentScene: GameScene!
     static var currentViewController: FloorViewController!
     static var gearDict : [String:[String : AnyObject]]!
@@ -48,9 +60,11 @@ class Player: NSObject {
     static var shieldRegenBoost = 0.0
     static var shieldRegenBoostMult = 1.0
     static var shotCoolDownBase = 0.5
-    static var shotCoolDownSeconds = 0.5
+    private static var legacyShotCoolDownSeconds = 0.5
+    static var shotCoolDownSeconds: Double { get { readDelve { $0.stats.shotCooldown } ?? legacyShotCoolDownSeconds } set { legacyShotCoolDownSeconds = newValue } }
     static var defenceBoostMult = 0.25
-    static var alive = true
+    private static var legacyAlive = true
+    static var alive: Bool { get { readDelve { $0.alive } ?? legacyAlive } set { legacyAlive = newValue } }
     static var expGained = 0
     
     static func resetProgress() {
@@ -77,6 +91,7 @@ class Player: NSObject {
     static func updatePlayer()
     
     {
+        if delveSession != nil { return }
         alive = true
         defence = defenceBoost * defenceBoostMult
         health = healthBase * Player.playerMultiplier(level, mult: healthExp) + healthBoost * healthBoostMult
@@ -106,6 +121,7 @@ class Player: NSObject {
     }
     static func updateEquipment()
     {
+        if delveSession != nil { return }
         attackPowerBoost = (gear["Power Core"]?.attackPower)! + (gear["Pulsar"]?.attackPower)! + (gear["Attachment 1"]?.attackPower)! + (gear["Attachment 2"]?.attackPower)!
         
         attackSpeedBoost = (gear["Special Pulsar"]?.attackSpeed)! + (gear["Power Core"]?.attackSpeed)! + (gear["Pulsar"]?.attackSpeed)! + (gear["Attachment 1"]?.attackSpeed)! + (gear["Attachment 2"]?.attackSpeed)!
@@ -143,6 +159,10 @@ class Player: NSObject {
     }
     static func damagePlayer(_ damage: Double)
     {
+        if let session = delveSession {
+            MainActor.assumeIsolated { session.receiveHit(damage) }
+            return
+        }
         guard alive else { return }
         var dam = damage - defence/10.0
         if (dam < 0)
@@ -197,7 +217,9 @@ class Player: NSObject {
     {
         if (entity.lastHit + 2 <= currentScene.time && currentShield < shield)
         {
-            currentShield = min(shield, currentShield + shieldRegen * currentScene.frameDuration * 60)
+            if let session = delveSession {
+                MainActor.assumeIsolated { session.recoverShield(shieldRegen * currentScene.frameDuration * 60) }
+            } else { currentShield = min(shield, currentShield + shieldRegen * currentScene.frameDuration * 60) }
             entity.component(ofType: HealthBarComponent.self)!.updateBars(currentShield, health: currentHealth)
         }
         if (entity.sprite.position.x > currentScene.size.width * 0.95 - entity.sprite.size.width/2)
@@ -236,6 +258,10 @@ class Player: NSObject {
     
     static func expToLevel(_ level: Int) -> Int
     {
+        if let cost = readDelve({ session in
+            let xp = session.progression.experience
+            return level >= xp.cap ? 1 : Int(min(xp.levelUpCosts[max(0, level - 1)], Double(Int.max / 2)))
+        }) { return cost }
         var total = 0.0
 //        for     i in 1 ... level
 //        {}

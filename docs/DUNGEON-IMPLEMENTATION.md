@@ -646,3 +646,49 @@ Next, connect floor planning, game events, equipment stat calculation, the
 one-time save reset, and checkpoint/dungeon-entry screens. Character/enemy/gear
 stat curves and performance normalization remain calibration work. Currency
 ownership and merchant generation remain separate unaccepted proposals.
+
+## Live account binding checkpoint: October 14
+
+The main-actor DelveGameSession owns the atomic store, derived Player facade,
+frozen authored combat ratios/catalog, and actual-plan HP/reference-DPS
+performance target. Contact, kill and regeneration events publish with their
+post-physics world. Critical entry/clear/continue/equip/extract/death/abandon
+commits retain one prepared token for retry. Periodic snapshots coalesce
+requests and drain lifecycle changes; room transitions preserve hit/shot
+timers and stop on pending settlement.
+
+All 53 core scenarios and 71 Catalyst regressions passed. Eight session
+scenarios cover derived ownership, HP carry/shield refill once, death/loot
+loss/XP, extraction, failed-write same-token duplicate retry, frozen scoring
+targets, fatal hit-before-kill XP, suspension behind a blocked write, and death
+during door navigation. The firing regression verifies 40 shots over two
+seconds at 30, 60 and 120 Hz and one immediate shot after idle activation.
+Evidence: `build/delve-session-core-tests.log`,
+`build/results/session-regressions-20261014-03.xcresult`, and
+`build/results/session-owner-20261014-05.xcresult`.
+
+Both Standards and Spec reviews rechecked clean after fixes for fatal-frame
+XP, snapshot coalescing, door transitions, cadence, and the critical-save
+scheduling guard. The structured autoreview helper remains unavailable
+because its default model is unsupported; the repository two-axis review
+workflow supplied the reviews. No review was claimed from the failed helper.
+
+Normal-input iOS combat completed three consecutive floors and extraction in
+672.528 seconds. Earlier deaths retained XP and discarded the bag; retries
+advanced character levels and used legitimate checkpoint equipment choices.
+The successful chain advanced rating to 103.365, held six unbanked items,
+then extracted them into the account (13 banked total). Reload matched the
+settled model. Evidence:
+`build/results/session-three-floor-play-20261014-04.xcresult`.
+The acceptance counter now resets on death, and its equipment chooser excludes
+an item already worn in another slot; no combat balance overrides were used.
+
+Native simulator controls also entered a combat room from the safe start,
+aimed and fired, depleted resources, and reached death. The owned scene
+correctly froze; the missing settlement presentation belongs to the following
+UI milestone. The 180-second fixture then checks durable reload equality.
+Evidence: `build/delve-session-hands-on-02.log`.
+
+Default App startup/lifecycle wiring, checkpoint/entry/error UI, and the
+one-time legacy reset remain the next milestone. The full goal is unfinished.
+Keep the keep-awake loop running during native tests.

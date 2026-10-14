@@ -50,6 +50,16 @@ class PlayerShootComponent: GKComponent {
     }
     
     func ShotIfNeeded(_ currentTime: TimeInterval) {
+        if scene.usesRestorableCombat {
+            // Keep the scheduled cadence rather than adding a frame's
+            // rounding delay to every shot. A capped logical frame can cross
+            // more than one cooldown on lower-refresh displays.
+            while Player.entity.shooting && lastShotTime + Player.shotCoolDownSeconds <= currentTime + 1e-9 {
+                lastShotTime += Player.shotCoolDownSeconds
+                fire(velocity)
+            }
+            return
+        }
         if Player.entity.shooting && (lastShotTime + TimeInterval(Player.shotCoolDownSeconds) <= currentTime) {
             lastShotTime = currentTime
             self.fire(self.velocity)
@@ -65,6 +75,9 @@ class PlayerShootComponent: GKComponent {
         let angle = atan2(velocity.y, velocity.x)
         self.velocity = CGPoint(x: cos(angle) * 50, y: sin(angle) * 50)
         Player.entity.cannonSprite.zRotation = angle
+        if scene.usesRestorableCombat && !Player.entity.shooting {
+            lastShotTime = max(lastShotTime, currentTime - Player.shotCoolDownSeconds)
+        }
         Player.entity.shooting = true
         ShotIfNeeded(currentTime)
     }
@@ -99,6 +112,9 @@ class PlayerShootComponent: GKComponent {
 //        self.sprite.physicsBody?.collisionBitMask = UInt32(32)
         scene.addChild(self.node)
         self.followPath(velocity)
+        if let room = scene as? RoomScene, let session = room.delveSession {
+            MainActor.assumeIsolated { session.fired(DelveSpriteBridge.id(node), in: room) }
+        }
     }
 
     func followPath(_ velocity: CGPoint) {

@@ -35,9 +35,13 @@ struct DelvePreparedSave<Result> {
 private final class DelveSaveWriter {
     private let queue = DispatchQueue(label: "cubrism.delve.save", qos: .utility)
     private let fileURL: URL
+    private let writeDocument: (Data, URL) throws -> Void
     private var writtenRevision: UInt64?
 
-    init(fileURL: URL) { self.fileURL = fileURL }
+    init(fileURL: URL, writeDocument: @escaping (Data, URL) throws -> Void) {
+        self.fileURL = fileURL
+        self.writeDocument = writeDocument
+    }
 
     func writeBlocking(_ progression: DelveProgression, revision: UInt64) throws {
         try queue.sync { try write(progression, revision: revision) }
@@ -62,7 +66,7 @@ private final class DelveSaveWriter {
         let data = try JSONEncoder().encode(document)
         try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(),
                                                 withIntermediateDirectories: true)
-        try data.write(to: fileURL, options: .atomic)
+        try writeDocument(data, fileURL)
         writtenRevision = revision
     }
 }
@@ -84,9 +88,10 @@ final class DelveSaveStore {
     // A fresh account is created only when the file is absent. Corruption,
     // unsupported versions and I/O failures propagate without resetting a run.
     // This separate file does not read or reset the legacy UserDefaults save.
-    init(fileURL: URL, makeNewAccount: () throws -> DelveProgression) throws {
+    init(fileURL: URL, writeDocument: @escaping (Data, URL) throws -> Void = { try $0.write(to: $1, options: .atomic) },
+         makeNewAccount: () throws -> DelveProgression) throws {
         guard fileURL.isFileURL, !fileURL.hasDirectoryPath else { throw DelveSaveError.invalidLocation }
-        writer = DelveSaveWriter(fileURL: fileURL)
+        writer = DelveSaveWriter(fileURL: fileURL, writeDocument: writeDocument)
         let data: Data?
         do {
             data = try Data(contentsOf: fileURL)
