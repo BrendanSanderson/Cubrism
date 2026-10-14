@@ -57,7 +57,9 @@ class RoomScene: GameScene {
             pendingWorld = nil
             do {
                 try DelveWorldBridge.restore(saved, plan: plan, room: self)
-                addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit"))
+                Player.entity.component(ofType: HealthBarComponent.self)?.updateBars(Player.currentShield, health: Player.currentHealth)
+                if delveSession?.onPause != nil { isPaused = true }
+                else { addChild(PopUpNode(scene: self, text: "Paused", button1Text: "Play", button2Text: "Quit")) }
             } catch {
                 isPaused = true
                 restoreError = error
@@ -88,6 +90,10 @@ class RoomScene: GameScene {
 
     
     override func update(_ currentTime: TimeInterval) {
+        if let session = delveSession, session.gameplayPaused || session.busy || session.error != nil {
+            isPaused = true
+            return
+        }
         /* Called before each frame is rendered */
 //        if (startTime == nil)
 //        {
@@ -142,7 +148,7 @@ class RoomScene: GameScene {
             doors[i].pointer = tempPointer
             self.addChild(doors[i].node)
         }
-        if (completed == true && self.name == "bossRoom")
+        if (delveSession == nil && completed == true && self.name == "bossRoom")
         {
             addTeleporter(CGPoint(x: self.size.width/2, y: self.size.height/2))
         }

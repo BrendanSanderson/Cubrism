@@ -28,6 +28,8 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "NO">
       <EnvironmentVariables>
+         <EnvironmentVariable key = "CUBRISM_LEGACY_TESTING" value = "1" isEnabled = "YES"/>
+
          <EnvironmentVariable key = "CUBRISM_ACCEPTANCE" value = "1" isEnabled = "YES"/>
       </EnvironmentVariables>
       <Testables>

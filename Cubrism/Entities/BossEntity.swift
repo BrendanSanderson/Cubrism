@@ -245,7 +245,7 @@ class BossEntity: DynamicEntity {
                     (i as! EnemyEntity).damageEnemy((i as! EnemyEntity).health)
                 }
             }
-            if (scene as! RoomScene).name == "bossRoom"
+            if (scene as! RoomScene).delveSession == nil && (scene as! RoomScene).name == "bossRoom"
             {
                 (scene as! RoomScene).addTeleporter(CGPoint(x: scene.size.width/2, y: scene.size.height/2))
             }

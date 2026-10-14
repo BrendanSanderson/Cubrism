@@ -634,18 +634,15 @@ combat/boss/checkpoint/settlement reloads; no capacity-swap healing; one shield
 refill per floor; failed/invalid save behavior; no duplicate rewards; and
 continued enemy/gear scaling beyond Delve 10000 with character cap 100.
 
-## Following integration
+## Final integration and acceptance
 
-The progression document is not a complete resumable live combat snapshot.
-Add stored encounters, projectiles/timers, ordered background writing, and
-lifecycle integration before enabling the new loop. Versioned atomic
-progression persistence and validation are now implemented. No live saves
-have been reset or migrated.
-
-Next, connect floor planning, game events, equipment stat calculation, the
-one-time save reset, and checkpoint/dungeon-entry screens. Character/enemy/gear
-stat curves and performance normalization remain calibration work. Currency
-ownership and merchant generation remain separate unaccepted proposals.
+Account ownership, stored floor plans, continuous calibration, complete combat
+snapshots and atomic commits are implemented and checkpointed. The current
+integration connects default app launch, dungeon entry, checkpoint choices,
+owned equipment, settlements, save retry and lifecycle suspension. Final
+acceptance still needs the complete UI-bound live combat chain, fourth-floor
+loot loss, and the remaining reload/error/capacity scenarios below. Currency
+and merchant systems remain outside the approved Delve refactor.
 
 ## Live account binding checkpoint: October 14
 
@@ -692,3 +689,56 @@ Evidence: `build/delve-session-hands-on-02.log`.
 Default App startup/lifecycle wiring, checkpoint/entry/error UI, and the
 one-time legacy reset remain the next milestone. The full goal is unfinished.
 Keep the keep-awake loop running during native tests.
+
+## Entry and lifecycle integration checkpoint: October 14
+
+The default launch now loads DelveBootstrap and DelveViewController. Bootstrap
+validates or creates the new atomic account before the one-time removal of
+legacy progress keys; corrupt/unsupported new documents are retained and
+shown with a retry-loading screen. Shared test schemes explicitly retain the
+legacy fixture boot path; production launch has no such override.
+
+The account screen provides entry/resume, checkpoint Continue/Extract, owned
+loadout selection, unbanked loot and risk, character XP, permanent Delve,
+continuation bonuses, death/abandonment settlement, and exact save retry.
+Old home/completion notifications and teleporters are rejected on owned
+floors. Equipment lists show all eligible owned gear and exclude duplicate
+attachment use. Epic and Legendary use purple and orange respectively.
+
+76 app regressions passed in
+`build/results/delve-entry-regressions-20261014-02.xcresult`. The final ten
+owner scenarios (including input reset and restored HUD) passed in
+`build/results/delve-entry-owner-20261014-04.xcresult`. Bootstrap tests verify
+one-time reset, no import, invalid/future-file preservation, and persisted
+entry/checkpoint/extraction screen controls.
+
+Native entry testing passed with real controls. Native background testing
+found combat progressing behind a pause dialog after platform activation.
+The owner now carries a semantic gameplayPaused flag, rejects simulation and
+contacts while paused, clears joystick/keyboard buffers, and reasserts renderer
+pause on activation. A regression simulates the platform unpausing SpriteKit.
+The background assertion also has an operation ID so an expired older write
+cannot end a newer assertion.
+
+The corrected production build retained HP 160, shield 19.948179, clock
+5.7700817, three actors, three projectiles, player pose, timers, metrics and RNG
+through both background/foreground and full process termination/relaunch.
+Native pause/cancel, suspension/resumption, and abandonment returned the
+expected screens. Comparisons are saved under ignored
+`build/production-background-fixed.json` and related diagnostic files.
+
+The native checkpoint fixture (presentation only, not a combat claim) equipped
+legendary run loot and extracted six items, changing banked inventory from
+seven to thirteen. The checkpoint fixture passed durable reload after extraction. The forced
+entry-write failure fixture also passed: native Retry opened the same prepared
+floor and pause menu. Evidence: `build/results/delve-checkpoint-hands-on-20261014-01.xcresult`
+and `build/results/delve-retry-hands-on-20261014-01.xcresult`. Navigation title
+contrast and settlement scroll-to-top were verified natively.
+
+The snapshot retry path now reports a repeated write failure through onError
+again instead of leaving a dismissed retry dialog. All eleven owner scenarios
+passed in `build/results/delve-entry-owner-20261014-05.xcresult`; the last three
+bootstrap scenarios passed in `build/results/delve-entry-bootstrap-20261014-03.xcresult`.
+Both review axes rechecked the input, HUD, presentation and retry fixes clean.
+The full UI-bound live combat chain and final acceptance remain the next pass.
+No merge or release has been performed.

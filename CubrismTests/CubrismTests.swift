@@ -1592,6 +1592,71 @@ class CubrismTests: XCTestCase {
 /// Runs the actual SpriteKit simulation with platform-appropriate control inputs.
 /// No health, damage, collision, loot, enemy, or completion overrides are used.
 class CubrismPlaythroughTests: XCTestCase {
+    @MainActor func testDelveEntryHandsOnPreview() async throws {
+        try await previewDelveUI(checkpoint: false, failFirstEntry: false)
+    }
+
+    /// A checkpoint presentation fixture, not a combat completion assertion.
+    @MainActor func testDelveCheckpointHandsOnPreview() async throws {
+        try await previewDelveUI(checkpoint: true, failFirstEntry: false)
+    }
+
+    @MainActor func testDelveEntryRetryHandsOnPreview() async throws {
+        try await previewDelveUI(checkpoint: false, failFirstEntry: true)
+    }
+
+    @MainActor private func previewDelveUI(checkpoint: Bool, failFirstEntry: Bool) async throws {
+        guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
+            throw XCTSkip("Run the acceptance scheme for native Delve UI inspection")
+        }
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let original = window.rootViewController
+        let oldSession = Player.delveSession, oldEntity = Player.entity
+        let oldScene = Player.currentScene, oldController = Player.currentViewController
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        var writes = 0
+        let store = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json"), writeDocument: { data, url in
+            writes += 1
+            if failFirstEntry && writes == 2 { throw CocoaError(.fileWriteUnknown) }
+            try data.write(to: url, options: .atomic)
+        }) { try DelveProgression.freshAccount() }
+        if checkpoint {
+            try store.transaction { progression in
+                var random = DelveRandom(seed: 741)
+                try progression.enterDungeon(using: &random)
+                for depth in 1...3 {
+                    let floor = try XCTUnwrap(progression.activeRun?.floor)
+                    for enemy in floor.plan.enemies { try progression.awardKill(floorID: floor.id, enemyID: enemy.id) }
+                    try progression.finishFloor(floorID: floor.id,
+                        performance: DelvePerformance(speed: 0.7, accuracy: 0.7, avoidance: 0.5), using: &random)
+                    if depth < 3 { try progression.continueRun(after: floor.id, using: &random) }
+                }
+            }
+        }
+        let session = try DelveGameSession(store: store)
+        let root = DelveViewController(session: session)
+        Player.delveSession = session
+        window.rootViewController = root; window.makeKeyAndVisible()
+        defer {
+            session.controller?.skView.presentScene(nil)
+            root.dismiss(animated: false)
+            window.rootViewController = original
+            Player.delveSession = oldSession; Player.entity = oldEntity
+            Player.currentScene = oldScene; Player.currentViewController = oldController
+            try? FileManager.default.removeItem(at: directory)
+        }
+        print("DELVE UI READY: checkpoint=\(checkpoint), failFirstEntry=\(failFirstEntry), isolated account")
+        try await Task.sleep(nanoseconds: 180_000_000_000)
+        session.suspend()
+        try await session.retrySave()
+        XCTAssertNil(session.error)
+        XCTAssertEqual(try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json")) { throw DelveError.invalidTransition }.progression, session.progression)
+        if root.presentedViewController != nil {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                root.dismiss(animated: false) { continuation.resume() }
+            }
+        }
+    }
     /// A timed fixture for native visual/control inspection, not an automated
     /// combat pass. Restore preferences even if hands-on combat earns rewards.
     @MainActor func testGeneratedFloorHandsOnPreview() async throws {
@@ -2194,6 +2259,11 @@ final class DelveSessionTests: XCTestCase {
         controller.skView.presentScene(nil)
         controller = try mount(loaded)
         XCTAssertEqual(loaded.shield, savedShield, "Loading a continued floor cannot refill the shield again")
+        let bars = try XCTUnwrap(Player.entity.component(ofType: HealthBarComponent.self))
+        let crop = try XCTUnwrap(bars.shieldCropSprite.parent as? SKCropNode)
+        let mask = try XCTUnwrap(crop.maskNode as? SKSpriteNode)
+        XCTAssertEqual(mask.size.width / bars.shieldCropSprite.size.width, loaded.shield / loaded.stats.maxShield, accuracy: 1e-6,
+                       "The resumed HUD must show the saved damage before the first combat frame")
         let died = expectation(description: "Atomic death settlement")
         loaded.onCommit = { action in if case .death = action { died.fulfill() } }
         loaded.receiveHit(loaded.health + loaded.shield + loaded.stats.flatArmour + 1)
@@ -2344,5 +2414,180 @@ final class DelveSessionTests: XCTestCase {
         let expected = (hp + catalog.bosses[boss]!.health) / reference.damagePerSecond + 2 * Double(run.floor.plan.combatRooms.count)
         XCTAssertEqual(world.metrics.targetSeconds, expected)
         XCTAssertLessThan(session.stats.damagePerSecond, reference.damagePerSecond)
+    }
+
+    func testLegacyCompletionAndHomeNotificationsCannotBypassDelveOwnership() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let previousController = Player.currentViewController
+        let defaults = UserDefaults.standard
+        let completed = defaults.object(forKey: "LevelCompleted")
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer {
+            controller.skView.presentScene(nil); Player.delveSession = previous
+            Player.currentViewController = previousController
+            if let completed = completed { defaults.set(completed, forKey: "LevelCompleted") }
+            try? FileManager.default.removeItem(at: directory)
+        }
+        defaults.removeObject(forKey: "LevelCompleted")
+        let before = session.progression
+        NotificationCenter.default.post(name: Notification.Name("GoToCompletedViewController"), object: controller.scene)
+        NotificationCenter.default.post(name: Notification.Name("GoToHomeViewController"), object: controller.scene)
+        XCTAssertEqual(session.progression, before)
+        XCTAssertFalse(controller.rewardsGranted)
+        XCTAssertTrue(controller.skView.scene === controller.scene)
+        XCTAssertNil(defaults.object(forKey: "LevelCompleted"))
+    }
+
+    func testPlatformUnpausingSpriteKitCannotResumeOwnedCombat() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let session = try DelveGameSession(store: store(in: directory))
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        session.resume()
+        controller.scene.started = true
+        controller.scene.update(1); controller.scene.update(1.05)
+        session.receiveHit(60); session.flush(controller.scene)
+        #if targetEnvironment(macCatalyst)
+        controller.scene.keyboardControls.press(.w)
+        controller.scene.keyboardControls.press(.up)
+        #endif
+        session.suspend()
+        try await session.retrySave()
+        let before = session.progression
+        let clock = controller.scene.time
+        // Scene activation can reset renderer pause flags. The account owner
+        // remains paused until the player explicitly chooses Resume.
+        controller.skView.isPaused = false; controller.scene.isPaused = false
+        controller.scene.update(100)
+        XCTAssertTrue(session.gameplayPaused)
+        XCTAssertTrue(controller.scene.isPaused)
+        XCTAssertEqual(controller.scene.time, clock)
+        XCTAssertEqual(session.progression, before)
+        #if targetEnvironment(macCatalyst)
+        XCTAssertFalse(controller.scene.keyboardControls.isMoving)
+        XCTAssertFalse(controller.scene.keyboardControls.isShooting)
+        #endif
+        session.resume()
+        controller.scene.update(101); controller.scene.update(101.02)
+        XCTAssertFalse(session.gameplayPaused)
+        XCTAssertEqual(controller.scene.time, clock + 0.02, accuracy: 1e-8)
+        XCTAssertFalse(Player.entity.moving)
+        XCTAssertFalse(Player.entity.shooting)
+    }
+
+    func testRepeatedSnapshotWriteFailureKeepsRetryVisibleAndCombatPaused() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let previous = Player.delveSession
+        let file = directory.appendingPathComponent("delve.json")
+        var writes = 0
+        let saved = try DelveSaveStore(fileURL: file, writeDocument: { data, url in
+            writes += 1
+            if writes == 3 || writes == 4 { throw CocoaError(.fileWriteUnknown) }
+            try data.write(to: url, options: .atomic)
+        }) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: saved)
+        try await session.enter()
+        let controller = try mount(session)
+        defer { controller.skView.presentScene(nil); Player.delveSession = previous; try? FileManager.default.removeItem(at: directory) }
+        let failed = expectation(description: "Snapshot write failed")
+        var errors = 0
+        session.onError = { _ in errors += 1; if errors == 1 { failed.fulfill() } }
+        session.receiveHit(40); session.flush(controller.scene)
+        let damaged = session.progression
+        session.saveSnapshot()
+        await fulfillment(of: [failed], timeout: 5)
+        do { try await session.retrySave(); XCTFail("The second write also fails") } catch {}
+        XCTAssertEqual(errors, 2, "A failed retry must present the error again")
+        XCTAssertNotNil(session.error)
+        XCTAssertTrue(session.gameplayPaused)
+        XCTAssertEqual(session.progression, damaged)
+        try await session.retrySave()
+        XCTAssertNil(session.error)
+        XCTAssertTrue(session.gameplayPaused, "Successful saving does not silently resume combat")
+        XCTAssertEqual(try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }.progression, damaged)
+    }
+}
+
+@MainActor
+final class DelveBootstrapTests: XCTestCase {
+    func testLegacyResetOccursOnceAfterValidAccountCreationAndNeverImportsGear() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let suite = "delve-bootstrap-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: directory) }
+        for key in DelveBootstrap.legacyKeys { defaults.set("old progress", forKey: key) }
+        let file = directory.appendingPathComponent("delve.json")
+        let session = try DelveBootstrap.load(fileURL: file, defaults: defaults)
+        XCTAssertEqual(session.progression.rating, 1)
+        XCTAssertEqual(session.progression.experience.level, 1)
+        XCTAssertEqual(session.progression.bankedItems.count, 7)
+        XCTAssertTrue(DelveBootstrap.legacyKeys.allSatisfy { defaults.object(forKey: $0) == nil })
+        XCTAssertEqual(defaults.integer(forKey: DelveBootstrap.resetMarker), 1)
+        defaults.set(9, forKey: "Level")
+        XCTAssertEqual(try DelveBootstrap.load(fileURL: file, defaults: defaults).progression, session.progression)
+        XCTAssertEqual(defaults.integer(forKey: "Level"), 9, "The one-time reset must not repeat")
+    }
+
+    func testInvalidSaveCannotResetLegacyDataOrOverwriteTheFile() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let suite = "delve-bootstrap-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let file = directory.appendingPathComponent("delve.json")
+        for data in [Data("broken".utf8), Data("{\"format\":\"cubrism.delve\",\"version\":999}".utf8)] {
+            try data.write(to: file)
+            defaults.set(80, forKey: "Level")
+            XCTAssertThrowsError(try DelveBootstrap.load(fileURL: file, defaults: defaults))
+            XCTAssertEqual(defaults.integer(forKey: "Level"), 80)
+            XCTAssertNil(defaults.object(forKey: DelveBootstrap.resetMarker))
+            XCTAssertEqual(try Data(contentsOf: file), data)
+        }
+    }
+
+    func testEntryUIResumesStoredCombatAndPresentsCheckpointWithoutRerolling() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("delve.json")
+        let saved = try DelveSaveStore(fileURL: file) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: saved)
+        let home = DelveViewController(session: session); home.loadViewIfNeeded()
+        XCTAssertNotNil(button("delve.enter", in: home.view))
+        try await session.enter()
+        let run = try XCTUnwrap(session.progression.activeRun)
+        // This test has no attached window, so the production UI cannot mount a
+        // game. Verify the persisted entry state through a second owner instead.
+        home.dismiss(animated: false)
+        let resumed = try DelveGameSession(store: DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition })
+        let root = DelveViewController(session: resumed); root.loadViewIfNeeded()
+        XCTAssertNotNil(button("delve.resume", in: root.view))
+        XCTAssertNil(button("delve.enter", in: root.view))
+        XCTAssertEqual(resumed.progression.activeRun?.floor.id, run.floor.id)
+        let plan = run.floor.plan
+        try resumed.store.transaction { progression in
+            for enemy in plan.enemies { try progression.awardKill(floorID: run.floor.id, enemyID: enemy.id) }
+            var random = DelveRandom(seed: 321)
+            try progression.finishFloor(floorID: run.floor.id,
+                performance: DelvePerformance(speed: 1, accuracy: 1, avoidance: 1), using: &random)
+        }
+        root.render()
+        XCTAssertNotNil(button("delve.continue", in: root.view))
+        XCTAssertNotNil(button("delve.extract", in: root.view))
+        XCTAssertNil(button("delve.resume", in: root.view))
+        XCTAssertNotNil(button("delve.equip.pulsar", in: root.view))
+        let loot = try XCTUnwrap(resumed.progression.activeRun?.loot)
+        try await resumed.extract()
+        XCTAssertEqual(resumed.progression.bankedItems.count, 7 + loot.count)
+        XCTAssertNotNil(button("delve.enter", in: root.view))
+    }
+
+    private func button(_ id: String, in view: UIView) -> UIButton? {
+        if let button = view as? UIButton, button.accessibilityIdentifier == id { return button }
+        return view.subviews.lazy.compactMap { self.button(id, in: $0) }.first
     }
 }

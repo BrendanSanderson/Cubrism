@@ -139,6 +139,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let touch = touches.first
             let but = atPoint(touch!.location(in: self))
             if  but.name == "pause"{
+                if let session = (self as? RoomScene)?.delveSession, session.onPause != nil {
+                    MainActor.assumeIsolated { session.requestPause() }
+                    return
+                }
                 if vending == false
                 {
                     if (self.isKind(of: HomeScene.self))
@@ -168,6 +172,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func didBegin(_ contact: SKPhysicsContact) {
+        if let session = (self as? RoomScene)?.delveSession,
+           session.gameplayPaused || session.busy || session.error != nil { return }
         // Changing rooms can leave contacts queued by the departing physics
         // world. Retired actors are no longer valid collision recipients.
         if let room = self as? RoomScene, room.viewController?.scene !== room { return }
@@ -202,6 +208,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             else if (self.isKind(of: RoomScene.self) == true)
             {
+                guard (self as? RoomScene)?.delveSession == nil else { return }
                 #if targetEnvironment(macCatalyst)
                 resetKeyboardControls()
                 #endif

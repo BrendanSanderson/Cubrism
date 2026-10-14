@@ -112,6 +112,7 @@ class PopUpNode: SKNode {
     
     @objc func play(_ sender: UIButton!) {
         remove()
+        if let session = (gameScene as? RoomScene)?.delveSession { MainActor.assumeIsolated { session.resume() } }
         gameScene.isPaused = false
         gameScene.button.texture = GameArt.texture( "pauseButton")
         
@@ -139,6 +140,10 @@ class PopUpNode: SKNode {
     
     @objc func yes(_ sender: UIButton!) {
         remove()
+        if let session = (gameScene as? RoomScene)?.delveSession {
+            Task { try? await session.abandon() }
+            return
+        }
         if (gameScene.isKind(of: HomeScene.self))
         {
             gameScene.isPaused = false

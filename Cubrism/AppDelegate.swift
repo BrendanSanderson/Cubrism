@@ -12,6 +12,9 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private(set) var delveSession: DelveGameSession?
+    private var backgroundSave: UIBackgroundTaskIdentifier = .invalid
+    private var backgroundSaveOperation: UUID?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -22,6 +25,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // the game's single-window controllers and app-hosted acceptance tests.
     func configureGame(in window: UIWindow) {
         self.window = window
+        Constants.w = window.frame.width; Constants.h = window.frame.height
+        Constants.uW = window.frame.width * 0.9; Constants.uH = window.frame.height * 0.8
+        Constants.jsonDict = loadBundledConstants()
+        EnemyEntity.refreshEnemyDictionary()
+        if ProcessInfo.processInfo.environment["CUBRISM_LEGACY_TESTING"] == "1" {
+            configureLegacyGame(in: window)
+            return
+        }
+        do {
+            let session = try DelveBootstrap.load(fileURL: DelveBootstrap.accountURL())
+            delveSession = session; Player.delveSession = session
+            window.rootViewController = DelveViewController(session: session)
+        } catch {
+            let controller = UIViewController()
+            controller.view.backgroundColor = GameArt.ink
+            let label = UILabel(); label.text = "Could not open your saved account.\nYour save has been kept. Retry when storage is available."
+            label.numberOfLines = 0; label.textColor = GameArt.ivory; label.textAlignment = .center
+            let button = UIButton(type: .system); button.setTitle("Retry loading", for: .normal)
+            button.addAction(UIAction { [weak self, weak window] _ in
+                if let window = window { self?.configureGame(in: window) }
+            }, for: .touchUpInside)
+            let stack = UIStackView(arrangedSubviews: [label, button]); stack.axis = .vertical; stack.spacing = 20
+            stack.translatesAutoresizingMaskIntoConstraints = false; controller.view.addSubview(stack)
+            NSLayoutConstraint.activate([
+                stack.centerYAnchor.constraint(equalTo: controller.view.centerYAnchor),
+                stack.leadingAnchor.constraint(equalTo: controller.view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
+                stack.trailingAnchor.constraint(equalTo: controller.view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
+            ])
+            window.rootViewController = controller
+        }
+        window.makeKeyAndVisible()
+    }
+
+    private func configureLegacyGame(in window: UIWindow) {
         let view = HomeViewController()
         //let view = CompletedViewController()
         view.view.isMultipleTouchEnabled = true
@@ -129,6 +166,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #if targetEnvironment(macCatalyst)
         Player.currentScene?.resetKeyboardControls()
         #endif
+    }
+
+    func suspendGame() {
+        resetGameControls()
+        guard let session = delveSession else { return }
+        session.suspend()
+        (window?.rootViewController as? DelveViewController)?.showPause()
+        guard backgroundSave == .invalid else { return }
+        let operation = UUID()
+        backgroundSaveOperation = operation
+        backgroundSave = UIApplication.shared.beginBackgroundTask(withName: "Save Delve") { [weak self] in
+            self?.endBackgroundSave(operation)
+        }
+        Task {
+            defer { endBackgroundSave(operation) }
+            try? await session.retrySave()
+        }
+    }
+
+    private func endBackgroundSave(_ operation: UUID) {
+        // An expired write may finish after a later background save starts.
+        guard backgroundSaveOperation == operation else { return }
+        backgroundSaveOperation = nil
+        guard backgroundSave != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundSave)
+        backgroundSave = .invalid
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

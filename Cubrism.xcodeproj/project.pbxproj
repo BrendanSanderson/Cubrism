@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE1FE0000000000000000025 /* DelveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000026 /* DelveViewController.swift */; };
+		DE1FE0000000000000000023 /* DelvePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000024 /* DelvePresentation.swift */; };
+		DE1FE0000000000000000021 /* DelveBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000022 /* DelveBootstrap.swift */; };
 		DE1FE000000000000000001F /* DelveGameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE0000000000000000020 /* DelveGameSession.swift */; };
 		DE1FE000000000000000001D /* DelveWorldFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000001E /* DelveWorldFactory.swift */; };
 		DE1FE000000000000000001B /* DelveWorldBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FE000000000000000001C /* DelveWorldBridge.swift */; };
@@ -90,6 +93,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DE1FE0000000000000000026 /* DelveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveViewController.swift; path = DelveViewController.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000024 /* DelvePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelvePresentation.swift; path = DelvePresentation.swift; sourceTree = "<group>"; };
+		DE1FE0000000000000000022 /* DelveBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveBootstrap.swift; path = DelveBootstrap.swift; sourceTree = "<group>"; };
 		DE1FE0000000000000000020 /* DelveGameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveGameSession.swift; path = DelveGameSession.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000001E /* DelveWorldFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveWorldFactory.swift; path = DelveWorldFactory.swift; sourceTree = "<group>"; };
 		DE1FE000000000000000001C /* DelveWorldBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DelveWorldBridge.swift; path = DelveWorldBridge.swift; sourceTree = "<group>"; };
@@ -324,6 +330,9 @@
 				DE1FE000000000000000000C /* DelveBalance.swift */,
 				DE1FE000000000000000000E /* DelveCalibration.swift */,
 				DE1FE000000000000000001C /* DelveWorldBridge.swift */,
+				DE1FE0000000000000000022 /* DelveBootstrap.swift */,
+				DE1FE0000000000000000024 /* DelvePresentation.swift */,
+				DE1FE0000000000000000026 /* DelveViewController.swift */,
 				DE1FE0000000000000000020 /* DelveGameSession.swift */,
 				DE1FE000000000000000001E /* DelveWorldFactory.swift */,
 				DE1FE000000000000000001A /* DelveActorBridge.swift */,
@@ -489,6 +498,9 @@
 				DE1FE000000000000000000B /* DelveBalance.swift in Sources */,
 				DE1FE000000000000000000D /* DelveCalibration.swift in Sources */,
 				DE1FE000000000000000001B /* DelveWorldBridge.swift in Sources */,
+				DE1FE0000000000000000021 /* DelveBootstrap.swift in Sources */,
+				DE1FE0000000000000000023 /* DelvePresentation.swift in Sources */,
+				DE1FE0000000000000000025 /* DelveViewController.swift in Sources */,
 				DE1FE000000000000000001F /* DelveGameSession.swift in Sources */,
 				DE1FE000000000000000001D /* DelveWorldFactory.swift in Sources */,
 				DE1FE0000000000000000019 /* DelveActorBridge.swift in Sources */,

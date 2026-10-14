@@ -337,13 +337,13 @@ class FloorViewController: UIViewController {
     }
     @objc func goToHomeViewController(_ notification: Notification)
     {
-        guard Player.currentViewController === self else { return }
+        guard delveSession == nil, Player.currentViewController === self else { return }
         self.skView.presentScene(nil)
         self.dismiss(animated: false, completion: nil)
     }
     @objc func goToCompletedViewController(_ notification: Notification)
     {
-        guard Player.currentViewController === self,
+        guard delveSession == nil, Player.currentViewController === self,
               let room = notification.object as? RoomScene, room === scene,
               !rewardsGranted, Player.alive else { return }
         rewardsGranted = true

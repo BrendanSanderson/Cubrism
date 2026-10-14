@@ -153,9 +153,9 @@ struct DelveRunSettlement: Codable, Equatable {
     let outcome: DelveRunEnd
 }
 
-// This snapshot owns account progression and run reward/resource state in one
-// value. DelveSaveStore persists this value atomically. Live encounters and
-// projectiles still need scene integration; this alone is not full combat resume.
+// Account progression, run resources and the stored combat world share one
+// snapshot. DelveSaveStore commits them atomically before critical transitions;
+// the SpriteKit bridge reconstructs actors and timelines from the stored world.
 struct DelveProgression: Codable, Equatable {
     private(set) var rating: Double
     private(set) var experience: DelveExperience

@@ -9,10 +9,12 @@ final class DelveGameSession {
     private(set) var stats: DelveCharacterStats
     private(set) var metrics: DelveCombatMetrics?
     private(set) var busy = false
+    private(set) var gameplayPaused = true
     private(set) var error: Error?
     weak var controller: FloorViewController?
     var onCommit: ((Action) -> Void)?
     var onError: ((Error) -> Void)?
+    var onPause: (() -> Void)?
     private var events = [Event]()
     private var bossDefeated = false
     private var pending: DelvePreparedSave<Void>?
@@ -77,6 +79,7 @@ final class DelveGameSession {
         let floor = try FloorViewController(plan: run.floor.plan, restorableCombat: true, world: world)
         controller = floor
         floor.delveSession = self
+        gameplayPaused = true
         metrics = world.metrics
         lastSaveClock = world.clock
         return floor
@@ -95,7 +98,7 @@ final class DelveGameSession {
     func resolved(_ id: UUID, hit: Bool) { metrics?.shots.resolve(id, hit: hit) }
 
     func recordFrame(_ room: RoomScene) {
-        guard !busy, !room.isPaused else { return }
+        guard !busy, !gameplayPaused, !room.isPaused else { return }
         do { try metrics?.recordTime(seconds: room.frameDuration, combatIsLive: combatIsLive(room)) }
         catch { fail(error) }
     }
@@ -156,11 +159,31 @@ final class DelveGameSession {
     }
 
     func suspend() {
+        gameplayPaused = true
         guard let room = controller?.scene else { return }
         room.isPaused = true
-        Player.entity.stopControls()
+        controller?.skView.isPaused = true
+        stopControls()
         flush(room)
         saveSnapshot()
+    }
+
+    func requestPause() { onPause?() }
+
+    private func stopControls() {
+        Player.entity.component(ofType: PlayerMovementComponent.self)?.joystick.resetInput()
+        Player.entity.component(ofType: PlayerShootComponent.self)?.joystick.resetInput()
+        Player.entity.stopControls()
+        #if targetEnvironment(macCatalyst)
+        controller?.scene?.resetKeyboardControls()
+        #endif
+    }
+
+    func resume() {
+        guard !busy, error == nil, progression.activeRun?.floor.phase == .combat else { return }
+        gameplayPaused = false
+        controller?.skView.isPaused = false
+        controller?.scene?.isPaused = false
     }
 
     func saveSnapshot() {
@@ -185,8 +208,13 @@ final class DelveGameSession {
 
     func retrySave() async throws {
         if pending != nil { try await retryPending(); return }
-        try await store.saveCombat()
-        error = nil
+        do {
+            try await store.saveCombat()
+            error = nil
+        } catch {
+            fail(error)
+            throw error
+        }
     }
 
     private func perform(_ action: Action, change: (inout DelveProgression) throws -> Void) async throws {
@@ -200,8 +228,9 @@ final class DelveGameSession {
         pendingAction = action
         pendingOperationID = UUID()
         busy = true
+        gameplayPaused = true
         controller?.scene?.isPaused = true
-        Player.entity.stopControls()
+        stopControls()
     }
 
     private func retryPending() async throws {
@@ -221,8 +250,9 @@ final class DelveGameSession {
 
     private func fail(_ error: Error) {
         self.error = error
+        gameplayPaused = true
         controller?.scene?.isPaused = true
-        Player.entity.stopControls()
+        stopControls()
         onError?(error)
     }
 }

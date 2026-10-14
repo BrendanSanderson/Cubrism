@@ -13,6 +13,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
-        (UIApplication.shared.delegate as? AppDelegate)?.resetGameControls()
+        (UIApplication.shared.delegate as? AppDelegate)?.suspendGame()
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        let app = UIApplication.shared.delegate as? AppDelegate
+        if app?.delveSession?.gameplayPaused == true { app?.delveSession?.suspend() }
     }
 }
