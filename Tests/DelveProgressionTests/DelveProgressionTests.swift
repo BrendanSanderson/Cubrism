@@ -11,6 +11,32 @@ private struct SeededRandom: RandomNumberGenerator {
 }
 
 final class DelveProgressionTests: XCTestCase {
+    func testLootRemembersEveryFloorAfterContinueReloadAndExtraction() throws {
+        var state = try account()
+        var random = SeededRandom(state: 345)
+        var floor = try state.startRun(maxHealth: 100, maxShield: 100, using: &random)
+        var expected = [UUID: Int]()
+        for depth in 1...3 {
+            let drops = try rewards(state, using: &random)
+            try state.clearFloor(floorID: floor, performance: performance(), loot: drops)
+            for item in drops { expected[item.id] = depth }
+            state = try restore(state)
+            try state.validateSnapshot()
+            for item in try XCTUnwrap(state.activeRun).loot {
+                XCTAssertEqual(item.floorDepth, expected[item.id])
+            }
+            if depth < 3 { floor = try state.continueRun(after: floor, using: &random) }
+        }
+        try state.extract(runID: XCTUnwrap(state.activeRun).id)
+        state = try restore(state)
+        XCTAssertEqual(state.bankedItems.count, expected.count)
+        for item in state.bankedItems { XCTAssertEqual(item.floorDepth, expected[item.id]) }
+        XCTAssertThrowsError(try DelveLoot(kind: .pulsar, power: 1, rarity: .common, floorDepth: 0))
+        let oldItem = try DelveLoot(kind: .pulsar, power: 1, rarity: .common)
+        let encoded = try JSONEncoder().encode(oldItem)
+        XCTAssertNil(try JSONDecoder().decode(DelveLoot.self, from: encoded).floorDepth)
+    }
+
     private func performance(_ value: Double = 0) throws -> DelvePerformance {
         try DelvePerformance(speed: value, accuracy: value, avoidance: value)
     }

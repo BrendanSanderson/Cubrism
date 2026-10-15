@@ -8,6 +8,7 @@ final class DelveViewController: UIViewController {
     private var floor: FloorViewController?
     private var working = false
     private var notice: String?
+    private var checkpoint: DelveCheckpointView?
 
     init(session: DelveGameSession) {
         self.session = session
@@ -44,8 +45,33 @@ final class DelveViewController: UIViewController {
 
     func render(resetScroll: Bool = false) {
         guard isViewLoaded else { return }
+        let account = session.progression
+        if let run = account.activeRun, run.floor.phase == .checkpoint {
+            scroll.isHidden = true
+            if checkpoint?.floorID != run.floor.id {
+                stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+                checkpoint?.removeFromSuperview()
+                let checkpoint = DelveCheckpointView(account: account)
+                checkpoint.translatesAutoresizingMaskIntoConstraints = false
+                self.checkpoint = checkpoint
+                checkpoint.onContinue = { [weak self] in self?.perform { try await self?.session.continueFloor() } }
+                checkpoint.onExtract = { [weak self] in self?.perform { try await self?.session.extract() } }
+                checkpoint.onInspect = { [weak self] in self?.inspect($0) }
+                checkpoint.onLoadout = { [weak self] in self?.showLoadout() }
+                view.addSubview(checkpoint)
+                NSLayoutConstraint.activate([
+                    checkpoint.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                    checkpoint.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                    checkpoint.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                    checkpoint.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+                ])
+            }
+            checkpoint?.update(account: account, enabled: !working && !session.busy && session.error == nil)
+            return
+        }
+        checkpoint?.removeFromSuperview(); checkpoint = nil; scroll.isHidden = false
         stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let account = session.progression, xp = account.experience
+        let xp = account.experience
         label("CUBRISM  /  DELVE", size: 30, color: GameArt.gold)
         label("Delve level \(DelvePresentation.number(account.rating)) · Character \(xp.level)", size: 22)
         if xp.level < xp.cap {
@@ -63,18 +89,8 @@ final class DelveViewController: UIViewController {
             label(run.floor.phase == .checkpoint ? "Floor \(run.depth) complete" : "Floor \(run.depth) suspended", size: 24)
             label("HP \(DelvePresentation.number(run.resources.health)) / \(DelvePresentation.number(run.resources.maxHealth)) · Shield \(DelvePresentation.number(run.resources.shield)) / \(DelvePresentation.number(run.resources.maxShield))", size: 17)
             label("\(run.loot.count) items at risk. Extract to bank them; dying or abandoning loses the whole run’s loot.", size: 17)
-            if run.floor.phase == .checkpoint {
-                let xpGained = ((try? account.rules.balance.xpAllocations(for: run.floor.plan)) ?? [:]).values.reduce(0, +)
-                    * (1 + ((try? DelveRules.continuationBonus(depth: run.depth)) ?? 0))
-                label("Floor XP +\(DelvePresentation.number(xpGained)) · Delve +\(DelvePresentation.number(account.rating - run.floor.entryRating))", size: 17, color: GameArt.ice)
-                let bonus = (try? DelveRules.continuationBonus(depth: run.depth + 1)) ?? 0
-                label("Next floor: +\(Int((bonus * 100).rounded()))% XP and Delve gains · Better rarity odds · \(Int((bonus * 200).rounded()))% chance of a third item. HP carries forward; shields recharge.", size: 17)
-                button("Continue to floor \(run.depth + 1)", id: "delve.continue") { [weak self] in self?.perform { try await self?.session.continueFloor() } }
-                button("Extract \(run.loot.count) items", id: "delve.extract") { [weak self] in self?.perform { try await self?.session.extract() } }
-            } else {
-                button("Resume floor \(run.depth)", id: "delve.resume") { [weak self] in self?.openFloor() }
-                button("Abandon run", id: "delve.abandon") { [weak self] in self?.confirmAbandon() }
-            }
+            button("Resume floor \(run.depth)", id: "delve.resume") { [weak self] in self?.openFloor() }
+            button("Abandon run", id: "delve.abandon") { [weak self] in self?.confirmAbandon() }
             if !run.loot.isEmpty {
                 label("Run loot", size: 22)
                 for item in run.loot {
@@ -198,6 +214,7 @@ final class DelveViewController: UIViewController {
             presenter.dismiss(animated: false) { [weak self] in self?.showSaveError() }
             return
         }
+        guard presenter.viewIfLoaded?.window != nil else { render(); return }
         let alert = UIAlertController(title: "Could not save", message: "Your run is paused. Retry saving to continue with the same floor and rewards.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Retry save", style: .default) { [weak self] _ in
             guard let self = self else { return }
@@ -214,6 +231,33 @@ final class DelveViewController: UIViewController {
         let picker = DelveGearViewController(session: session, slot: slot)
         picker.onEquipped = { [weak self] in self?.render() }
         present(UINavigationController(rootViewController: picker), animated: true)
+    }
+
+    private func showLoadout() {
+        guard !working, !session.busy, session.error == nil, presentedViewController == nil else { return }
+        let alert = UIAlertController(title: "Loadout", message: "Choose equipment to change. Unbanked gear is still lost on death.", preferredStyle: .alert)
+        for slot in DelveEquipmentSlot.allCases {
+            alert.addAction(UIAlertAction(title: DelvePresentation.name(slot), style: .default) { [weak self, weak alert] _ in
+                alert?.dismiss(animated: false) { self?.chooseGear(slot) }
+            })
+        }
+        alert.addAction(UIAlertAction(title: "Back to rewards", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    private func inspect(_ item: DelveLoot) {
+        guard !working, !session.busy, session.error == nil, presentedViewController == nil else { return }
+        let source = item.floorDepth.map { "Floor \($0) · " } ?? ""
+        let alert = UIAlertController(title: DelvePresentation.name(item),
+            message: "\(source)Unbanked · Lost on death\n\n\(DelvePresentation.stats(item, balance: session.progression.rules.balance))", preferredStyle: .alert)
+        for slot in DelveEquipmentSlot.allCases where slot.accepts(item.kind)
+            && !session.progression.equipped.contains(where: { $0.key != slot && $0.value == item.id }) {
+            alert.addAction(UIAlertAction(title: "Equip: \(DelvePresentation.name(slot))", style: .default) { [weak self] _ in
+                self?.perform { try await self?.session.equip(item.id, in: slot) }
+            })
+        }
+        alert.addAction(UIAlertAction(title: "Back to rewards", style: .cancel))
+        present(alert, animated: true)
     }
 }
 

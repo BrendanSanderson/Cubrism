@@ -22,11 +22,13 @@ struct DelveLoot: Codable, Equatable {
     let rarity: DelveRarity
     let variant: Int
     let attachmentStat: String?
+    let floorDepth: Int?
 
     init(id: UUID = UUID(), kind: DelveItemKind, power: Double, rarity: DelveRarity,
-         variant: Int = 0, attachmentStat: String? = nil) throws {
+         variant: Int = 0, attachmentStat: String? = nil, floorDepth: Int? = nil) throws {
         try DelveRules.validateScore(power)
         guard (0...3).contains(variant) else { throw DelveError.invalidLoot }
+        guard floorDepth.map({ $0 > 0 }) ?? true else { throw DelveError.invalidLoot }
         let attachmentStats = ["AttackPower", "Defence", "Shield", "Health"]
         guard kind == .attachment ? attachmentStats.contains(attachmentStat ?? "") : attachmentStat == nil else {
             throw DelveError.invalidLoot
@@ -37,6 +39,7 @@ struct DelveLoot: Codable, Equatable {
         self.rarity = rarity
         self.variant = variant
         self.attachmentStat = attachmentStat
+        self.floorDepth = floorDepth
     }
 }
 
@@ -223,7 +226,7 @@ struct DelveProgression: Codable, Equatable {
         guard Set(items.map(\.id)).count == items.count else { throw DelveError.invalidLoot }
         for item in items {
             _ = try DelveLoot(id: item.id, kind: item.kind, power: item.power, rarity: item.rarity,
-                             variant: item.variant, attachmentStat: item.attachmentStat)
+                             variant: item.variant, attachmentStat: item.attachmentStat, floorDepth: item.floorDepth)
         }
         try Self.validateLoadout(equipped, items: items)
         guard let run = activeRun else { return }
@@ -269,6 +272,9 @@ struct DelveProgression: Codable, Equatable {
         // Each completed floor must still own its unbanked rewards. Use Double
         // for count bounds so a malformed Int.max depth cannot overflow here.
         let cleared = Double(run.depth - (run.floor.phase == .combat ? 1 : 0))
+        guard run.loot.allSatisfy({ $0.floorDepth.map { Double($0) <= cleared } ?? true }) else {
+            throw DelveError.invalidLoot
+        }
         let minimumLoot = 2 * min(cleared, 5) + 3 * max(0, cleared - 5)
         let maximumLoot = cleared == 0 ? 0 : 2 + 3 * (cleared - 1)
         guard Double(run.loot.count) >= minimumLoot, Double(run.loot.count) <= maximumLoot else {
@@ -286,7 +292,8 @@ struct DelveProgression: Codable, Equatable {
             let allowedCount = run.depth == 1 ? 2...2 : (run.depth >= 6 ? 3...3 : 2...3)
             let rewards = run.loot.suffix(rewardCount)
             guard allowedCount.contains(rewardCount), rewards.map(\.id) == run.floor.rewardIDs,
-                  rewards.allSatisfy({ $0.power == run.floor.difficulty }) else {
+                  rewards.allSatisfy({ $0.power == run.floor.difficulty && ($0.floorDepth.map { $0 == run.depth } ?? true) }),
+                  run.loot.dropLast(rewardCount).allSatisfy({ $0.floorDepth.map { $0 < run.depth } ?? true }) else {
                 throw DelveError.invalidLoot
             }
             let low = try rules.winGain(entryRating: run.floor.entryRating, difficulty: run.floor.difficulty,
@@ -446,7 +453,10 @@ struct DelveProgression: Codable, Equatable {
         let gain = try rules.winGain(entryRating: run.floor.entryRating, difficulty: run.floor.difficulty,
                                      depth: run.depth, performance: performance)
         guard (rating + gain).isFinite else { throw DelveError.invalidValue("rating") }
-        run.loot += loot
+        run.loot += try loot.map {
+            try DelveLoot(id: $0.id, kind: $0.kind, power: $0.power, rarity: $0.rarity,
+                          variant: $0.variant, attachmentStat: $0.attachmentStat, floorDepth: run.depth)
+        }
         run.floor.rewardIDs = loot.map(\.id)
         run.floor.phase = .checkpoint
         run.floor.world = nil

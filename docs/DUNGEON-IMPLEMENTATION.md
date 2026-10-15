@@ -782,3 +782,66 @@ from the live combat claim.
 The accepted numerical curves are initial tuning. The calibration study and
 short playtests verify implementation and provide a starting point; longer
 human play feedback will determine later balance adjustments.
+
+## Native checkpoint presentation: October 14
+
+The approved reactor checkpoint design is implemented in
+`DelveCheckpointView.swift`, using the game's 750 × 375 logical arena and
+Comfortaa score font. The full-width XP banner and Delve count animate from
+the just-completed floor's actual account values. At the character cap, XP
+remains a lifetime statistic. The gain starts at the blue section's boundary;
+if the unfilled space cannot hold readable text, it appears below the floor
+title instead. Layout tests cover 0%, 10%, 50%, 90%, and 99% progress.
+The left column shows the floor title, score
+and gold burst; the right column scrolls through every unbanked reward in
+the run, grouped by floor with the newest rewards first. Gear uses the
+existing art catalog and its saved cosmetic variants. The footer includes
+the full health track, shield refill/risk labels, and equal-sized choices.
+
+Each newly cleared floor stamps its drops with an optional `floorDepth` in
+the existing atomic transaction. Snapshot validation rejects impossible
+floor origins. Older saved items without this field remain readable and
+appear under “Earlier floors”; their source is never guessed. Current-floor
+reward IDs still identify the new rewards on an older checkpoint.
+
+Continue and Extract call the existing `DelveGameSession` operations. Both
+choices disable during a pending action; repeated taps cannot create a
+second floor or bank items twice. Save failure preserves the checkpoint and
+offers Retry on the visible controller after dismissing covered modal UI.
+The loadout picker and direct item inspection/equipping remain accessible.
+
+Verification:
+
+- 54 pure progression tests pass, including floor origins through continuation,
+  reload and extraction (`build/checkpoint-core-tests.log`).
+- 84 Mac Catalyst app regressions pass, including both choices, duplicate
+  extraction, failure/retry, compact layouts, all-floor loot scrolling, and
+  separate full-screen combat/equipment save-error tests
+  (`build/results/checkpoint-mac-regressions-20261014-03.xcresult`).
+- All 83 iOS app regressions pass in
+  `build/results/checkpoint-ios-regressions-20261014-03.xcresult`. The equipment
+  recovery test explicitly presents the real picker full screen, since
+  adaptive sheets do not detach the account on every OS release.
+- Native iPhone inspection verified scrolling to Floor 1, inspecting an older
+  drop, opening the loadout picker, equipping earlier-floor loot, extracting
+  six items into thirteen total banked items, and continuing into Floor 4.
+  Movement, aiming and pause worked after continuation. These prepared
+  checkpoint fixtures are separate from live combat acceptance.
+- The actual account-UI combat run cleared three consecutive floors and
+  extracted all eight rewards. It finished at Delve 56.3741602524 and
+  lifetime XP 370.2779086295; the reloaded account equaled the settled state.
+  Earlier deaths exercised loss of the bag and retained XP before the
+  successful climb. No combat, health, damage, reward or completion overrides
+  were used. Both native inspection and live acceptance pass in
+  `build/results/checkpoint-live-20261014-02.xcresult`; the native screenshot
+  is exported under `build/checkpoint-evidence/`.
+- Final structured review is clean after correcting both modal save-retry
+  paths. Command: `autoreview --mode local --model gpt-6.1-sol --thinking high
+  --no-web-search`; outputs are `build/checkpoint-review.md` and
+  `build/checkpoint-review.json`. The configured model was used because the
+  helper's older default model is unavailable on this account.
+
+The separate local Mac build is `/Users/beep/Applications/Cubrism Delve.app`;
+its code signature verifies and production launch opens the Delve entry
+screen with the normal starter account. The older installed builds and
+`master` remain unchanged.

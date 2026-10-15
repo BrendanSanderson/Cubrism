@@ -17,16 +17,23 @@ enum DelvePresentation {
     }
 
     static func name(_ item: DelveLoot) -> String {
-        let kind: String
+        "\(rarity(item.rarity)) \(kind(item)) · Power \(number(item.power))"
+    }
+
+    static func kind(_ item: DelveLoot) -> String {
         switch item.kind {
-        case .powerCore: kind = "Power Core"
-        case .armorCore: kind = "Armor Core"
-        case .pulsar: kind = "Pulsar"
-        case .specialPulsar: kind = "Special Pulsar"
-        case .shield: kind = "Shield"
-        case .attachment: kind = "\(item.attachmentStat == "AttackPower" ? "Attack" : item.attachmentStat ?? "") Attachment"
+        case .powerCore: return "Power Core"
+        case .armorCore: return "Armor Core"
+        case .pulsar: return "Pulsar"
+        case .specialPulsar: return "Special Pulsar"
+        case .shield: return "Shield"
+        case .attachment: return "\(item.attachmentStat == "AttackPower" ? "Attack" : item.attachmentStat ?? "") Attachment"
         }
-        return "\(rarity(item.rarity)) \(kind) · Power \(number(item.power))"
+    }
+
+    static func image(_ item: DelveLoot) -> UIImage? {
+        let family = item.kind == .attachment ? "Attachment" : kind(item)
+        return GameArt.image(family + (item.rarity == .common ? "" : "\(item.variant)"))
     }
 
     static func rarity(_ rarity: DelveRarity) -> String {

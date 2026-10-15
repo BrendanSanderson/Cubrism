@@ -1636,6 +1636,17 @@ class CubrismPlaythroughTests: XCTestCase {
             try? FileManager.default.removeItem(at: directory)
         }
         print("DELVE UI READY: checkpoint=\(checkpoint), failFirstEntry=\(failFirstEntry), isolated account")
+        if checkpoint {
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            root.view.layoutIfNeeded()
+            let image = UIGraphicsImageRenderer(bounds: root.view.bounds).image { _ in
+                root.view.drawHierarchy(in: root.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "Native Delve checkpoint"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
         try await Task.sleep(nanoseconds: 180_000_000_000)
         session.suspend()
         try await session.retrySave()
@@ -2691,7 +2702,7 @@ final class DelveBootstrapTests: XCTestCase {
         XCTAssertNotNil(delveButton("delve.continue", in: root.view))
         XCTAssertNotNil(delveButton("delve.extract", in: root.view))
         XCTAssertNil(delveButton("delve.resume", in: root.view))
-        XCTAssertNotNil(delveButton("delve.equip.pulsar", in: root.view))
+        XCTAssertNotNil(delveButton("delve.loadout", in: root.view))
         let loot = try XCTUnwrap(resumed.progression.activeRun?.loot)
         try await resumed.extract()
         XCTAssertEqual(resumed.progression.bankedItems.count, 7 + loot.count)
@@ -2704,6 +2715,231 @@ final class DelveBootstrapTests: XCTestCase {
 private func delveButton(_ id: String, in view: UIView) -> UIButton? {
     if let button = view as? UIButton, button.accessibilityIdentifier == id { return button }
     return view.subviews.lazy.compactMap { delveButton(id, in: $0) }.first
+}
+
+@MainActor
+final class DelveCheckpointTests: XCTestCase {
+    func testXPGainStartsAtBlueSectionAndStaysReadableNearFull() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json")) { try DelveProgression.freshAccount() }
+        try prepareThreeFloorCheckpoint(in: store)
+        let initial = store.progression
+        for fraction in [0.0, 0.1, 0.5, 0.9, 0.99] {
+            var document = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(initial)) as? [String: Any])
+            var xp = try XCTUnwrap(document["experience"] as? [String: Any])
+            let level = initial.experience.level, costs = initial.experience.levelUpCosts
+            let progress = costs[level - 1] * fraction
+            xp["progress"] = progress
+            xp["lifetime"] = costs.prefix(level - 1).reduce(0, +) + progress
+            document["experience"] = xp
+            let account = try JSONDecoder().decode(DelveProgression.self, from: JSONSerialization.data(withJSONObject: document))
+            try account.validateSnapshot()
+            let view = DelveCheckpointView(account: account)
+            view.frame = CGRect(x: 0, y: 0, width: 750, height: 375); view.layoutIfNeeded()
+            let gain = try XCTUnwrap(completionView(view, id: "delve.xpGain"))
+            let fill = try XCTUnwrap(completionView(view, id: "delve.xpFill"))
+            if fraction <= 0.9 {
+                XCTAssertTrue(gain.superview === fill.superview)
+                XCTAssertEqual(gain.frame.minX, fill.frame.maxX + 10, accuracy: 0.01)
+                XCTAssertTrue(try XCTUnwrap(gain.superview).bounds.contains(gain.frame))
+                for id in ["delve.characterLevel", "delve.xpValue"] {
+                    XCTAssertFalse(gain.frame.intersects(try XCTUnwrap(completionView(view, id: id)).frame))
+                }
+            } else {
+                XCTAssertFalse(gain.superview === fill.superview)
+                XCTAssertTrue(view.bounds.contains(gain.convert(gain.bounds, to: view)))
+                XCTAssertGreaterThan(gain.bounds.width, 95)
+            }
+        }
+    }
+
+    func testEquipmentSaveFailureDismissesPickerAndOffersRetry() async throws {
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let original = window.rootViewController
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        var rejectWrite = false
+        let store = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json"), writeDocument: { data, url in
+            if rejectWrite { throw CocoaError(.fileWriteUnknown) }
+            try data.write(to: url, options: .atomic)
+        }) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: store)
+        let root = DelveViewController(session: session)
+        window.rootViewController = root; window.makeKeyAndVisible()
+        defer {
+            root.dismiss(animated: false); window.rootViewController = original
+            try? FileManager.default.removeItem(at: directory)
+        }
+        try XCTUnwrap(delveButton("delve.equip.powerCore", in: root.view)).sendActions(for: .touchUpInside)
+        try await waitUntil { root.presentedViewController is UINavigationController && root.presentedViewController?.transitionCoordinator == nil }
+        let navigation = try XCTUnwrap(root.presentedViewController as? UINavigationController)
+        let picker = try XCTUnwrap(navigation.topViewController as? UITableViewController)
+        picker.loadViewIfNeeded()
+        // Adaptive sheets differ by OS. Explicitly cover the account to exercise
+        // recovery when its view has actually been detached from the window.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            root.dismiss(animated: false) { continuation.resume() }
+        }
+        navigation.modalPresentationStyle = .fullScreen
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            root.present(navigation, animated: false) { continuation.resume() }
+        }
+        XCTAssertNil(root.view.window, "The full-screen equipment picker covers the account")
+        rejectWrite = true
+        let unequip = IndexPath(row: picker.tableView.numberOfRows(inSection: 0) - 1, section: 0)
+        picker.tableView.delegate?.tableView?(picker.tableView, didSelectRowAt: unequip)
+        try await waitUntil { (root.presentedViewController as? UIAlertController)?.title == "Could not save" }
+        XCTAssertNotNil(session.error)
+        XCTAssertEqual((root.presentedViewController as? UIAlertController)?.actions.first?.title, "Retry save")
+        rejectWrite = false
+        try await session.retrySave()
+        XCTAssertNil(session.error)
+        XCTAssertNil(session.progression.equipped[.powerCore])
+    }
+
+    func testCombatSaveFailurePresentsRetryOnTheVisibleFullScreenFloor() async throws {
+        let window = try XCTUnwrap((UIApplication.shared.delegate as? AppDelegate)?.window)
+        let original = window.rootViewController
+        let oldSession = Player.delveSession, oldEntity = Player.entity
+        let oldScene = Player.currentScene, oldController = Player.currentViewController
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        var rejectWrite = false
+        let store = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json"), writeDocument: { data, url in
+            if rejectWrite { throw CocoaError(.fileWriteUnknown) }
+            try data.write(to: url, options: .atomic)
+        }) { try DelveProgression.freshAccount() }
+        let session = try DelveGameSession(store: store)
+        let root = DelveViewController(session: session)
+        Player.delveSession = session
+        window.rootViewController = root; window.makeKeyAndVisible()
+        defer {
+            session.controller?.skView.presentScene(nil); root.dismiss(animated: false)
+            window.rootViewController = original
+            Player.delveSession = oldSession; Player.entity = oldEntity
+            Player.currentScene = oldScene; Player.currentViewController = oldController
+            try? FileManager.default.removeItem(at: directory)
+        }
+        try XCTUnwrap(delveButton("delve.enter", in: root.view)).sendActions(for: .touchUpInside)
+        try await waitUntil { session.controller?.presentedViewController is UIAlertController }
+        let floor = try XCTUnwrap(session.controller)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            floor.dismiss(animated: false) { continuation.resume() }
+        }
+        session.resume()
+        XCTAssertNil(root.view.window, "The account view is detached behind full-screen combat")
+        rejectWrite = true
+        session.receiveHit(10); session.flush(floor.scene); session.saveSnapshot()
+        try await waitUntil { (floor.presentedViewController as? UIAlertController)?.title == "Could not save" }
+        XCTAssertNotNil(session.error)
+        let alert = try XCTUnwrap(floor.presentedViewController as? UIAlertController)
+        XCTAssertEqual(alert.actions.first?.title, "Retry save")
+        rejectWrite = false
+        try await session.retrySave()
+        XCTAssertNil(session.error)
+    }
+
+    func testCheckpointFitsGameViewportWithEqualButtonsAndAllFloorsOfLoot() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = try DelveSaveStore(fileURL: directory.appendingPathComponent("delve.json")) { try DelveProgression.freshAccount() }
+        try prepareThreeFloorCheckpoint(in: store)
+        let session = try DelveGameSession(store: store)
+        let root = DelveViewController(session: session); root.loadViewIfNeeded()
+        for size in [CGSize(width: 750, height: 375), CGSize(width: 844, height: 390), CGSize(width: 667, height: 375)] {
+            root.view.frame = CGRect(origin: .zero, size: size)
+            root.view.setNeedsLayout(); root.view.layoutIfNeeded()
+            let checkpoint = try XCTUnwrap(completionView(root.view, id: "delve.checkpoint"))
+            checkpoint.layoutIfNeeded()
+            let extract = try XCTUnwrap(delveButton("delve.extract", in: root.view))
+            let descend = try XCTUnwrap(delveButton("delve.continue", in: root.view))
+            XCTAssertEqual(extract.bounds.size, descend.bounds.size)
+            XCTAssertTrue(root.view.bounds.contains(extract.convert(extract.bounds, to: root.view)))
+            XCTAssertTrue(root.view.bounds.contains(descend.convert(descend.bounds, to: root.view)))
+            let health = try XCTUnwrap(completionView(root.view, id: "delve.health"))
+            XCTAssertTrue(try XCTUnwrap(health.accessibilityValue).contains("HP"))
+            let table = try XCTUnwrap(completionView(root.view, id: "delve.runLoot") as? UITableView)
+            table.layoutIfNeeded()
+            XCTAssertEqual(table.numberOfSections, 3)
+            XCTAssertEqual((0..<3).reduce(0) { $0 + table.numberOfRows(inSection: $1) }, session.progression.activeRun?.loot.count)
+            XCTAssertGreaterThan(table.contentSize.height, table.bounds.height)
+            let last = IndexPath(row: table.numberOfRows(inSection: 2) - 1, section: 2)
+            table.scrollToRow(at: last, at: .bottom, animated: false)
+            table.layoutIfNeeded()
+            XCTAssertGreaterThan(table.contentOffset.y, 0)
+            XCTAssertTrue(try XCTUnwrap(table.cellForRow(at: last)?.accessibilityValue).contains("Floor 1"))
+        }
+    }
+
+    func testExtractButtonBanksEveryFloorOnceAndReturnsToEntry() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("delve.json")
+        let store = try DelveSaveStore(fileURL: file) { try DelveProgression.freshAccount() }
+        try prepareThreeFloorCheckpoint(in: store)
+        let session = try DelveGameSession(store: store)
+        let root = DelveViewController(session: session); root.loadViewIfNeeded()
+        let run = try XCTUnwrap(session.progression.activeRun), original = session.progression.bankedItems
+        let button = try XCTUnwrap(delveButton("delve.extract", in: root.view))
+        button.sendActions(for: .touchUpInside)
+        XCTAssertFalse(button.isEnabled)
+        XCTAssertFalse(try XCTUnwrap(delveButton("delve.continue", in: root.view)).isEnabled)
+        button.sendActions(for: .touchUpInside)
+        try await waitUntil { session.progression.activeRun == nil && delveButton("delve.enter", in: root.view)?.isEnabled == true }
+        XCTAssertEqual(session.progression.bankedItems, original + run.loot)
+        XCTAssertEqual(session.progression.lastSettlement?.outcome, .extracted)
+        XCTAssertNil(completionView(root.view, id: "delve.checkpoint"))
+        XCTAssertEqual(try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }.progression, session.progression)
+    }
+
+    func testBothChoicesStayAtCheckpointOnSaveFailureAndRetrySameTransaction() async throws {
+        for choice in ["delve.continue", "delve.extract"] {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let file = directory.appendingPathComponent("delve.json")
+            var rejectWrite = false
+            let store = try DelveSaveStore(fileURL: file, writeDocument: { data, url in
+                if rejectWrite { throw CocoaError(.fileWriteUnknown) }
+                try data.write(to: url, options: .atomic)
+            }) { try DelveProgression.freshAccount() }
+            try prepareThreeFloorCheckpoint(in: store)
+            let session = try DelveGameSession(store: store)
+            let root = DelveViewController(session: session); root.loadViewIfNeeded()
+            let before = session.progression, run = try XCTUnwrap(before.activeRun)
+            rejectWrite = true
+            try XCTUnwrap(delveButton(choice, in: root.view)).sendActions(for: .touchUpInside)
+            try await waitUntil { session.error != nil }
+            XCTAssertEqual(session.progression, before)
+            XCTAssertEqual(try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }.progression, before)
+            XCTAssertNotNil(completionView(root.view, id: "delve.checkpoint"))
+            XCTAssertFalse(try XCTUnwrap(delveButton("delve.extract", in: root.view)).isEnabled)
+            XCTAssertFalse(try XCTUnwrap(delveButton("delve.continue", in: root.view)).isEnabled)
+            rejectWrite = false
+            try await session.retrySave()
+            try await waitUntil { !session.busy }
+            if choice == "delve.continue" {
+                let next = try XCTUnwrap(session.progression.activeRun)
+                XCTAssertEqual(next.depth, 4); XCTAssertNotEqual(next.floor.id, run.floor.id)
+                XCTAssertEqual(next.loot, run.loot)
+                XCTAssertEqual(next.resources.health, run.resources.health)
+                XCTAssertEqual(next.resources.shield, next.resources.maxShield)
+                XCTAssertNotNil(delveButton("delve.resume", in: root.view))
+            } else {
+                XCTAssertNil(session.progression.activeRun)
+                XCTAssertEqual(session.progression.bankedItems, before.bankedItems + run.loot)
+                XCTAssertNotNil(delveButton("delve.enter", in: root.view))
+            }
+            let settled = session.progression
+            try await session.retrySave()
+            XCTAssertEqual(session.progression, settled)
+            XCTAssertEqual(try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }.progression, settled)
+        }
+    }
+
+    private func waitUntil(_ condition: () -> Bool) async throws {
+        let deadline = Date().addingTimeInterval(5)
+        while !condition() && Date() < deadline { try await Task.sleep(nanoseconds: 10_000_000) }
+        XCTAssertTrue(condition(), "Checkpoint transition did not finish")
+    }
 }
 
 @MainActor
