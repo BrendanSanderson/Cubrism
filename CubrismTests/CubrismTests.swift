@@ -1830,7 +1830,12 @@ class CubrismPlaythroughTests: XCTestCase {
         try await playFloors(restorableCombat: true, useDelve: true, useDelveUI: true)
     }
 
-    @MainActor private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false, reloadCombat: Bool = false, useDelve: Bool = false, useDelveUI: Bool = false) async throws {
+    /// Earns real rewards, then leaves the home screen available for a recorded inventory inspection.
+    @MainActor func testOneDelveFloorAndInventoryHandsOnPreview() async throws {
+        try await playFloors(restorableCombat: true, useDelve: true, useDelveUI: true, inventoryPreview: true)
+    }
+
+    @MainActor private func playFloors(plan: DelveFloorPlan? = nil, restorableCombat: Bool = false, reloadCombat: Bool = false, useDelve: Bool = false, useDelveUI: Bool = false, inventoryPreview: Bool = false) async throws {
         guard ProcessInfo.processInfo.environment["CUBRISM_ACCEPTANCE"] == "1" else {
             throw XCTSkip("Run the CubrismAcceptance scheme for the live gameplay check")
         }
@@ -1866,7 +1871,11 @@ class CubrismPlaythroughTests: XCTestCase {
             }
         }
         if !useDelve { Player.resetProgress() }
-        let goalFloor = useDelve ? 3 : (plan == nil ? 2 : 1)
+        if inventoryPreview {
+            print("DELVE VIDEO READY: isolated fresh account, real combat, one floor")
+            try await Task.sleep(nanoseconds: 12_000_000_000)
+        }
+        let goalFloor = useDelve ? (inventoryPreview ? 1 : 3) : (plan == nil ? 2 : 1)
         var floor = 1
         while floor <= goalFloor {
             var cleared = false
@@ -2127,9 +2136,15 @@ class CubrismPlaythroughTests: XCTestCase {
                 XCTAssertGreaterThanOrEqual(run.loot.count, floor * 2)
                 print("DELVE CHECKPOINT depth=\(run.depth) rating=\(session.progression.rating) XP=\(session.progression.experience.lifetime) loot=\(run.loot.count) HP=\(run.resources.health) shield=\(run.resources.shield)")
                 controller.skView.presentScene(nil)
-                if floor < 3 { try await equipBetterDelveLoot(session) }
-                if floor == 3 {
+                if floor < goalFloor { try await equipBetterDelveLoot(session) }
+                if floor == goalFloor {
                     let lootCount = run.loot.count
+                    if inventoryPreview {
+                        for item in run.loot {
+                            print("DELVE VIDEO EARNED id=\(item.id) kind=\(item.kind) name=\(DelvePresentation.name(item))")
+                        }
+                        try await Task.sleep(nanoseconds: 8_000_000_000)
+                    }
                     if let ui = accountUI {
                         XCTAssertNil(ui.presentedViewController, "Boss clear must return to the account checkpoint")
                         try await tapDelveButton("delve.extract", in: ui)
@@ -2144,6 +2159,11 @@ class CubrismPlaythroughTests: XCTestCase {
                     let loaded = try DelveSaveStore(fileURL: file) { throw DelveError.invalidTransition }
                     XCTAssertEqual(loaded.progression, session.progression)
                     print("DELVE EXTRACTED items=\(lootCount) lifetimeXP=\(session.progression.experience.lifetime)")
+                    if inventoryPreview {
+                        XCTAssertTrue(run.loot.allSatisfy { earned in session.progression.bankedItems.contains { $0.id == earned.id } })
+                        print("DELVE VIDEO INVENTORY READY: earned items are banked; inspect through the home loadout")
+                        try await Task.sleep(nanoseconds: 180_000_000_000)
+                    }
                 }
             } else {
             XCTAssertEqual(Player.totalExp, xpBeforeAttempt + controller.levelExp, "Rewards must be credited exactly once")
